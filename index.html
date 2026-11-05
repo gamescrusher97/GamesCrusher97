@@ -444,7 +444,7 @@
   }
 
   /* ===== SEARCH ===== */
-  .search-wrap { position: fixed; top: 22px; left: 88px; width: min(340px, calc(100vw - 176px)); z-index: 1001; }
+  .search-wrap { position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: min(340px, calc(100vw - 176px)); z-index: 1001; }
   .search-box {
     display:flex; align-items:center; height: 48px;
     background: rgba(30,25,66,0.92); backdrop-filter: blur(8px);
@@ -490,19 +490,32 @@
     0%,100% { box-shadow: 0 6px 20px rgba(0,0,0,0.25); border-color: rgba(255,255,255,0.12); }
     20%,60% { box-shadow: 0 0 0 3px rgba(255,216,111,0.8), 0 0 34px rgba(255,216,111,0.55); border-color: rgba(255,216,111,0.9); }
   }
+
+  /* ===== TOP BAR (solid, stays on top) ===== */
+  .top-bar { position: fixed; top: 0; left: 0; right: 0; height: 80px; background: #16112f; border-bottom: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 997; }
+  /* ===== CONTACT / FOOTER ===== */
+  .contact-card { max-width: 700px; margin: 0 auto; text-align: center; }
+  .contact-card .c-name { font-size: 1.15em; font-weight: 700; color: #fff; margin-bottom: 2px; }
+  .contact-card .c-role { color: #c9c6e0; font-size: 0.9em; margin-bottom: 14px; }
+  .contact-card a { color: #ffd86f; font-weight: 700; text-decoration: none; word-break: break-all; }
+  .contact-card a:hover { text-decoration: underline; }
+  .footer-link { color: #b9b5d6; text-decoration: none; border-bottom: 1px solid rgba(185,181,214,0.4); }
+  .footer-link:hover { color: #ffd86f; border-color: #ffd86f; }
 </style>
 </head>
 <body>
 
 <div class="search-wrap" id="searchWrap">
   <form class="search-box" id="searchForm" role="search" onsubmit="return searchSubmit(event)">
-    <input type="text" id="searchInput" placeholder="Search&hellip;" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search apps and games" oninput="searchRun()" onfocus="searchRun()" onkeydown="searchKey(event)">
+    <input type="text" id="searchInput" placeholder="Search&hellip;" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search apps and games" oninput="searchRun()" onkeydown="searchKey(event)">
     <button type="submit" class="search-btn" aria-label="Search">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1a1a2e" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
     </button>
   </form>
   <div class="search-results" id="searchResults"></div>
 </div>
+
+<div class="top-bar"></div>
 
 <a href="javascript:void(0)" class="back-link" id="backLink" onclick="showView('home')" style="display:none;">&#8592;</a>
 
@@ -610,6 +623,15 @@
     </div>
   </section>
 
+  <section id="home-contact">
+    <h2>Contact Us</h2>
+    <div class="game-card contact-card">
+      <p class="c-name">Sahil Sheemar</p>
+      <p class="c-role">Owner and creator of Games Crusher 97</p>
+      <a href="mailto:gamescrusher97@gmail.com">gamescrusher97@gmail.com</a>
+    </div>
+  </section>
+
   <section class="donate-section" id="home-donate">
     <button type="button" class="donate-btn" onclick="openDonate()" aria-label="Support">
       <svg class="d-heart" viewBox="0 0 24 24"><defs><linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffd6e2"/></linearGradient></defs><path fill="url(#dg1)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -619,7 +641,7 @@
   </section>
 
   <footer>
-    &copy; 2026 Games Crusher 97. All rights reserved.
+    &copy; 2026 Games Crusher 97. All rights reserved.<br><a class="footer-link" href="privacy.html" style="display:inline-block;margin-top:8px;">Privacy Policy</a>
   </footer>
 </div>
 
@@ -696,7 +718,7 @@
     </div>
   </section>
   <footer>
-    &copy; 2026 Games Crusher 97. All rights reserved.
+    &copy; 2026 Games Crusher 97. All rights reserved.<br><a class="footer-link" href="privacy.html" style="display:inline-block;margin-top:8px;">Privacy Policy</a>
   </footer>
 </div>
 
@@ -844,6 +866,7 @@ function searchBuild() {
 function searchRun() {
   if (!searchIndex.length) searchBuild();
   var q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) { searchMatches = []; searchActive = -1; var b0 = document.getElementById('searchResults'); b0.innerHTML = ''; b0.classList.remove('open'); return; }
   var terms = q ? q.split(/\s+/) : [];
   searchMatches = searchIndex.filter(function(it) {
     return terms.every(function(t) { return it.text.indexOf(t) > -1; });
