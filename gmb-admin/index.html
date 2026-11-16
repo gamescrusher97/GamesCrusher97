@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Glass Marble Balls — Admin</title>
+<style>
+:root{ --bg:#120a2a; --card:#1e1442; --card2:#281b57; --line:rgba(255,255,255,0.12); --text:#f2efff; --mute:#b7aedc; --gold:#ffd34d; --red:#ff5c6c; --green:#4fe08a; --blue:#6fb6ff; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+a{ color:var(--blue); }
+header{ position:sticky; top:0; z-index:20; background:#0d0720; border-bottom:1px solid var(--line); padding:10px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+header h1{ font-size:17px; margin:0; color:var(--gold); }
+header .who{ margin-left:auto; color:var(--mute); font-size:12px; }
+nav{ display:flex; gap:6px; flex-wrap:wrap; padding:8px 14px; background:#170e35; border-bottom:1px solid var(--line); position:sticky; top:47px; z-index:19; }
+nav button{ background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:18px; padding:6px 12px; cursor:pointer; font-size:13px; }
+nav button.on{ background:var(--gold); color:#2a1a00; font-weight:700; }
+main{ padding:14px; max-width:1200px; margin:0 auto; }
+.tab{ display:none; } .tab.on{ display:block; }
+.card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px; }
+.card h2{ margin:0 0 10px; font-size:16px; }
+.card h3{ margin:14px 0 8px; font-size:14px; color:var(--gold); }
+.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+.stat{ background:var(--card2); border-radius:12px; padding:12px; border:1px solid var(--line); }
+.stat b{ display:block; font-size:24px; color:var(--gold); margin-top:4px; }
+.stat span{ color:var(--mute); font-size:12px; }
+table{ width:100%; border-collapse:collapse; font-size:13px; }
+th,td{ text-align:left; padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+th{ color:var(--mute); font-weight:600; font-size:12px; }
+tr.click{ cursor:pointer; } tr.click:hover{ background:rgba(255,255,255,0.05); }
+.scroll{ overflow-x:auto; }
+input,select,textarea{ background:#0f0824; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 9px; font:inherit; }
+input[type=checkbox]{ width:18px; height:18px; vertical-align:middle; }
+textarea{ width:100%; min-height:70px; }
+label.f{ display:flex; flex-direction:column; gap:4px; color:var(--mute); font-size:12px; }
+label.f input,label.f select,label.f textarea{ color:var(--text); font-size:14px; }
+.row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+.row > *{ flex:1 1 150px; }
+button.b{ background:var(--card2); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 13px; cursor:pointer; font:inherit; font-weight:600; }
+button.b:hover{ filter:brightness(1.15); }
+button.gold{ background:var(--gold); color:#2a1a00; border-color:var(--gold); }
+button.red{ background:#5a1622; border-color:var(--red); color:#ffd4d9; }
+button.green{ background:#13492c; border-color:var(--green); color:#d7ffe6; }
+button.sm{ padding:4px 9px; font-size:12px; }
+.pill{ display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+.pill.ok{ background:#13492c; color:var(--green); } .pill.bad{ background:#5a1622; color:#ffb3bc; } .pill.warn{ background:#5a4a12; color:var(--gold); } .pill.info{ background:#16325a; color:var(--blue); }
+.mute{ color:var(--mute); } .small{ font-size:12px; }
+.alert{ background:#5a1622; border:1px solid var(--red); color:#ffe0e4; border-radius:12px; padding:10px 12px; margin-bottom:12px; }
+.note{ background:#16325a; border:1px solid #2d5c9a; border-radius:12px; padding:10px 12px; margin-bottom:12px; color:#d8ebff; font-size:13px; }
+#login{ max-width:420px; margin:12vh auto; text-align:center; }
+#login .card{ padding:26px; }
+#toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#000c; color:#fff; padding:10px 16px; border-radius:10px; display:none; z-index:100; max-width:90%; }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:flex-start; justify-content:center; z-index:50; overflow-y:auto; padding:20px 10px; }
+.modal.on{ display:flex; }
+.modal .card{ width:100%; max-width:760px; position:relative; }
+.modal .x{ position:absolute; right:12px; top:10px; }
+pre{ white-space:pre-wrap; word-break:break-word; background:#0f0824; padding:10px; border-radius:8px; font-size:12px; max-height:300px; overflow:auto; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="card">
+    <div style="font-size:50px">🎪</div>
+    <h2>Glass Marble Balls — Admin</h2>
+    <p class="mute">Only the Games Crusher 97 Google account can open this page.</p>
+    <button class="b gold" id="btn-login">Sign in with Google</button>
+    <p id="login-msg" class="mute small"></p>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<header><h1>🎪 Glass Marble Balls — Admin</h1><span class="who" id="who"></span><button class="b sm" id="btn-logout">Sign out</button></header>
+<nav id="nav">
+  <button data-tab="dash" class="on">📊 Dashboard</button>
+  <button data-tab="players">👤 Players</button>
+  <button data-tab="passes">⭐ Passes</button>
+  <button data-tab="purchases">💳 Purchases</button>
+  <button data-tab="hack">🛡️ Hack check</button>
+  <button data-tab="events">🎉 Events</button>
+  <button data-tab="games">🕹️ Online games</button>
+  <button data-tab="rewards">🎁 Rewards & settings</button>
+  <button data-tab="messages">📢 Messages</button>
+  <button data-tab="codes">🎟️ Codes</button>
+  <button data-tab="feedback">💬 Feedback</button>
+  <button data-tab="billing">💰 Billing & usage</button>
+  <button data-tab="log">📜 Action log</button>
+</nav>
+<main>
+  <div id="global-alert"></div>
+
+  <!-- DASHBOARD -->
+  <section class="tab on" id="tab-dash">
+    <div class="card"><h2>Players right now <button class="b sm" id="btn-dash-refresh">↻ Refresh</button></h2>
+      <div class="grid">
+        <div class="stat"><span>Online now (last 2 min)</span><b id="d-online">–</b></div>
+        <div class="stat"><span>Active in last 24 h</span><b id="d-active">–</b></div>
+        <div class="stat"><span>Played a game in last 24 h</span><b id="d-played">–</b></div>
+        <div class="stat"><span>All phones seen</span><b id="d-devices">–</b></div>
+        <div class="stat"><span>Google sign-in accounts</span><b id="d-players">–</b></div>
+        <div class="stat"><span>Guests (not signed in)</span><b id="d-guests">–</b></div>
+        <div class="stat"><span>Monthly Pass active</span><b id="d-mpass">–</b></div>
+        <div class="stat"><span>Unread feedback</span><b id="d-fb">–</b></div>
+      </div>
+      <p class="mute small">Phones are counted from v32 (build v58) on. Download numbers are only in Google Play Console.</p>
+    </div>
+    <div class="card"><h2>Earnings</h2>
+      <div class="scroll"><table>
+        <tr><th></th><th>Today</th><th>Last 7 days</th><th>Last 30 days</th></tr>
+        <tr><td>Purchases (AED, before Google's fee)</td><td id="e-p-d">–</td><td id="e-p-w">–</td><td id="e-p-m">–</td></tr>
+        <tr><td>Number of purchases</td><td id="e-n-d">–</td><td id="e-n-w">–</td><td id="e-n-m">–</td></tr>
+        <tr><td>AdMob ads (USD)</td><td id="e-a-d">–</td><td id="e-a-w">–</td><td id="e-a-m">–</td></tr>
+        <tr><td>AdMob impressions</td><td id="e-i-d">–</td><td id="e-i-w">–</td><td id="e-i-m">–</td></tr>
+        <tr><td>Meta Audience Network (USD)</td><td id="e-f-d">–</td><td id="e-f-w">–</td><td id="e-f-m">–</td></tr>
+      </table></div>
+      <p class="mute small" id="e-note">Ad earnings need "Connect Google reports" (Billing & usage tab). Meta needs its report key (same tab). Ad numbers can be 1–2 days late.</p>
+    </div>
+  </section>
+
+  <!-- PLAYERS -->
+  <section class="tab" id="tab-players">
+    <div class="card"><h2>Find a player</h2>
+      <div class="row"><label class="f">E-mail or name (start of it)<input id="p-q" placeholder="name@gmail.com or Sahil"></label><button class="b gold" id="btn-p-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-p-top" style="flex:0 0 auto">Top 50 by balls</button><button class="b" id="btn-p-new" style="flex:0 0 auto">Newest 50</button></div>
+    </div>
+    <div class="card"><div class="scroll"><table id="p-table"></table></div></div>
+  </section>
+
+  <!-- PASSES -->
+  <section class="tab" id="tab-passes">
+    <div class="card"><h2>Monthly Pass <button class="b sm" id="btn-passes">↻ Load</button></h2>
+      <p class="mute small" id="pass-sum"></p>
+      <div class="scroll"><table id="pass-table"></table></div></div>
+    <div class="card"><h2>Weekly Event Pass (current event)</h2><div class="scroll"><table id="epass-table"></table></div></div>
+  </section>
+
+  <!-- PURCHASES -->
+  <section class="tab" id="tab-purchases">
+    <div class="card"><h2>Order ID search</h2>
+      <div class="row"><label class="f">Google Play Order ID (GPA.xxxx) or player e-mail<input id="o-q" placeholder="GPA.3312-..."></label><button class="b gold" id="btn-o-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-o-recent" style="flex:0 0 auto">Latest 100</button></div>
+      <p class="mute small">Purchases are copied here by the game from v32 on. If a player paid and did not get the item, open the player and give it (the player gets an Inbox message).</p>
+    </div>
+    <div class="card"><div class="scroll"><table id="o-table"></table></div></div>
+  </section>
+
+  <!-- HACK CHECK -->
+  <section class="tab" id="tab-hack">
+    <div class="card"><h2>Hack check</h2>
+      <p class="mute small">Checks every account for things that should not be possible: more balls than the jar holds, a Monthly Pass with no payment and no code, a very big jar with no payments, very many balls, or a big jump in balls since the last saved check.</p>
+      <div class="row"><button class="b gold" id="btn-scan" style="flex:0 0 auto">Run check</button><button class="b" id="btn-snap" style="flex:0 0 auto">Save today's ball counts (for the jump check)</button>
+      <label class="f" style="flex:0 0 160px">"Very many balls" from<input id="h-max" type="number" value="5000"></label><label class="f" style="flex:0 0 160px">Jump bigger than<input id="h-jump" type="number" value="1000"></label></div>
+    </div>
+    <div class="card"><div class="scroll"><table id="h-table"></table></div></div>
+  </section>
+
+  <!-- EVENTS -->
+  <section class="tab" id="tab-events">
+    <div class="card"><h2>Now running</h2><div id="ev-now"></div></div>
+    <div class="card"><h2>Coming events <button class="b sm gold" id="btn-ev-add">+ New event</button> <label class="small mute"><input type="checkbox" id="ev-alloff"> Switch ALL events off</label></h2>
+      <div class="scroll"><table id="ev-table"></table></div>
+      <p class="mute small">Changes reach the players within 5 minutes (or when they open the game). The game for an event comes from the "Online games" list.</p></div>
+    <div class="card"><h2>Event leaderboard</h2><div class="row"><label class="f">Event<select id="lb-ev"></select></label><button class="b" id="btn-lb" style="flex:0 0 auto">Show</button><button class="b red" id="btn-lb-reset" style="flex:0 0 auto">Reset this board</button></div><div class="scroll"><table id="lb-table"></table></div></div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="tab" id="tab-games">
+    <div class="card"><h2>Online event games</h2>
+      <div class="note">The games are files on your website (GitHub): <b>gmb-games/</b>. To add a new game: upload its .html file to that folder, then press "+ Add game" here and write the same file name. It can then be chosen for any event — no app update. If you changed a game file on GitHub, press "Make phones download the games again".</div>
+      <div class="row"><label class="f">Website folder of the games<input id="g-base"></label><label class="f" style="flex:0 0 120px">Games version<input id="g-ver" readonly></label><button class="b" id="btn-g-bump" style="flex:0 0 auto">Make phones download the games again</button></div>
+      <div class="scroll" style="margin-top:10px"><table id="g-table"></table></div>
+      <div class="row" style="margin-top:10px"><button class="b gold" id="btn-g-add" style="flex:0 0 auto">+ Add game</button><button class="b green" id="btn-g-save" style="flex:0 0 auto">💾 Save games</button></div>
+    </div>
+  </section>
+
+  <!-- REWARDS & SETTINGS -->
+  <section class="tab" id="tab-rewards">
+    <div class="card"><h2>Event reward ladder</h2><div class="scroll"><table id="r-ladder"></table></div>
+      <div class="row" style="margin-top:8px"><button class="b" id="btn-r-addtier" style="flex:0 0 auto">+ Step</button><button class="b" id="btn-r-default" style="flex:0 0 auto">Back to built-in ladder</button></div></div>
+    <div class="card"><h2>Weekly Event Pass & tickets</h2><div class="row">
+      <label class="f">Points multiplier with pass<input id="r-mult" type="number" step="0.5" min="1"></label>
+      <label class="f">Free tickets a day<input id="r-tf" type="number" min="1"></label>
+      <label class="f">Tickets a day with pass<input id="r-tp" type="number" min="1"></label>
+      <label class="f">Balls for 1 ticket<input id="r-tc" type="number" min="1"></label></div></div>
+    <div class="card"><h2>Daily bonus (7 days)</h2><div class="scroll"><table id="r-daily"></table></div></div>
+    <div class="card"><h2>Ads</h2><div class="row">
+      <label class="f">Banner ads<select id="r-banner"><option value="1">On</option><option value="0">Off</option></select></label>
+      <label class="f">Watch Ad gives at least (balls)<input id="r-amin" type="number" min="1"></label>
+      <label class="f">Watch Ad gives at most (balls)<input id="r-amax" type="number" min="1"></label></div></div>
+    <div class="card"><h2>Games on/off</h2><div class="row">
+      <label class="f">Guess the Balls<select id="r-mg"><option value="1">On</option><option value="0">Off</option></select></label>
+      <label class="f">Aim the Queen<select id="r-ma"><option value="1">On</option><option value="0">Off</option></select></label>
+      <label class="f">Events button<select id="r-me"><option value="1">On</option><option value="0">Off</option></select></label></div>
+      <p class="mute small">Game speed, difficulty and timers stay automatic inside each game.</p></div>
+    <button class="b green" id="btn-r-save">💾 Save rewards & settings</button>
+  </section>
+
+  <!-- MESSAGES -->
+  <section class="tab" id="tab-messages">
+    <div class="card"><h2>Message to ALL players (popup, shown once)</h2>
+      <label class="f">Title<input id="m-title"></label><br><label class="f">Text<textarea id="m-text"></textarea></label><br>
+      <div class="row"><label class="f">Show until (empty = always)<input id="m-until" type="datetime-local"></label><label class="f">Status<select id="m-on"><option value="1">On</option><option value="0">Off</option></select></label></div><br>
+      <button class="b gold" id="btn-m-send">📢 Send / update message</button> <span class="mute small" id="m-cur"></span></div>
+    <div class="card"><h2>Maintenance mode</h2>
+      <p class="mute small">When ON, nobody can play: the game shows this message with "Try again" and "Exit".</p>
+      <label class="f">Title<input id="mt-title" placeholder="Short break"></label><br><label class="f">Text<textarea id="mt-text" placeholder="We are improving the game. Please come back in a little while."></textarea></label><br>
+      <button class="b red" id="btn-mt-on">Turn maintenance ON</button> <button class="b green" id="btn-mt-off">Turn maintenance OFF</button> <span id="mt-cur"></span></div>
+  </section>
+
+  <!-- CODES -->
+  <section class="tab" id="tab-codes">
+    <div class="card"><h2>New code</h2>
+      <div class="row"><label class="f">Code<input id="c-code" placeholder="DIWALI100" style="text-transform:uppercase"></label><button class="b sm" id="btn-c-gen" style="flex:0 0 auto">Random</button>
+      <label class="f">Gives<select id="c-type"><option value="balls">Balls</option><option value="monthlyPass">Monthly Pass (days)</option><option value="jarCapacity">Jar capacity</option></select></label>
+      <label class="f">Amount (balls / days / capacity)<input id="c-amount" type="number" value="50"></label>
+      <label class="f">How many players can use it (0 = no limit)<input id="c-max" type="number" value="0"></label>
+      <label class="f">Expires (empty = never)<input id="c-exp" type="datetime-local"></label>
+      <label class="f">Note (only for you)<input id="c-note"></label></div><br>
+      <button class="b gold" id="btn-c-create">Create code</button>
+      <p class="mute small">Every player can use a code only once. Put codes on your website wherever you like. Players enter them in Settings → 🎁 Redeem.</p></div>
+    <div class="card"><h2>All codes <button class="b sm" id="btn-c-load">↻ Load</button></h2><div class="scroll"><table id="c-table"></table></div></div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section class="tab" id="tab-feedback">
+    <div class="card"><h2>Feedback from the game <button class="b sm" id="btn-f-load">↻ Load</button></h2><div class="scroll"><table id="f-table"></table></div></div>
+  </section>
+
+  <!-- BILLING -->
+  <section class="tab" id="tab-billing">
+    <div class="card"><h2>Connect Google reports</h2>
+      <p class="mute small">Needed for: Firebase usage & extra charges, the budget, and AdMob earnings. It asks your GamesCrusher97 Google account for read access (and budget editing). One-time setup is in FIREBASE-STEPS.txt (switch on 4 Google APIs). Access lasts about 1 hour, then press the button again.</p>
+      <button class="b gold" id="btn-connect">🔗 Connect Google reports</button> <span id="conn-st" class="small mute"></span></div>
+    <div class="card"><h2>Firebase usage (Blaze plan)</h2>
+      <div class="scroll"><table id="u-table"></table></div>
+      <p class="mute small" id="u-note">Free every day: 50,000 reads, 20,000 writes, 20,000 deletes. Free every month: 2,000,000 server function calls. Prices below are Google's list prices (USD) and can be changed.</p>
+      <div class="row"><label class="f">Price per 100,000 reads $<input id="pr-r" type="number" step="0.001" value="0.06"></label><label class="f">per 100,000 writes $<input id="pr-w" type="number" step="0.001" value="0.18"></label><label class="f">per 100,000 deletes $<input id="pr-d" type="number" step="0.001" value="0.02"></label><label class="f">per 1,000,000 function calls $<input id="pr-f" type="number" step="0.01" value="0.40"></label></div></div>
+    <div class="card"><h2>Budget & alerts</h2>
+      <div id="b-info" class="mute small">Connect Google reports to see the budget.</div>
+      <div class="row" style="margin-top:8px"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Alert me (e-mail + this page) at % of limit<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
+      <p class="mute small">Google e-mails you at 50%, 90% and 100% of the limit. Nothing is stopped automatically — you decide. The billing month renews on the 1st of every month.</p></div>
+    <div class="card"><h2>Meta Audience Network report key</h2>
+      <p class="mute small">Meta Business Settings → System users → Generate token (permission: read_audience_network_insights). Paste it here; it is saved privately in your Firebase (only this admin account can read it).</p>
+      <div class="row"><label class="f">Meta app / property ID<input id="meta-app" value="1171074295600149"></label><label class="f">Token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save</button></div></div>
+  </section>
+
+  <!-- LOG -->
+  <section class="tab" id="tab-log">
+    <div class="card"><h2>Everything done on this page <button class="b sm" id="btn-log">↻ Load</button></h2><div class="scroll"><table id="log-table"></table></div></div>
+  </section>
+</main>
+</div>
+
+<div class="modal" id="modal"><div class="card"><button class="b sm x" id="modal-x">✕</button><div id="modal-body"></div></div></div>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, orderBy, limit, startAt, endAt, documentId, getCountFromServer, increment, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
+const PROJECT_ID = 'glass-marble-balls', PROJECT_NUMBER = '35109064745';
+const ADMOB_PUBLISHER = 'pub-1732207620591859';
+const app = initializeApp({
+  apiKey: "AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E", authDomain: "glass-marble-balls.firebaseapp.com", projectId: PROJECT_ID,
+  storageBucket: "glass-marble-balls.firebasestorage.app", messagingSenderId: PROJECT_NUMBER, appId: "1:35109064745:web:7f844923b50914d0930c38"
+});
+const auth = getAuth(app), db = getFirestore(app);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = t => t ? new Date(t).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–';
+const toLocalInput = t => { if(!t) return ''; const d = new Date(t); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+const fromLocalInput = v => v ? new Date(v).getTime() : 0;
+const DAY = 86400000;
+function toast(t){ const e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = 'none', 3200); }
+function modal(html){ $('modal-body').innerHTML = html; $('modal').classList.add('on'); }
+function closeModal(){ $('modal').classList.remove('on'); }
+$('modal-x').onclick = closeModal;
+function err(e){ console.error(e); toast('Error: ' + (e && e.message || e)); }
+
+/* ---------------- sign in ---------------- */
+$('btn-login').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => $('login-msg').textContent = e.message);
+$('btn-logout').onclick = () => signOut(auth);
+onAuthStateChanged(auth, u => {
+  if(u && String(u.email).toLowerCase() === ADMIN_EMAIL && u.emailVerified){
+    $('login').style.display = 'none'; $('app').style.display = 'block'; $('who').textContent = u.email;
+    start();
+  } else {
+    if(u){ $('login-msg').textContent = 'This account (' + u.email + ') is not the admin account.'; signOut(auth); }
+    $('login').style.display = 'block'; $('app').style.display = 'none';
+  }
+});
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
+  const f = onTab[b.dataset.tab]; if(f) f();
+});
+
+/* ---------------- shared ---------------- */
+let CFG = {};          // config/game
+let ADM = {};          // adminData/settings
+async function loadCfg(){ const s = await getDoc(doc(db, 'config', 'game')); CFG = s.exists() ? s.data() : {}; return CFG; }
+async function saveCfg(part, what){ await setDoc(doc(db, 'config', 'game'), part, { merge: true }); Object.assign(CFG, part); await logAction('settings', what || Object.keys(part).join(', '), ''); toast('Saved. Players get it within 5 minutes.'); }
+async function logAction(action, details, target){ try { await addDoc(collection(db, 'adminLog'), { at: Date.now(), action, details: String(details || '').slice(0, 1000), target: target || '', by: auth.currentUser.email }); } catch(e){ console.log(e); } }
+async function inbox(email, text, kind){ await addDoc(collection(db, 'players', email, 'inbox'), { at: Date.now(), read: false, title: 'Glass Marble Balls Team', text, kind: kind || 'admin' }); }
+/* every change to a player: the change + a new edit number (the phone reloads) + an Inbox message + the log */
+async function playerChange(email, changes, msg, kind){
+  changes.adminRev = increment(1);
+  await updateDoc(doc(db, 'players', email), changes);
+  if(msg) await inbox(email, msg, kind);
+  await logAction(kind || 'player edit', msg || JSON.stringify(changes), email);
+}
+
+/* ---------------- event calendar (same as the game) ---------------- */
+const ENGINES = ['catch', 'cards', 'slice', 'shooter'];
+
+  /* ------------------------------------------------------------------ calendar */
+  /* festival day (month/day) per year; the event starts the day BEFORE and lasts 7 days.
+     fixed festivals work for every year; Diwali/Holi/Eid/Raksha Bandhan move, so their dates are listed for 2026-2031
+     (the same list as the website). From 2032 only the fixed festivals continue until a new list is added in an update. */
+const FIXED = [
+    { k: 'newyear',   m: 1,  d: 1,  p: 6 },
+    { k: 'valentine', m: 2,  d: 14, p: 11 },
+    { k: 'indep',     m: 8,  d: 15, p: 9 },
+    { k: 'halloween', m: 10, d: 31, p: 7 },
+    { k: 'uae',       m: 12, d: 2,  p: 8 },
+    { k: 'christmas', m: 12, d: 25, p: 4 }
+  ];
+const MOVING = {
+    diwali:   { p: 3,  y: { 2026: '11-08', 2027: '10-29', 2028: '10-17', 2029: '11-05', 2030: '10-26', 2031: '11-14' } },
+    holi:     { p: 5,  y: { 2026: '03-04', 2027: '03-22', 2028: '03-11', 2029: '03-01', 2030: '03-20', 2031: '03-09' } },
+    eidfitr:  { p: 1,  y: { 2026: '03-21', 2027: '03-10', 2028: '02-27', 2029: '02-15', 2030: '02-05', 2031: '01-25' } },
+    eidadha:  { p: 2,  y: { 2026: '05-27', 2027: '05-17', 2028: '05-06', 2029: '04-25', 2030: '04-14', 2031: '04-03' } },
+    raksha:   { p: 10, y: { 2026: '08-28', 2027: '08-17', 2028: '08-05', 2029: '08-23', 2030: '08-13', 2031: '08-02' } }
+  };
+  /* names, colours and the 8 emoji of each event (only emoji that old Android phones can draw) */
+const THEMES = {
+    newyear:   { n: 'New Year',                 e: '🎆', c1: '#f2c94c', c2: '#1d2b64', set: ['🎆', '🥂', '🎉', '🕛', '🎊', '✨', '🍾', '🎇'], gold: '🎆' },
+    valentine: { n: "Valentine's Day",          e: '💖', c1: '#ff5e8a', c2: '#6b1b4a', set: ['❤️', '💌', '🌹', '🍫', '💘', '🎁', '💖', '🧸'], gold: '💖' },
+    holi:      { n: 'Holi',                     e: '🎨', c1: '#ff4fa3', c2: '#2b3fbf', set: ['🎨', '💦', '🌈', '🌸', '😄', '🎉', '🌺', '🍬'], gold: '🌈' },
+    eidfitr:   { n: 'Eid al-Fitr',              e: '🌙', c1: '#1fb78a', c2: '#14405e', set: ['🌙', '⭐', '🕌', '🎁', '🍬', '✨', '🌟', '🍽️'], gold: '🌙' },
+    eidadha:   { n: 'Eid al-Adha',              e: '🕌', c1: '#2aa36b', c2: '#3a2b6b', set: ['🌙', '⭐', '🕌', '🎁', '✨', '🍽️', '🌟', '🤲'], gold: '🌟' },
+    raksha:    { n: 'Raksha Bandhan',           e: '🎀', c1: '#ff7a59', c2: '#8a1f5c', set: ['🎀', '🍬', '🎁', '💖', '🌸', '✨', '🍰', '🌟'], gold: '🎀' },
+    indep:     { n: 'Independence Day (India)', e: '🇮🇳', c1: '#ff9933', c2: '#138808', set: ['🇮🇳', '🎆', '🎇', '⭐', '🏵️', '✨', '🎉', '🌟'], gold: '🇮🇳' },
+    halloween: { n: 'Halloween',                e: '🎃', c1: '#ff8a1f', c2: '#4a1a6b', set: ['🎃', '👻', '🦇', '🕷️', '🍬', '💀', '🕸️', '🧙'], gold: '🎃' },
+    diwali:    { n: 'Diwali',                   e: '✨', c1: '#ffb300', c2: '#7a1e6b', set: ['✨', '🎆', '🎇', '🏮', '🕯️', '🎁', '🌟', '🍬'], gold: '🏮' },
+    uae:       { n: 'UAE National Day',         e: '🇦🇪', c1: '#d62839', c2: '#0a6b3a', set: ['🇦🇪', '🎆', '🦅', '🕌', '⭐', '🎇', '🎉', '🌟'], gold: '🦅' },
+    christmas: { n: 'Christmas',                e: '🎄', c1: '#d63a3a', c2: '#14683c', set: ['🎄', '🎅', '⛄', '🎁', '🔔', '⭐', '🦌', '🍪'], gold: '🎅' }
+  };
+
+function allEvents(){
+  const raw = []; let y, i, k;
+  const yNow = new Date().getFullYear();
+  for(y = yNow - 1; y <= yNow + 2; y++){
+    for(i = 0; i < FIXED.length; i++) raw.push({ key: FIXED[i].k, year: y, m: FIXED[i].m, d: FIXED[i].d, p: FIXED[i].p });
+    for(k in MOVING){ if(MOVING[k].y[y]){ const md = MOVING[k].y[y].split('-'); raw.push({ key: k, year: y, m: +md[0], d: +md[1], p: MOVING[k].p }); } }
+  }
+  // the game builds its list from 2025: keep the same order so each event gets the same built-in game
+  const full = [];
+  for(y = 2025; y <= 2045; y++){
+    for(i = 0; i < FIXED.length; i++) full.push({ key: FIXED[i].k, year: y, m: FIXED[i].m, d: FIXED[i].d, p: FIXED[i].p });
+    for(k in MOVING){ if(MOVING[k].y[y]){ const md = MOVING[k].y[y].split('-'); full.push({ key: k, year: y, m: +md[0], d: +md[1], p: MOVING[k].p }); } }
+  }
+  full.forEach(e => { e.start = new Date(e.year, e.m - 1, e.d - 1).getTime(); e.end = new Date(e.year, e.m - 1, e.d - 1 + 7).getTime(); e.id = e.key + '-' + e.year; });
+  full.sort((a, b) => a.p - b.p || a.start - b.start);
+  let kept = [];
+  full.forEach(e => { for(const q of kept) if(e.start < q.end && q.start < e.end) return; kept.push(e); });
+  kept.sort((a, b) => a.start - b.start);
+  kept.forEach((e, idx) => { e.engine = ENGINES[idx % ENGINES.length]; e.builtinEngine = e.engine; e.builtinStart = e.start; e.builtinEnd = e.end; });
+  const ec = CFG.events || {}, ov = ec.overrides || {};
+  kept.forEach(e => { const o = ov[e.id]; if(!o) return; if(o.engine) e.engine = o.engine; if(o.start) e.start = +o.start; if(o.end) e.end = +o.end; if(o.name) e.title = o.name; if(o.off) e.off = true; e.changed = true; });
+  (ec.extra || []).forEach(x => { if(x && x.id) kept.push({ key: THEMES[x.key] ? x.key : 'newyear', id: x.id, start: +x.start, end: +x.end, engine: x.engine || 'catch', title: x.name || '', off: !!x.off, custom: true }); });
+  kept.sort((a, b) => a.start - b.start);
+  return kept;
+}
+const evName = e => (e.title || (THEMES[e.key] && THEMES[e.key].n) || e.key);
+const evEmoji = e => (THEMES[e.key] && THEMES[e.key].e) || '🎪';
+function currentEvent(){ const t = Date.now(); if((CFG.events || {}).off) return null; return allEvents().find(e => !e.off && e.start <= t && t < e.end) || null; }
+function gamesList(){
+  const builtin = { catch: { name: 'Catch the Balls', file: 'catch.html', time: 35 }, cards: { name: 'Match the Pairs', file: 'cards.html', time: 75 }, slice: { name: 'Marble Slice', file: 'slice.html', time: 40 }, shooter: { name: 'Marble Shooter', file: 'shooter.html', time: 60 } };
+  return Object.assign({}, builtin, CFG.games || {});
+}
+
+/* ---------------- start ---------------- */
+let started = false;
+async function start(){
+  if(started) return; started = true;
+  try { await loadCfg(); } catch(e){ err(e); }
+  try { const s = await getDoc(doc(db, 'adminData', 'settings')); ADM = s.exists() ? s.data() : {}; } catch(e){}
+  if(ADM.budget){ $('b-amount').value = ADM.budget.amount || 5; $('b-cur').value = ADM.budget.currency || 'USD'; $('b-alert').value = ADM.budget.alertPct || 80; }
+  if(ADM.prices){ ['r', 'w', 'd', 'f'].forEach(k => { if(ADM.prices[k] != null) $('pr-' + k).value = ADM.prices[k]; }); }
+  if(ADM.metaApp) $('meta-app').value = ADM.metaApp;
+  if(ADM.metaToken) $('meta-tok').value = ADM.metaToken;
+  loadDash();
+}
+const onTab = {
+  dash: loadDash, passes: loadPasses, purchases: () => loadPurchases(), events: renderEvents, games: renderGames, rewards: renderRewards,
+  messages: renderMessages, codes: loadCodes, feedback: loadFeedback, log: loadLog, billing: renderBilling
+};
+
+/* ---------------- DASHBOARD ---------------- */
+$('btn-dash-refresh').onclick = loadDash;
+const cnt = async q => { try { return (await getCountFromServer(q)).data().count; } catch(e){ console.log(e); return '?'; } };
+async function loadDash(){
+  const now = Date.now(), pres = collection(db, 'presence'), pl = collection(db, 'players');
+  const [on, act, played, dev, players, guests, mp, fb] = await Promise.all([
+    cnt(query(pres, where('lastActive', '>=', now - 120000))), cnt(query(pres, where('lastActive', '>=', now - DAY))),
+    cnt(query(pres, where('lastPlayed', '>=', now - DAY))), cnt(pres), cnt(pl), cnt(query(pres, where('signedIn', '==', false))),
+    cnt(query(pl, where('monthlyPass.active', '==', true))), cnt(query(collection(db, 'feedback'), where('status', '==', 'new')))
+  ]);
+  $('d-online').textContent = on; $('d-active').textContent = act; $('d-played').textContent = played; $('d-devices').textContent = dev;
+  $('d-players').textContent = players; $('d-guests').textContent = guests; $('d-mpass').textContent = mp; $('d-fb').textContent = fb;
+  // purchases
+  try {
+    const qs = await getDocs(query(collection(db, 'purchaseLog'), where('at', '>=', now - 30 * DAY)));
+    const mid = new Date(); mid.setHours(0, 0, 0, 0);
+    let d = 0, w = 0, m = 0, nd = 0, nw = 0, nm = 0;
+    qs.forEach(s => { const p = s.data(), a = +p.aed || 0; m += a; nm++; if(p.at >= now - 7 * DAY){ w += a; nw++; } if(p.at >= mid.getTime()){ d += a; nd++; } });
+    $('e-p-d').textContent = d + ' AED'; $('e-p-w').textContent = w + ' AED'; $('e-p-m').textContent = m + ' AED';
+    $('e-n-d').textContent = nd; $('e-n-w').textContent = nw; $('e-n-m').textContent = nm;
+  } catch(e){ err(e); }
+  loadAdEarnings();
+  checkBudgetAlert();
+}
+
+/* ---------------- PLAYERS ---------------- */
+function playerRow(id, p){
+  const mp = p.monthlyPass || {}, passOn = mp.active && mp.expiryDate > Date.now();
+  const sus = p.suspended && (!p.suspended.until || p.suspended.until > Date.now()) && p.suspended.on !== false;
+  return `<tr class="click" data-email="${esc(id)}"><td>${esc(p.name || '')}<div class="mute small">${esc(id)}</div></td><td>${esc(p.country || '')}</td><td><b>${p.balls ?? '–'}</b> / ${(p.ballsLimit || 100) + (p.eventCapacity || 0)}</td><td>${passOn ? '<span class="pill ok">Monthly Pass</span>' : ''} ${sus ? '<span class="pill bad">Suspended</span>' : ''}</td><td>${p.totalPayments || 0}</td><td class="small">${fmt(p.updatedAt)}</td></tr>`;
+}
+function showPlayers(rows){
+  $('p-table').innerHTML = '<tr><th>Player</th><th>Country</th><th>Balls / jar</th><th>Status</th><th>Payments</th><th>Last save</th></tr>' + (rows.length ? rows.map(r => playerRow(r.id, r.d)).join('') : '<tr><td colspan="6" class="mute">Nothing found.</td></tr>');
+  $('p-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
+}
+const snapRows = qs => { const a = []; qs.forEach(s => a.push({ id: s.id, d: s.data() })); return a; };
+$('btn-p-top').onclick = async () => { try { showPlayers(snapRows(await getDocs(query(collection(db, 'players'), orderBy('balls', 'desc'), limit(50))))); } catch(e){ err(e); } };
+$('btn-p-new').onclick = async () => { try { showPlayers(snapRows(await getDocs(query(collection(db, 'players'), orderBy('createdAt', 'desc'), limit(50))))); } catch(e){ err(e); } };
+$('btn-p-search').onclick = async () => {
+  const q = $('p-q').value.trim(); if(!q) return;
+  try {
+    const pl = collection(db, 'players');
+    const a = snapRows(await getDocs(query(pl, orderBy(documentId()), startAt(q.toLowerCase()), endAt(q.toLowerCase() + ''), limit(30))));
+    const b = snapRows(await getDocs(query(pl, orderBy('name'), startAt(q), endAt(q + ''), limit(30))));
+    const seen = new Set(); showPlayers(a.concat(b).filter(r => !seen.has(r.id) && seen.add(r.id)));
+  } catch(e){ err(e); }
+};
+$('p-q').onkeydown = e => { if(e.key === 'Enter') $('btn-p-search').click(); };
+
+async function openPlayer(email){
+  const s = await getDoc(doc(db, 'players', email));
+  if(!s.exists()){ toast('Player not found'); return; }
+  const p = s.data(), mp = p.monthlyPass || {}, ep = p.eventPass || null, sus = p.suspended || null;
+  let buys = [], redeemed = [], msgs = [];
+  try { buys = snapRows(await getDocs(query(collection(db, 'purchaseLog'), where('email', '==', email)))).sort((a, b) => b.d.at - a.d.at); } catch(e){}
+  try { redeemed = snapRows(await getDocs(collection(db, 'players', email, 'redeemed'))); } catch(e){}
+  try { msgs = snapRows(await getDocs(query(collection(db, 'players', email, 'inbox'), orderBy('at', 'desc'), limit(20)))); } catch(e){}
+  const unl = p.jarUnlocks || {}, sty = p.jarStyle || {};
+  modal(`<h2>👤 ${esc(p.name || '')} <span class="mute small">${esc(email)}</span></h2>
+  ${sus && (!sus.until || sus.until > Date.now()) && sus.on !== false ? `<div class="alert">⛔ Suspended ${sus.until ? 'until ' + fmt(sus.until) : '(no end date)'} — ${esc(sus.reason || '')}</div>` : ''}
+  <p class="mute small">Country: ${esc(p.country || '–')} · Created: ${fmt(p.createdAt)} · Last save: ${fmt(p.updatedAt)} · Wins: ${p.totalWins || 0} · Games: ${p.totalGamesPlayed || 0} · Ads watched: ${p.totalAdsWatched || 0} · Payments: ${p.totalPayments || 0}</p>
+  <h3>Balls & jar</h3>
+  <div class="row"><label class="f">Balls<input id="pe-balls" type="number" value="${p.balls || 0}"></label><label class="f">Paid jar capacity (ballsLimit)<input id="pe-limit" type="number" value="${p.ballsLimit || 100}"></label><label class="f">Free jar capacity from events<input id="pe-evcap" type="number" value="${p.eventCapacity || 0}"></label></div>
+  <div class="row" style="margin-top:6px"><label class="f">Quick: give / take balls<input id="pe-delta" type="number" placeholder="+100 or -50"></label><button class="b" id="pe-delta-go" style="flex:0 0 auto">Apply</button></div>
+  <h3>Monthly Pass</h3>
+  <div class="row"><label class="f">Active<select id="pe-mp-on"><option value="1" ${mp.active ? 'selected' : ''}>Yes</option><option value="0" ${!mp.active ? 'selected' : ''}>No</option></select></label>
+  <label class="f">Bought / started<input id="pe-mp-start" type="datetime-local" value="${toLocalInput(mp.startDate)}"></label>
+  <label class="f">Expires<input id="pe-mp-exp" type="datetime-local" value="${toLocalInput(mp.expiryDate)}"></label>
+  <label class="f">Renews by itself<select id="pe-mp-auto"><option value="1" ${mp.autoRenew ? 'selected' : ''}>Yes</option><option value="0" ${!mp.autoRenew ? 'selected' : ''}>No</option></select></label></div>
+  <p class="mute small">Last renewal: ${fmt(mp.lastRenewal || mp.renewedAt || mp.startDate)}</p>
+  <h3>Weekly Event Pass</h3>
+  <div class="row"><label class="f">Event ID (e.g. christmas-2026, empty = no pass)<input id="pe-ep-id" value="${esc(ep && ep.eventId || '')}"></label><label class="f">Expires<input id="pe-ep-exp" type="datetime-local" value="${toLocalInput(ep && ep.expiryDate)}"></label></div>
+  <h3>Jar styles (themes)</h3>
+  <div class="row"><label class="f">Owned colours (event keys, comma)<input id="pe-uc" value="${esc((unl.c || []).join(','))}"></label><label class="f">Owned glows<input id="pe-ug" value="${esc((unl.g || []).join(','))}"></label><label class="f">Owned stickers<input id="pe-us" value="${esc((unl.s || []).join(','))}"></label></div>
+  <p class="mute small">Event keys: ${Object.keys(THEMES).join(', ')}</p>
+  <label class="f">Reason (shown to the player in the Inbox)<input id="pe-reason" placeholder="e.g. Your payment for 100 balls was missing"></label><br>
+  <button class="b green" id="pe-save">💾 Save changes</button>
+  <h3>Warning / suspend</h3>
+  <label class="f">Text / reason<input id="pe-wtext" placeholder="Please do not use cheat apps."></label>
+  <div class="row" style="margin-top:6px"><button class="b" id="pe-warn" style="flex:0 0 auto">⚠️ Send warning</button><label class="f" style="flex:0 0 150px">Suspend for days (0 = no end)<input id="pe-days" type="number" value="7"></label><button class="b red" id="pe-sus" style="flex:0 0 auto">⛔ Suspend</button><button class="b green" id="pe-unsus" style="flex:0 0 auto">Remove suspension</button></div>
+  <h3>Send an Inbox message</h3>
+  <div class="row"><label class="f">Message<input id="pe-msg"></label><button class="b" id="pe-msg-go" style="flex:0 0 auto">Send</button></div>
+  <h3>Purchases (${buys.length})</h3>
+  <table><tr><th>When</th><th>Product</th><th>AED</th><th>Order ID</th></tr>${buys.map(b => `<tr><td>${fmt(b.d.at)}</td><td>${esc(b.d.productId)}</td><td>${b.d.aed}</td><td class="small">${esc(b.d.orderId || b.id)}</td></tr>`).join('') || '<tr><td colspan=4 class="mute">none</td></tr>'}</table>
+  <h3>Codes used</h3><p class="small">${redeemed.map(r => esc(r.id) + ' (' + esc(r.d.type) + ' ' + r.d.amount + ', ' + fmt(r.d.at) + ')').join(' · ') || '<span class="mute">none</span>'}</p>
+  <h3>Inbox (last 20)</h3><table>${msgs.map(m => `<tr><td class="small">${fmt(m.d.at)}</td><td>${esc(m.d.text)}</td><td>${m.d.read ? '<span class="pill ok">read</span>' : '<span class="pill warn">new</span>'}</td></tr>`).join('') || '<tr><td class="mute">empty</td></tr>'}</table>
+  <h3>Danger</h3><button class="b red sm" id="pe-del">Delete this account</button>`);
+  const list = v => v.split(',').map(x => x.trim()).filter(Boolean);
+  $('pe-save').onclick = async () => {
+    try {
+      const ch = {}, said = [];
+      const nb = Math.max(0, Math.floor(+$('pe-balls').value || 0)); if(nb !== (p.balls || 0)){ ch.balls = nb; said.push((nb > (p.balls || 0) ? 'gave you ' + (nb - (p.balls || 0)) : 'removed ' + ((p.balls || 0) - nb)) + ' balls (now ' + nb + ')'); }
+      const nl = Math.max(100, Math.floor(+$('pe-limit').value || 100)); if(nl !== (p.ballsLimit || 100)){ ch.ballsLimit = nl; said.push('set your jar capacity to ' + nl); }
+      const ne = Math.max(0, Math.min(5000, Math.floor(+$('pe-evcap').value || 0))); if(ne !== (p.eventCapacity || 0)){ ch.eventCapacity = ne; said.push('set your event jar capacity to ' + ne); }
+      const on = $('pe-mp-on').value === '1', st = fromLocalInput($('pe-mp-start').value), ex = fromLocalInput($('pe-mp-exp').value), au = $('pe-mp-auto').value === '1';
+      if(on !== !!mp.active || st !== (mp.startDate || 0) || ex !== (mp.expiryDate || 0) || au !== !!mp.autoRenew){
+        ch.monthlyPass = Object.assign({}, mp, { active: on, startDate: st || null, expiryDate: ex || null, autoRenew: au });
+        said.push(on ? 'updated your Monthly Pass (ends ' + fmt(ex) + ')' : 'removed your Monthly Pass');
+      }
+      const eid = $('pe-ep-id').value.trim(), eex = fromLocalInput($('pe-ep-exp').value);
+      if(eid !== (ep && ep.eventId || '') || eex !== (ep && ep.expiryDate || 0)){
+        ch.eventPass = eid ? Object.assign({}, ep || {}, { eventId: eid, expiryDate: eex || null, startDate: (ep && ep.startDate) || Date.now() }) : null;
+        said.push(eid ? 'updated your Weekly Event Pass' : 'removed your Weekly Event Pass');
+      }
+      const nu = { c: list($('pe-uc').value), g: list($('pe-ug').value), s: list($('pe-us').value) };
+      if(JSON.stringify(nu) !== JSON.stringify({ c: unl.c || [], g: unl.g || [], s: unl.s || [] })){
+        ch.jarUnlocks = nu; said.push('updated your jar styles');
+        const js = Object.assign({}, sty); ['c', 'g', 's'].forEach(k => { if(js[k] && nu[k].indexOf(js[k]) < 0) js[k] = ''; }); ch.jarStyle = js;
+      }
+      if(!said.length){ toast('Nothing changed'); return; }
+      const reason = $('pe-reason').value.trim();
+      await playerChange(email, ch, 'Glass Marble Balls Team ' + said.join(', ') + '.' + (reason ? ' Reason: ' + reason : ''), 'edit');
+      toast('Saved. The player gets an Inbox message.'); openPlayer(email);
+    } catch(e){ err(e); }
+  };
+  $('pe-delta-go').onclick = async () => {
+    const d = Math.floor(+$('pe-delta').value || 0); if(!d) return;
+    const nb = Math.max(0, (p.balls || 0) + d), reason = $('pe-reason').value.trim();
+    try { await playerChange(email, { balls: nb }, 'Glass Marble Balls Team ' + (d > 0 ? 'gave you ' + d : 'removed ' + (-d)) + ' balls.' + (reason ? ' Reason: ' + reason : ''), d > 0 ? 'give balls' : 'take balls'); toast('Done'); openPlayer(email); } catch(e){ err(e); }
+  };
+  $('pe-warn').onclick = async () => {
+    const t = $('pe-wtext').value.trim() || 'Please follow the game rules. Using cheats or hacks can get your account suspended.';
+    try { const w = Array.isArray(p.warnings) ? p.warnings.slice(-9) : []; w.push({ at: Date.now(), text: t }); await updateDoc(doc(db, 'players', email), { warnings: w }); await inbox(email, '⚠️ Warning from Glass Marble Balls Team: ' + t, 'warning'); await logAction('warning', t, email); toast('Warning sent'); } catch(e){ err(e); }
+  };
+  $('pe-sus').onclick = async () => {
+    const days = Math.max(0, +$('pe-days').value || 0), reason = $('pe-wtext').value.trim() || 'Breaking the game rules';
+    if(!confirm('Suspend ' + email + (days ? ' for ' + days + ' days' : ' with no end date') + '?')) return;
+    const until = days ? Date.now() + days * DAY : 0;
+    try { await updateDoc(doc(db, 'players', email), { suspended: { on: true, until, reason, at: Date.now() } }); await inbox(email, '⛔ Glass Marble Balls Team suspended your account ' + (until ? 'until ' + fmt(until) : 'until further notice') + '. Reason: ' + reason, 'suspend'); await logAction('suspend', reason + (until ? ' until ' + fmt(until) : ''), email); toast('Suspended'); openPlayer(email); } catch(e){ err(e); }
+  };
+  $('pe-unsus').onclick = async () => {
+    try { await updateDoc(doc(db, 'players', email), { suspended: { on: false, until: 0, reason: '', at: Date.now() } }); await inbox(email, '✅ Glass Marble Balls Team removed the suspension from your account. Welcome back!', 'unsuspend'); await logAction('unsuspend', '', email); toast('Suspension removed'); openPlayer(email); } catch(e){ err(e); }
+  };
+  $('pe-msg-go').onclick = async () => { const t = $('pe-msg').value.trim(); if(!t) return; try { await inbox(email, t, 'message'); await logAction('inbox message', t, email); toast('Sent'); } catch(e){ err(e); } };
+  $('pe-del').onclick = async () => { if(!confirm('Delete the account ' + email + ' for good? Balls, passes and progress are lost.')) return; try { await deleteDoc(doc(db, 'players', email)); await logAction('delete account', '', email); toast('Deleted'); closeModal(); } catch(e){ err(e); } };
+}
+
+/* ---------------- PASSES ---------------- */
+$('btn-passes').onclick = loadPasses;
+async function loadPasses(){
+  try {
+    const rows = snapRows(await getDocs(query(collection(db, 'players'), where('monthlyPass.active', '==', true)))), now = Date.now();
+    rows.sort((a, b) => (a.d.monthlyPass.expiryDate || 0) - (b.d.monthlyPass.expiryDate || 0));
+    const live = rows.filter(r => (r.d.monthlyPass.expiryDate || 0) > now).length;
+    $('pass-sum').textContent = live + ' players have a running Monthly Pass (' + (rows.length - live) + ' more are marked active but already expired).';
+    $('pass-table').innerHTML = '<tr><th>Player</th><th>Bought / started</th><th>Expires</th><th>Last renewal</th><th>Renews</th><th>Status</th></tr>' + rows.map(r => { const m = r.d.monthlyPass; return `<tr class="click" data-email="${esc(r.id)}"><td>${esc(r.d.name || '')}<div class="mute small">${esc(r.id)}</div></td><td>${fmt(m.startDate)}</td><td>${fmt(m.expiryDate)}</td><td>${fmt(m.lastRenewal || m.renewedAt || m.startDate)}</td><td>${m.autoRenew ? 'yes' : 'no'}</td><td>${m.expiryDate > now ? '<span class="pill ok">running</span>' : '<span class="pill bad">expired</span>'} ${r.d.totalPayments ? '' : '<span class="pill warn">no payment (code?)</span>'}</td></tr>`; }).join('');
+    $('pass-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
+    const ev = currentEvent();
+    if(ev){
+      const er = snapRows(await getDocs(query(collection(db, 'players'), where('eventPass.eventId', '==', ev.id))));
+      $('epass-table').innerHTML = `<tr><th colspan=3>${evEmoji(ev)} ${esc(evName(ev))} — ${er.length} passes</th></tr><tr><th>Player</th><th>Bought</th><th>Expires</th></tr>` + er.map(r => `<tr class="click" data-email="${esc(r.id)}"><td>${esc(r.d.name || '')} <span class="mute small">${esc(r.id)}</span></td><td>${fmt(r.d.eventPass.startDate)}</td><td>${fmt(r.d.eventPass.expiryDate)}</td></tr>`).join('');
+      $('epass-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
+    } else $('epass-table').innerHTML = '<tr><td class="mute">No event is running.</td></tr>';
+  } catch(e){ err(e); }
+}
+
+/* ---------------- PURCHASES ---------------- */
+function showBuys(rows){
+  $('o-table').innerHTML = '<tr><th>When</th><th>Player</th><th>Product</th><th>AED</th><th>Order ID</th><th>Credited by</th></tr>' + (rows.map(r => `<tr class="click" data-email="${esc(r.d.email)}"><td>${fmt(r.d.at)}</td><td>${esc(r.d.email)}</td><td>${esc(r.d.productId)}</td><td>${r.d.aed}</td><td class="small">${esc(r.d.orderId || r.id)}</td><td>${esc(r.d.via || '')}</td></tr>`).join('') || '<tr><td colspan=6 class="mute">Nothing found.</td></tr>');
+  $('o-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
+}
+async function loadPurchases(){ try { showBuys(snapRows(await getDocs(query(collection(db, 'purchaseLog'), orderBy('at', 'desc'), limit(100))))); } catch(e){ err(e); } }
+$('btn-o-recent').onclick = loadPurchases;
+$('btn-o-search').onclick = async () => {
+  const q = $('o-q').value.trim(); if(!q) return;
+  try {
+    let rows = [];
+    if(q.indexOf('@') > 0) rows = snapRows(await getDocs(query(collection(db, 'purchaseLog'), where('email', '==', q.toLowerCase()))));
+    else {
+      const s = await getDoc(doc(db, 'purchaseLog', q)); if(s.exists()) rows.push({ id: s.id, d: s.data() });
+      if(!rows.length) rows = snapRows(await getDocs(query(collection(db, 'purchaseLog'), where('orderId', '==', q))));
+    }
+    showBuys(rows.sort((a, b) => b.d.at - a.d.at));
+  } catch(e){ err(e); }
+};
+
+/* ---------------- HACK CHECK ---------------- */
+$('btn-scan').onclick = async () => {
+  try {
+    const rows = snapRows(await getDocs(collection(db, 'players'))), max = +$('h-max').value || 5000, jump = +$('h-jump').value || 1000, now = Date.now(), out = [];
+    rows.forEach(r => {
+      const p = r.d, f = [], lim = (p.ballsLimit || 100) + (p.eventCapacity || 0), mp = p.monthlyPass || {};
+      if((p.balls || 0) > lim + 5) f.push('more balls than the jar holds (' + p.balls + ' / ' + lim + ')');
+      if(mp.active && mp.expiryDate > now && !p.totalPayments && !(p.voucherEventWindows || []).length) f.push('Monthly Pass with no payment and no code');
+      if((p.ballsLimit || 100) > 3000 && !p.totalPayments) f.push('very big jar (' + p.ballsLimit + ') with no payments');
+      if((p.balls || 0) >= max) f.push('very many balls (' + p.balls + ')');
+      if(p.adminSnap && p.adminSnap.at && (p.balls || 0) - (p.adminSnap.balls || 0) > jump) f.push('+' + ((p.balls || 0) - p.adminSnap.balls) + ' balls since ' + fmt(p.adminSnap.at));
+      if((p.totalWins || 0) > 0 && (p.totalGamesPlayed || 0) > 0 && p.totalWins > p.totalGamesPlayed) f.push('more wins than games played');
+      if(f.length) out.push({ id: r.id, d: p, f });
+    });
+    $('h-table').innerHTML = `<tr><th colspan=3>${rows.length} accounts checked · ${out.length} need a look</th></tr><tr><th>Player</th><th>Why</th><th>Balls</th></tr>` + out.map(o => `<tr class="click" data-email="${esc(o.id)}"><td>${esc(o.d.name || '')}<div class="mute small">${esc(o.id)}</div></td><td>${o.f.map(x => '<span class="pill bad">' + esc(x) + '</span>').join(' ')}</td><td>${o.d.balls}</td></tr>`).join('');
+    $('h-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
+    await logAction('hack check', out.length + ' flagged of ' + rows.length, '');
+  } catch(e){ err(e); }
+};
+$('btn-snap').onclick = async () => {
+  try {
+    const rows = snapRows(await getDocs(collection(db, 'players'))), now = Date.now();
+    for(let i = 0; i < rows.length; i += 400){
+      const b = writeBatch(db);
+      rows.slice(i, i + 400).forEach(r => b.update(doc(db, 'players', r.id), { adminSnap: { balls: r.d.balls || 0, at: now } }));
+      await b.commit();
+    }
+    await logAction('save ball counts', rows.length + ' accounts', ''); toast('Saved for ' + rows.length + ' accounts');
+  } catch(e){ err(e); }
+};
+
+/* ---------------- EVENTS ---------------- */
+function gameOptions(sel){ const g = gamesList(); return Object.keys(g).map(k => `<option value="${esc(k)}" ${k === sel ? 'selected' : ''}>${esc(g[k].name || k)}${g[k].off ? ' (off)' : ''}</option>`).join(''); }
+function renderEvents(){
+  const evs = allEvents(), now = Date.now(), cur = currentEvent(), g = gamesList();
+  $('ev-alloff').checked = !!(CFG.events && CFG.events.off);
+  $('ev-now').innerHTML = cur ? `<h3>${evEmoji(cur)} ${esc(evName(cur))}</h3><p>Game: <b>${esc((g[cur.engine] || {}).name || cur.engine)}</b> · Started ${fmt(cur.start)} · <b>Ends ${fmt(cur.end)}</b> (${Math.ceil((cur.end - now) / 3600000)} h left)</p><button class="b sm" data-ev="${esc(cur.id)}">✏️ Change</button>` : '<p class="mute">No event is running.</p>';
+  const next = evs.filter(e => e.end > now).slice(0, 14);
+  $('ev-table').innerHTML = '<tr><th>Event</th><th>Starts</th><th>Ends</th><th>Game</th><th></th></tr>' + next.map(e => `<tr><td>${evEmoji(e)} ${esc(evName(e))} ${e.custom ? '<span class="pill info">new</span>' : ''} ${e.changed ? '<span class="pill warn">changed</span>' : ''} ${e.off ? '<span class="pill bad">off</span>' : ''}<div class="mute small">${esc(e.id)}</div></td><td>${fmt(e.start)}</td><td>${fmt(e.end)}</td><td>${esc((g[e.engine] || {}).name || e.engine)}</td><td><button class="b sm" data-ev="${esc(e.id)}">✏️ Change</button></td></tr>`).join('');
+  document.querySelectorAll('#tab-events [data-ev]').forEach(b => b.onclick = () => editEvent(b.dataset.ev));
+  $('lb-ev').innerHTML = evs.filter(e => e.start < now).slice(-6).reverse().map(e => `<option value="${esc(e.id)}">${evEmoji(e)} ${esc(evName(e))} (${esc(e.id)})</option>`).join('');
+}
+function editEvent(id){
+  const e = allEvents().find(x => x.id === id); if(!e) return;
+  modal(`<h2>${evEmoji(e)} ${esc(evName(e))}</h2><p class="mute small">${esc(e.id)}</p>
+  <div class="row"><label class="f">Name<input id="ee-name" value="${esc(e.title || '')}" placeholder="${esc((THEMES[e.key] || {}).n || '')}"></label><label class="f">Game<select id="ee-game">${gameOptions(e.engine)}</select></label></div>
+  <div class="row"><label class="f">Starts<input id="ee-start" type="datetime-local" value="${toLocalInput(e.start)}"></label><label class="f">Ends<input id="ee-end" type="datetime-local" value="${toLocalInput(e.end)}"></label><label class="f">Status<select id="ee-off"><option value="0">On</option><option value="1" ${e.off ? 'selected' : ''}>Off (skip this event)</option></select></label></div><br>
+  <button class="b green" id="ee-save">💾 Save</button> ${e.custom ? '<button class="b red" id="ee-del">Delete event</button>' : '<button class="b" id="ee-reset">Back to built-in</button>'}`);
+  $('ee-save').onclick = async () => {
+    const o = { engine: $('ee-game').value, start: fromLocalInput($('ee-start').value), end: fromLocalInput($('ee-end').value), name: $('ee-name').value.trim(), off: $('ee-off').value === '1' };
+    if(!(o.end > o.start)){ toast('The end must be after the start'); return; }
+    const ev = JSON.parse(JSON.stringify(CFG.events || {})); ev.overrides = ev.overrides || {}; ev.extra = ev.extra || [];
+    if(e.custom){ const x = ev.extra.find(q => q.id === id); Object.assign(x, o); }
+    else ev.overrides[id] = o;
+    try { await saveCfg({ events: ev }, 'event ' + id + ' changed'); closeModal(); renderEvents(); } catch(er){ err(er); }
+  };
+  if($('ee-reset')) $('ee-reset').onclick = async () => { const ev = JSON.parse(JSON.stringify(CFG.events || {})); if(ev.overrides) delete ev.overrides[id]; try { await saveCfg({ events: ev }, 'event ' + id + ' back to built-in'); closeModal(); renderEvents(); } catch(er){ err(er); } };
+  if($('ee-del')) $('ee-del').onclick = async () => { const ev = JSON.parse(JSON.stringify(CFG.events || {})); ev.extra = (ev.extra || []).filter(q => q.id !== id); try { await saveCfg({ events: ev }, 'event ' + id + ' deleted'); closeModal(); renderEvents(); } catch(er){ err(er); } };
+}
+$('btn-ev-add').onclick = () => {
+  modal(`<h2>New event</h2><div class="row"><label class="f">Look (colours, emoji)<select id="ne-key">${Object.keys(THEMES).map(k => `<option value="${k}">${THEMES[k].e} ${esc(THEMES[k].n)}</option>`).join('')}</select></label><label class="f">Name<input id="ne-name" placeholder="Summer Festival"></label><label class="f">Game<select id="ne-game">${gameOptions('catch')}</select></label></div>
+  <div class="row"><label class="f">Starts<input id="ne-start" type="datetime-local"></label><label class="f">Ends<input id="ne-end" type="datetime-local"></label></div><br><button class="b green" id="ne-save">Create</button>
+  <p class="mute small">It must not overlap another event (the earlier one would hide it).</p>`);
+  $('ne-save').onclick = async () => {
+    const x = { id: 'custom-' + Date.now().toString(36), key: $('ne-key').value, name: $('ne-name').value.trim(), engine: $('ne-game').value, start: fromLocalInput($('ne-start').value), end: fromLocalInput($('ne-end').value), off: false };
+    if(!(x.end > x.start)){ toast('Set start and end'); return; }
+    const ev = JSON.parse(JSON.stringify(CFG.events || {})); ev.extra = (ev.extra || []).concat([x]); ev.overrides = ev.overrides || {};
+    try { await saveCfg({ events: ev }, 'new event ' + (x.name || x.key)); closeModal(); renderEvents(); } catch(er){ err(er); }
+  };
+};
+$('ev-alloff').onchange = async () => { const ev = JSON.parse(JSON.stringify(CFG.events || {})); ev.off = $('ev-alloff').checked; try { await saveCfg({ events: ev }, ev.off ? 'ALL events off' : 'events on'); } catch(er){ err(er); } };
+$('btn-lb').onclick = async () => {
+  const id = $('lb-ev').value; if(!id) return;
+  try { const s = await getDoc(doc(db, 'eventBoards', id)), rows = s.exists() ? (s.data().rows || []) : [];
+    $('lb-table').innerHTML = `<tr><th colspan=4>${rows.length} players on the board (top 20 are kept)</th></tr><tr><th>#</th><th>Player</th><th>Country</th><th>Best score</th></tr>` + rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.n)} <span class="mute small">${esc(r.k || '')}</span></td><td>${esc(r.c || '')}</td><td>${r.b}</td></tr>`).join('');
+  } catch(e){ err(e); }
+};
+$('btn-lb-reset').onclick = async () => { const id = $('lb-ev').value; if(!id || !confirm('Reset the leaderboard of ' + id + '?')) return; try { await deleteDoc(doc(db, 'eventBoards', id)); await logAction('reset leaderboard', id, ''); toast('Reset'); $('lb-table').innerHTML = ''; } catch(e){ err(e); } };
+
+/* ---------------- ONLINE GAMES ---------------- */
+let GEDIT = {};
+function renderGames(){
+  $('g-base').value = CFG.gamesBase || 'https://gamescrusher97.com/gmb-games/';
+  $('g-ver').value = CFG.gamesVersion || '1';
+  GEDIT = JSON.parse(JSON.stringify(gamesList()));
+  drawGames();
+}
+function drawGames(){
+  $('g-table').innerHTML = '<tr><th>ID</th><th>Name</th><th>File on website</th><th>Time (s)</th><th>How to play</th><th>On</th><th></th></tr>' + Object.keys(GEDIT).map(k => { const g = GEDIT[k]; return `<tr data-g="${esc(k)}"><td><b>${esc(k)}</b></td><td><input data-f="name" value="${esc(g.name || '')}"></td><td><input data-f="file" value="${esc(g.file || '')}"></td><td><input data-f="time" type="number" style="width:70px" value="${g.time || ''}"></td><td><input data-f="tip" value="${esc(g.tip || '')}"></td><td><input data-f="on" type="checkbox" ${g.off ? '' : 'checked'}></td><td><a class="small" target="_blank" href="${esc(($('g-base').value || '') + (g.file || ''))}">open</a> <button class="b sm red" data-del="${esc(k)}">✕</button></td></tr>`; }).join('');
+  $('g-table').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if(confirm('Remove ' + b.dataset.del + ' from the list?')){ readGames(); delete GEDIT[b.dataset.del]; drawGames(); } });
+}
+function readGames(){ $('g-table').querySelectorAll('tr[data-g]').forEach(tr => { const g = GEDIT[tr.dataset.g]; tr.querySelectorAll('[data-f]').forEach(i => { const f = i.dataset.f; if(f === 'on') g.off = !i.checked; else if(f === 'time') g.time = +i.value || 0; else g[f] = i.value.trim(); }); }); }
+$('btn-g-add').onclick = () => { readGames(); const id = (prompt('Short ID for the new game (letters only, e.g. pinball):') || '').trim().toLowerCase().replace(/[^a-z0-9]/g, ''); if(!id) return; GEDIT[id] = { name: id, file: id + '.html', time: 60, tip: '' }; drawGames(); };
+$('btn-g-save').onclick = async () => { readGames(); try { await saveCfg({ games: GEDIT, gamesBase: $('g-base').value.trim() }, 'online games list'); } catch(e){ err(e); } };
+$('btn-g-bump').onclick = async () => { const v = String((+(CFG.gamesVersion || 1) || 1) + 1); try { await saveCfg({ gamesVersion: v }, 'games version ' + v); $('g-ver').value = v; } catch(e){ err(e); } };
+
+/* ---------------- REWARDS & SETTINGS ---------------- */
+const BUILTIN_LADDER = [{ pts: 100, balls: 15 }, { pts: 250, skin: 'c' }, { pts: 450, balls: 30 }, { pts: 700, skin: 'g', cap: 20 }, { pts: 1000, balls: 50 }, { pts: 1350, skin: 's' }, { pts: 1700, balls: 100, cap: 50, trophy: true }];
+const BUILTIN_DAILY = [{ balls: 15, capacityPct: 0 }, { balls: 25, capacityPct: 0 }, { balls: 0, capacityPct: 10 }, { balls: 40, capacityPct: 0 }, { balls: 0, capacityPct: 10 }, { balls: 50, capacityPct: 0 }, { balls: 70, capacityPct: 20 }];
+let LAD = [];
+function drawLadder(){
+  $('r-ladder').innerHTML = '<tr><th>Step</th><th>Points</th><th>Balls</th><th>Jar capacity</th><th>Jar style</th><th>Trophy</th><th></th></tr>' + LAD.map((t, i) => `<tr data-i="${i}"><td>${i + 1}</td><td><input data-f="pts" type="number" style="width:80px" value="${t.pts || 0}"></td><td><input data-f="balls" type="number" style="width:80px" value="${t.balls || 0}"></td><td><input data-f="cap" type="number" style="width:80px" value="${t.cap || 0}"></td><td><select data-f="skin"><option value="">none</option><option value="c" ${t.skin === 'c' ? 'selected' : ''}>colour</option><option value="g" ${t.skin === 'g' ? 'selected' : ''}>glow</option><option value="s" ${t.skin === 's' ? 'selected' : ''}>sticker</option></select></td><td><input data-f="trophy" type="checkbox" ${t.trophy ? 'checked' : ''}></td><td><button class="b sm red" data-rm="${i}">✕</button></td></tr>`).join('');
+  $('r-ladder').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { readLadder(); LAD.splice(+b.dataset.rm, 1); drawLadder(); });
+}
+function readLadder(){ $('r-ladder').querySelectorAll('tr[data-i]').forEach(tr => { const t = LAD[+tr.dataset.i]; tr.querySelectorAll('[data-f]').forEach(i => { const f = i.dataset.f; t[f] = f === 'trophy' ? i.checked : f === 'skin' ? i.value : (+i.value || 0); }); }); }
+function renderRewards(){
+  LAD = JSON.parse(JSON.stringify(CFG.rewardLadder && CFG.rewardLadder.length ? CFG.rewardLadder : BUILTIN_LADDER)); drawLadder();
+  const ep = CFG.eventPass || {}; $('r-mult').value = ep.pointsMult || 2; $('r-tf').value = ep.ticketsFree || 5; $('r-tp').value = ep.ticketsPass || 10; $('r-tc').value = ep.ticketCost || 10;
+  const db7 = CFG.dailyBonus && CFG.dailyBonus.length === 7 ? CFG.dailyBonus : BUILTIN_DAILY;
+  $('r-daily').innerHTML = '<tr><th>Day</th><th>Balls</th><th>Jar capacity %</th></tr>' + db7.map((d, i) => `<tr data-d="${i}"><td>${i + 1}</td><td><input data-f="balls" type="number" value="${d.balls || 0}"></td><td><input data-f="capacityPct" type="number" value="${d.capacityPct || 0}"></td></tr>`).join('');
+  const ad = CFG.ads || {}; $('r-banner').value = ad.bannerOn === false ? '0' : '1'; $('r-amin').value = ad.watchAdMin || 1; $('r-amax').value = ad.watchAdMax || 20;
+  const md = CFG.modes || {}; $('r-mg').value = md.guess === false ? '0' : '1'; $('r-ma').value = md.aim === false ? '0' : '1'; $('r-me').value = md.events === false ? '0' : '1';
+}
+$('btn-r-addtier').onclick = () => { readLadder(); const last = LAD[LAD.length - 1]; LAD.push({ pts: (last ? last.pts : 0) + 300, balls: 20 }); drawLadder(); };
+$('btn-r-default').onclick = () => { LAD = JSON.parse(JSON.stringify(BUILTIN_LADDER)); drawLadder(); };
+$('btn-r-save').onclick = async () => {
+  readLadder();
+  const daily = []; $('r-daily').querySelectorAll('tr[data-d]').forEach(tr => daily.push({ balls: +tr.querySelector('[data-f=balls]').value || 0, capacityPct: +tr.querySelector('[data-f=capacityPct]').value || 0 }));
+  try {
+    await saveCfg({
+      rewardLadder: LAD.filter(t => t.pts > 0).sort((a, b) => a.pts - b.pts),
+      eventPass: { pointsMult: +$('r-mult').value || 2, ticketsFree: +$('r-tf').value || 5, ticketsPass: +$('r-tp').value || 10, ticketCost: +$('r-tc').value || 10 },
+      dailyBonus: daily,
+      ads: { bannerOn: $('r-banner').value === '1', watchAdMin: +$('r-amin').value || 1, watchAdMax: +$('r-amax').value || 20 },
+      modes: { guess: $('r-mg').value === '1', aim: $('r-ma').value === '1', events: $('r-me').value === '1' }
+    }, 'rewards & settings');
+  } catch(e){ err(e); }
+};
+
+/* ---------------- MESSAGES / MAINTENANCE ---------------- */
+function renderMessages(){
+  const b = CFG.broadcast || {}; $('m-title').value = b.title || ''; $('m-text').value = b.text || ''; $('m-until').value = toLocalInput(b.until); $('m-on').value = b.on ? '1' : '0';
+  $('m-cur').textContent = b.id ? 'Last sent ' + fmt(+b.id) + (b.on ? ' (on)' : ' (off)') : '';
+  const m = CFG.maintenance || {}; $('mt-title').value = m.title || ''; $('mt-text').value = m.text || '';
+  $('mt-cur').innerHTML = m.on ? '<span class="pill bad">MAINTENANCE IS ON</span>' : '<span class="pill ok">game is open</span>';
+}
+$('btn-m-send').onclick = async () => { const t = $('m-text').value.trim(); if(!t){ toast('Write a message'); return; } try { await saveCfg({ broadcast: { id: String(Date.now()), title: $('m-title').value.trim() || 'Message', text: t, until: fromLocalInput($('m-until').value) || 0, on: $('m-on').value === '1' } }, 'message to all: ' + t); renderMessages(); } catch(e){ err(e); } };
+$('btn-mt-on').onclick = async () => { if(!confirm('Close the game for everybody now?')) return; try { await saveCfg({ maintenance: { on: true, title: $('mt-title').value.trim(), text: $('mt-text').value.trim() } }, 'maintenance ON'); renderMessages(); } catch(e){ err(e); } };
+$('btn-mt-off').onclick = async () => { try { await saveCfg({ maintenance: { on: false, title: $('mt-title').value.trim(), text: $('mt-text').value.trim() } }, 'maintenance OFF'); renderMessages(); } catch(e){ err(e); } };
+
+/* ---------------- CODES ---------------- */
+$('btn-c-gen').onclick = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = 'GMB'; for(let i = 0; i < 7; i++) s += a[Math.floor(Math.random() * a.length)]; $('c-code').value = s; };
+$('btn-c-create').onclick = async () => {
+  const code = $('c-code').value.trim().toUpperCase().replace(/\s+/g, '');
+  if(!code || /[\/.#$\[\]]/.test(code) || code.length > 40){ toast('Write a code (letters and numbers)'); return; }
+  try {
+    if((await getDoc(doc(db, 'vouchers', code))).exists()){ toast('This code already exists'); return; }
+    const v = { type: $('c-type').value, amount: Math.max(1, Math.floor(+$('c-amount').value || 0)), maxUses: Math.max(0, Math.floor(+$('c-max').value || 0)), uses: 0, active: true, expiresAt: fromLocalInput($('c-exp').value) || 0, note: $('c-note').value.trim(), createdAt: Date.now() };
+    await setDoc(doc(db, 'vouchers', code), v); await logAction('new code', code + ' ' + v.type + ' ' + v.amount, ''); toast('Code ' + code + ' created'); loadCodes();
+  } catch(e){ err(e); }
+};
+$('btn-c-load').onclick = loadCodes;
+async function loadCodes(){
+  try {
+    const rows = snapRows(await getDocs(collection(db, 'vouchers'))).sort((a, b) => (b.d.createdAt || 0) - (a.d.createdAt || 0));
+    const desc = v => !('type' in v) ? 'Monthly Pass 30 days (old one-time code)' : v.type === 'balls' ? v.amount + ' balls' : v.type === 'monthlyPass' ? 'Monthly Pass ' + v.amount + ' days' : '+' + v.amount + ' jar capacity';
+    $('c-table').innerHTML = '<tr><th>Code</th><th>Gives</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr>' + rows.map(r => { const v = r.d, legacy = !('type' in v);
+      const st = legacy ? (v.used ? '<span class="pill bad">used by ' + esc(v.usedBy || '') + '</span>' : '<span class="pill ok">free</span>') : (v.active === false ? '<span class="pill bad">off</span>' : v.expiresAt && v.expiresAt < Date.now() ? '<span class="pill warn">expired</span>' : '<span class="pill ok">on</span>');
+      return `<tr><td><b>${esc(r.id)}</b><div class="mute small">${esc(v.note || '')}</div></td><td>${desc(v)}</td><td>${legacy ? (v.used ? 1 : 0) : (v.uses || 0) + (v.maxUses ? ' / ' + v.maxUses : '')}</td><td>${v.expiresAt ? fmt(v.expiresAt) : '–'}</td><td>${st}</td><td>${legacy ? '' : `<button class="b sm" data-tog="${esc(r.id)}" data-on="${v.active === false ? 0 : 1}">${v.active === false ? 'Switch on' : 'Switch off'}</button>`} <button class="b sm red" data-del="${esc(r.id)}">Delete</button></td></tr>`; }).join('');
+    $('c-table').querySelectorAll('[data-tog]').forEach(b => b.onclick = async () => { try { await updateDoc(doc(db, 'vouchers', b.dataset.tog), { active: b.dataset.on !== '1' }); await logAction('code ' + (b.dataset.on === '1' ? 'off' : 'on'), b.dataset.tog, ''); loadCodes(); } catch(e){ err(e); } });
+    $('c-table').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { if(!confirm('Delete code ' + b.dataset.del + '?')) return; try { await deleteDoc(doc(db, 'vouchers', b.dataset.del)); await logAction('delete code', b.dataset.del, ''); loadCodes(); } catch(e){ err(e); } });
+  } catch(e){ err(e); }
+}
+
+/* ---------------- FEEDBACK ---------------- */
+$('btn-f-load').onclick = loadFeedback;
+async function loadFeedback(){
+  try {
+    const rows = snapRows(await getDocs(query(collection(db, 'feedback'), orderBy('at', 'desc'), limit(200))));
+    $('f-table').innerHTML = '<tr><th>When</th><th>From</th><th>Feedback</th><th>Status</th></tr>' + (rows.map(r => `<tr class="click" data-id="${esc(r.id)}"><td class="small">${fmt(r.d.at)}</td><td>${esc(r.d.name || '')}<div class="mute small">${esc(r.d.email || 'guest')}</div></td><td>${esc((r.d.text || '').slice(0, 120))}${(r.d.text || '').length > 120 ? '…' : ''}</td><td>${r.d.status === 'done' ? '<span class="pill ok">done</span>' : '<span class="pill warn">new</span>'}</td></tr>`).join('') || '<tr><td colspan=4 class="mute">No feedback yet.</td></tr>');
+    $('f-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { const r = rows.find(x => x.id === tr.dataset.id); openFeedback(r); });
+  } catch(e){ err(e); }
+}
+function openFeedback(r){
+  const f = r.d;
+  modal(`<h2>💬 Feedback</h2><p class="mute small">${fmt(f.at)} · ${esc(f.name || '')} ${esc(f.email || 'guest')} · ${esc(f.appVersion || '')}</p><pre>${esc(f.text)}</pre><p class="mute small">${esc(f.device || '')}</p>
+  ${f.email ? '<label class="f">Reply in the player\'s Inbox<textarea id="fb-reply"></textarea></label><br><button class="b gold" id="fb-send">Send reply</button> ' : ''}
+  <button class="b green" id="fb-done">Mark done</button> <button class="b red" id="fb-del">Delete</button>`);
+  if($('fb-send')) $('fb-send').onclick = async () => { const t = $('fb-reply').value.trim(); if(!t) return; try { await inbox(f.email, 'Reply to your feedback: ' + t, 'feedback reply'); await updateDoc(doc(db, 'feedback', r.id), { status: 'done' }); await logAction('feedback reply', t, f.email); toast('Sent'); closeModal(); loadFeedback(); } catch(e){ err(e); } };
+  $('fb-done').onclick = async () => { try { await updateDoc(doc(db, 'feedback', r.id), { status: 'done' }); closeModal(); loadFeedback(); } catch(e){ err(e); } };
+  $('fb-del').onclick = async () => { try { await deleteDoc(doc(db, 'feedback', r.id)); closeModal(); loadFeedback(); } catch(e){ err(e); } };
+}
+
+/* ---------------- LOG ---------------- */
+$('btn-log').onclick = loadLog;
+async function loadLog(){ try { const rows = snapRows(await getDocs(query(collection(db, 'adminLog'), orderBy('at', 'desc'), limit(300)))); $('log-table').innerHTML = '<tr><th>When</th><th>What</th><th>Player</th><th>Details</th></tr>' + rows.map(r => `<tr><td class="small">${fmt(r.d.at)}</td><td>${esc(r.d.action)}</td><td>${esc(r.d.target || '')}</td><td class="small">${esc(r.d.details || '')}</td></tr>`).join(''); } catch(e){ err(e); } }
+
+/* ---------------- GOOGLE REPORTS: usage, budget, AdMob ---------------- */
+let TOKEN = null;
+try { const t = JSON.parse(sessionStorage.getItem('gmb_adm_tok') || 'null'); if(t && t.exp > Date.now()) TOKEN = t.v; } catch(e){}
+$('btn-connect').onclick = async () => {
+  const p = new GoogleAuthProvider();
+  ['https://www.googleapis.com/auth/cloud-billing', 'https://www.googleapis.com/auth/monitoring.read', 'https://www.googleapis.com/auth/admob.readonly'].forEach(s => p.addScope(s));
+  p.setCustomParameters({ login_hint: ADMIN_EMAIL, prompt: 'consent' });
+  try {
+    const r = await signInWithPopup(auth, p), c = GoogleAuthProvider.credentialFromResult(r);
+    TOKEN = c && c.accessToken; sessionStorage.setItem('gmb_adm_tok', JSON.stringify({ v: TOKEN, exp: Date.now() + 55 * 60000 }));
+    toast('Connected'); renderBilling(); loadAdEarnings();
+  } catch(e){ err(e); }
+};
+async function gapi(url, opt){
+  if(!TOKEN) throw new Error('Press "Connect Google reports" first (Billing & usage tab).');
+  const o = Object.assign({ headers: {} }, opt || {});
+  o.headers = Object.assign({ Authorization: 'Bearer ' + TOKEN, 'x-goog-user-project': PROJECT_ID, 'Content-Type': 'application/json' }, o.headers);
+  const r = await fetch(url, o);
+  if(r.status === 401){ TOKEN = null; sessionStorage.removeItem('gmb_adm_tok'); throw new Error('Access ended. Press "Connect Google reports" again.'); }
+  const j = await r.json().catch(() => ({}));
+  if(!r.ok) throw new Error((j.error && j.error.message) || ('HTTP ' + r.status));
+  return j;
+}
+async function metric(type, startMs, endMs){
+  const u = new URL('https://monitoring.googleapis.com/v3/projects/' + PROJECT_ID + '/timeSeries');
+  u.searchParams.set('filter', 'metric.type="' + type + '"');
+  u.searchParams.set('interval.startTime', new Date(startMs).toISOString());
+  u.searchParams.set('interval.endTime', new Date(endMs).toISOString());
+  u.searchParams.set('aggregation.alignmentPeriod', Math.max(60, Math.round((endMs - startMs) / 1000)) + 's');
+  u.searchParams.set('aggregation.perSeriesAligner', 'ALIGN_SUM');
+  u.searchParams.set('aggregation.crossSeriesReducer', 'REDUCE_SUM');
+  const j = await gapi(u.toString());
+  let sum = 0; (j.timeSeries || []).forEach(ts => (ts.points || []).forEach(p => { sum += +(p.value.int64Value || p.value.doubleValue || 0); }));
+  return sum;
+}
+let USAGE = null;
+async function renderBilling(){
+  $('conn-st').textContent = TOKEN ? '✓ connected' : 'not connected';
+  if(!TOKEN) return;
+  const now = Date.now(), mid = new Date(); mid.setHours(0, 0, 0, 0);
+  const m1 = new Date(); m1.setDate(1); m1.setHours(0, 0, 0, 0);
+  const next1 = new Date(m1); next1.setMonth(next1.getMonth() + 1);
+  try {
+    const [rD, wD, dD, rM, wM, dM, fM] = await Promise.all([
+      metric('firestore.googleapis.com/document/read_count', mid.getTime(), now), metric('firestore.googleapis.com/document/write_count', mid.getTime(), now), metric('firestore.googleapis.com/document/delete_count', mid.getTime(), now),
+      metric('firestore.googleapis.com/document/read_count', m1.getTime(), now), metric('firestore.googleapis.com/document/write_count', m1.getTime(), now), metric('firestore.googleapis.com/document/delete_count', m1.getTime(), now),
+      metric('cloudfunctions.googleapis.com/function/execution_count', m1.getTime(), now)
+    ]);
+    const days = Math.max(1, Math.ceil((now - m1.getTime()) / DAY));
+    const pr = { r: +$('pr-r').value, w: +$('pr-w').value, d: +$('pr-d').value, f: +$('pr-f').value };
+    // free amounts are per day for Firestore: the month's extra = month total minus (days × free per day), never below 0 (a close estimate)
+    const ex = { r: Math.max(0, rM - days * 50000), w: Math.max(0, wM - days * 20000), d: Math.max(0, dM - days * 20000), f: Math.max(0, fM - 2000000) };
+    const cost = ex.r / 100000 * pr.r + ex.w / 100000 * pr.w + ex.d / 100000 * pr.d + ex.f / 1000000 * pr.f;
+    USAGE = { cost, at: now };
+    const pct = (a, b) => Math.round(a / b * 100) + '%';
+    $('u-table').innerHTML = `<tr><th></th><th>Today</th><th>Free a day</th><th>Used of free today</th><th>This month</th><th>Above free this month</th></tr>
+      <tr><td>Firestore reads</td><td>${rD.toLocaleString()}</td><td>50,000</td><td>${pct(rD, 50000)}</td><td>${rM.toLocaleString()}</td><td>${ex.r.toLocaleString()}</td></tr>
+      <tr><td>Firestore writes</td><td>${wD.toLocaleString()}</td><td>20,000</td><td>${pct(wD, 20000)}</td><td>${wM.toLocaleString()}</td><td>${ex.w.toLocaleString()}</td></tr>
+      <tr><td>Firestore deletes</td><td>${dD.toLocaleString()}</td><td>20,000</td><td>${pct(dD, 20000)}</td><td>${dM.toLocaleString()}</td><td>${ex.d.toLocaleString()}</td></tr>
+      <tr><td>Server function calls</td><td></td><td>2,000,000 a month</td><td>${pct(fM, 2000000)} of month</td><td>${fM.toLocaleString()}</td><td>${ex.f.toLocaleString()}</td></tr>
+      <tr><th colspan=5>Estimated extra charge this month</th><th style="color:var(--gold);font-size:16px">$${cost.toFixed(2)}</th></tr>
+      <tr><td colspan=6 class="mute small">Billing month: ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()}</td></tr>`;
+    await setDoc(doc(db, 'adminData', 'settings'), { prices: pr, lastUsage: USAGE }, { merge: true });
+  } catch(e){ $('u-table').innerHTML = `<tr><td class="alert">${esc(e.message)}<br><span class="small">Check FIREBASE-STEPS.txt: Cloud Monitoring API must be switched on.</span></td></tr>`; }
+  try {
+    const bi = await gapi('https://cloudbilling.googleapis.com/v1/projects/' + PROJECT_ID + '/billingInfo');
+    if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Billing (Blaze plan) is not switched on for this project yet.'; }
+    else {
+      ADM.billingAccount = bi.billingAccountName;
+      const bl = await gapi('https://billingbudgets.googleapis.com/v1/' + bi.billingAccountName + '/budgets');
+      const mine = (bl.budgets || []).find(b => (b.budgetFilter && (b.budgetFilter.projects || []).some(p => p.indexOf(PROJECT_NUMBER) >= 0 || p.indexOf(PROJECT_ID) >= 0))) || (bl.budgets || [])[0];
+      ADM.budgetName = mine ? mine.name : '';
+      if(mine){ const a = mine.amount && mine.amount.specifiedAmount || {}; $('b-amount').value = +(a.units || 0) + (a.nanos ? a.nanos / 1e9 : 0); $('b-cur').value = a.currencyCode || 'USD'; }
+      $('b-info').innerHTML = 'Billing account: <b>' + esc(bi.billingAccountName) + '</b> · ' + (mine ? 'Budget: <b>' + esc($('b-amount').value + ' ' + $('b-cur').value) + '</b> a month · alerts at ' + (mine.thresholdRules || []).map(t => Math.round(t.thresholdPercent * 100) + '%').join(', ') : 'No budget yet — press "Save limit" to make one.');
+    }
+  } catch(e){ $('b-info').innerHTML = '<span style="color:var(--red)">' + esc(e.message) + '</span><br>Check FIREBASE-STEPS.txt: Cloud Billing API and Cloud Billing Budget API must be switched on.'; }
+  checkBudgetAlert();
+}
+$('btn-b-save').onclick = async () => {
+  const amount = Math.max(1, +$('b-amount').value || 5), cur = ($('b-cur').value || 'USD').toUpperCase(), alertPct = Math.max(10, Math.min(100, +$('b-alert').value || 80));
+  try {
+    await setDoc(doc(db, 'adminData', 'settings'), { budget: { amount, currency: cur, alertPct } }, { merge: true });
+    ADM.budget = { amount, currency: cur, alertPct };
+    if(TOKEN && ADM.billingAccount){
+      const body = { displayName: 'Glass Marble Balls limit', budgetFilter: { projects: ['projects/' + PROJECT_NUMBER] }, amount: { specifiedAmount: { currencyCode: cur, units: String(Math.floor(amount)), nanos: Math.round((amount % 1) * 1e9) } },
+        thresholdRules: [{ thresholdPercent: alertPct / 100 }, { thresholdPercent: 0.5 }, { thresholdPercent: 0.9 }, { thresholdPercent: 1.0 }].filter((t, i, a) => a.findIndex(x => x.thresholdPercent === t.thresholdPercent) === i) };
+      if(ADM.budgetName) await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.budgetName + '?updateMask=amount,thresholdRules', { method: 'PATCH', body: JSON.stringify(body) });
+      else await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.billingAccount + '/budgets', { method: 'POST', body: JSON.stringify(body) });
+      toast('Limit saved in Google Cloud. Google e-mails you at the alert points.');
+    } else toast('Limit saved here. Connect Google reports to also set it in Google Cloud (for e-mails).');
+    await logAction('budget limit', amount + ' ' + cur + ', alert ' + alertPct + '%', ''); renderBilling();
+  } catch(e){ err(e); }
+};
+function checkBudgetAlert(){
+  const b = ADM.budget, u = USAGE || ADM.lastUsage;
+  if(b && u && u.cost >= b.amount * (b.alertPct || 80) / 100) $('global-alert').innerHTML = `<div class="alert">💰 Firebase extra charges this month are about <b>$${u.cost.toFixed(2)}</b> — that is ${Math.round(u.cost / b.amount * 100)}% of your limit (${b.amount} ${esc(b.currency)}). Check the Billing & usage tab and decide what to do.</div>`;
+  else $('global-alert').innerHTML = '';
+}
+$('btn-meta-save').onclick = async () => { try { await setDoc(doc(db, 'adminData', 'settings'), { metaApp: $('meta-app').value.trim(), metaToken: $('meta-tok').value.trim() }, { merge: true }); ADM.metaApp = $('meta-app').value.trim(); ADM.metaToken = $('meta-tok').value.trim(); toast('Saved'); loadAdEarnings(); } catch(e){ err(e); } };
+
+const ymd = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+async function admobRange(fromDate, toDate){
+  const j = await gapi('https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/networkReport:generate', { method: 'POST', body: JSON.stringify({ reportSpec: {
+    dateRange: { startDate: ymd(fromDate), endDate: ymd(toDate) }, dimensions: ['APP'], metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS'] } }) });
+  let micros = 0, imp = 0;
+  (Array.isArray(j) ? j : []).forEach(x => { const r = x.row; if(!r) return; const lab = (r.dimensionValues && r.dimensionValues.APP && (r.dimensionValues.APP.displayLabel || '')) || '';
+    if(!/glass marble/i.test(lab)) return; micros += +(r.metricValues.ESTIMATED_EARNINGS && r.metricValues.ESTIMATED_EARNINGS.microsValue || 0); imp += +(r.metricValues.IMPRESSIONS && r.metricValues.IMPRESSIONS.integerValue || 0); });
+  return { usd: micros / 1e6, imp };
+}
+async function metaRange(fromDate, toDate){
+  const app = ADM.metaApp || '1171074295600149', tok = ADM.metaToken; if(!tok) throw new Error('no Meta key');
+  const f = d => d.toISOString().slice(0, 10), to = new Date(toDate.getTime() + DAY);
+  const u = 'https://graph.facebook.com/v19.0/' + encodeURIComponent(app) + '/adnetworkanalytics/?metrics=' + encodeURIComponent('["fb_ad_network_revenue"]') + '&since=' + f(fromDate) + '&until=' + f(to) + '&aggregation_period=total&access_token=' + encodeURIComponent(tok);
+  const r = await fetch(u), j = await r.json(); if(j.error) throw new Error(j.error.message);
+  let sum = 0; (j.data || []).forEach(q => (q.results || []).forEach(x => { sum += +x.value || 0; })); return sum;
+}
+async function loadAdEarnings(){
+  const today = new Date(), w = new Date(Date.now() - 6 * DAY), m = new Date(Date.now() - 29 * DAY);
+  if(TOKEN){
+    try {
+      const [a, b, c] = await Promise.all([admobRange(today, today), admobRange(w, today), admobRange(m, today)]);
+      $('e-a-d').textContent = '$' + a.usd.toFixed(2); $('e-a-w').textContent = '$' + b.usd.toFixed(2); $('e-a-m').textContent = '$' + c.usd.toFixed(2);
+      $('e-i-d').textContent = a.imp; $('e-i-w').textContent = b.imp; $('e-i-m').textContent = c.imp;
+    } catch(e){ $('e-a-d').textContent = '–'; $('e-note').textContent = 'AdMob: ' + e.message; }
+  }
+  if(ADM.metaToken){
+    try { const [a, b, c] = await Promise.all([metaRange(today, today), metaRange(w, today), metaRange(m, today)]); $('e-f-d').textContent = '$' + a.toFixed(2); $('e-f-w').textContent = '$' + b.toFixed(2); $('e-f-m').textContent = '$' + c.toFixed(2); }
+    catch(e){ $('e-f-d').textContent = '–'; $('e-note').textContent += ' · Meta: ' + e.message; }
+  }
+}
+</script>
+</body>
+</html>
