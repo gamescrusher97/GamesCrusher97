@@ -259,7 +259,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
         <label class="f">Amount<input id="c-amount" type="number" value="50"></label>
         <label class="f">Max players (0 = no limit)<input id="c-max" type="number" value="0"></label>
         <label class="f">Ends (empty = never)<input id="c-exp" type="datetime-local"></label>
-        <label class="f">Note (only you see it)<input id="c-note"></label></div><br>
+        <label class="f">Note (only you see it)<input id="c-note"></label><label class="f" style="flex:0 0 auto">Show on website<input id="c-web" type="checkbox" checked style="width:22px;height:22px"></label></div><p class="help">Ticked codes appear on gamescrusher97.com &rarr; menu &rarr; Vouchers. Codes that end or are switched off disappear from the website by themselves. Use the Website button in the list below to add or remove older codes.</p>
         <button class="b gold" id="btn-c-create">Create code</button></div>
       <div class="card"><h2>All codes <button class="b sm" id="btn-c-load">↻ Load</button></h2><div class="scroll"><table id="c-table"></table></div></div>
     </div>
@@ -783,6 +783,8 @@ $('btn-mt-on').onclick = async () => { if(!confirm('Close the game for everybody
 $('btn-mt-off').onclick = async () => { try { await saveCfg({ maintenance: { on: false, title: $('mt-title').value.trim(), text: $('mt-text').value.trim() } }, 'maintenance OFF'); renderMessages(); } catch(e){ err(e); } };
 
 /* ---------------- CODES ---------------- */
+const pubOf = v => ({ game: 'glass-marble-balls', type: v.type, amount: v.amount || 0, maxUses: v.maxUses || 0, uses: v.uses || 0, active: v.active !== false, expiresAt: v.expiresAt || 0, createdAt: v.createdAt || Date.now() });
+const pubSame = (a, b) => ['type', 'amount', 'maxUses', 'uses', 'active', 'expiresAt', 'game'].every(k => a[k] === b[k]);
 $('btn-c-gen').onclick = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = 'GMB'; for(let i = 0; i < 7; i++) s += a[Math.floor(Math.random() * a.length)]; $('c-code').value = s; };
 $('btn-c-create').onclick = async () => {
   const code = $('c-code').value.trim().toUpperCase().replace(/\s+/g, '');
@@ -790,19 +792,32 @@ $('btn-c-create').onclick = async () => {
   try {
     if((await getDoc(doc(db, 'vouchers', code))).exists()){ toast('This code already exists'); return; }
     const v = { type: $('c-type').value, amount: Math.max(1, Math.floor(+$('c-amount').value || 0)), maxUses: Math.max(0, Math.floor(+$('c-max').value || 0)), uses: 0, active: true, expiresAt: fromLocalInput($('c-exp').value) || 0, note: $('c-note').value.trim(), createdAt: Date.now() };
-    await setDoc(doc(db, 'vouchers', code), v); await logAction('new code', code + ' ' + v.type + ' ' + v.amount, ''); toast('Code ' + code + ' created'); loadCodes();
+    await setDoc(doc(db, 'vouchers', code), v); await logAction('new code', code + ' ' + v.type + ' ' + v.amount, '');
+    if($('c-web').checked){ try { await setDoc(doc(db, 'publicCodes', code), pubOf(v)); } catch(e){ toast('Code made, but not put on the website: ' + e.message); } } toast('Code ' + code + ' created'); loadCodes();
   } catch(e){ err(e); }
 };
 $('btn-c-load').onclick = loadCodes;
 async function loadCodes(){
   try {
     const rows = snapRows(await getDocs(collection(db, 'vouchers'))).sort((a, b) => (b.d.createdAt || 0) - (a.d.createdAt || 0));
+    let pub = null;
+    try { pub = {}; snapRows(await getDocs(collection(db, 'publicCodes'))).forEach(r => pub[r.id] = r.d); }
+    catch(e){ pub = null; toast('Website codes cannot be read. Add the publicCodes rule in Firestore Rules.'); }
+    if(pub){
+      const ids = {}; rows.forEach(r => ids[r.id] = r);
+      for(const id in pub){ const r = ids[id];
+        try { if(!r || !('type' in r.d)) await deleteDoc(doc(db, 'publicCodes', id)); else if(!pubSame(pub[id], pubOf(r.d))) await setDoc(doc(db, 'publicCodes', id), pubOf(r.d)); } catch(e){ console.error(e); } }
+    }
     const desc = v => !('type' in v) ? 'Monthly Pass 30 days (old one-time code)' : v.type === 'balls' ? v.amount + ' balls' : v.type === 'monthlyPass' ? 'Monthly Pass ' + v.amount + ' days' : '+' + v.amount + ' jar capacity';
-    $('c-table').innerHTML = '<tr><th>Code</th><th>Gives</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr>' + rows.map(r => { const v = r.d, legacy = !('type' in v);
+    $('c-table').innerHTML = '<tr><th>Code</th><th>Gives</th><th>Used</th><th>Expires</th><th>Status</th><th>Website</th><th></th></tr>' + rows.map(r => { const v = r.d, legacy = !('type' in v);
       const st = legacy ? (v.used ? '<span class="pill bad">used by ' + esc(v.usedBy || '') + '</span>' : '<span class="pill ok">free</span>') : (v.active === false ? '<span class="pill bad">off</span>' : v.expiresAt && v.expiresAt < Date.now() ? '<span class="pill warn">expired</span>' : '<span class="pill ok">on</span>');
-      return `<tr><td><b>${esc(r.id)}</b><div class="mute small">${esc(v.note || '')}</div></td><td>${desc(v)}</td><td>${legacy ? (v.used ? 1 : 0) : (v.uses || 0) + (v.maxUses ? ' / ' + v.maxUses : '')}</td><td>${v.expiresAt ? fmt(v.expiresAt) : '–'}</td><td>${st}</td><td>${legacy ? '' : `<button class="b sm" data-tog="${esc(r.id)}" data-on="${v.active === false ? 0 : 1}">${v.active === false ? 'Switch on' : 'Switch off'}</button>`} <button class="b sm red" data-del="${esc(r.id)}">Delete</button></td></tr>`; }).join('');
+      return `<tr><td><b>${esc(r.id)}</b><div class="mute small">${esc(v.note || '')}</div></td><td>${desc(v)}</td><td>${legacy ? (v.used ? 1 : 0) : (v.uses || 0) + (v.maxUses ? ' / ' + v.maxUses : '')}</td><td>${v.expiresAt ? fmt(v.expiresAt) : '–'}</td><td>${st}</td><td>${legacy || !pub ? '–' : `<button class="b sm${pub[r.id] ? ' gold' : ''}" data-web="${esc(r.id)}" data-on="${pub[r.id] ? 1 : 0}">${pub[r.id] ? '✓ On website' : 'Show on website'}</button>`}</td><td>${legacy ? '' : `<button class="b sm" data-tog="${esc(r.id)}" data-on="${v.active === false ? 0 : 1}">${v.active === false ? 'Switch on' : 'Switch off'}</button>`} <button class="b sm red" data-del="${esc(r.id)}">Delete</button></td></tr>`; }).join('');
+    $('c-table').querySelectorAll('[data-web]').forEach(b => b.onclick = async () => { const id = b.dataset.web, r = rows.find(x => x.id === id); try {
+      if(b.dataset.on === '1'){ await deleteDoc(doc(db, 'publicCodes', id)); await logAction('code off website', id, ''); }
+      else { await setDoc(doc(db, 'publicCodes', id), pubOf(r.d)); await logAction('code on website', id, ''); }
+      loadCodes(); } catch(e){ err(e); } });
     $('c-table').querySelectorAll('[data-tog]').forEach(b => b.onclick = async () => { try { await updateDoc(doc(db, 'vouchers', b.dataset.tog), { active: b.dataset.on !== '1' }); await logAction('code ' + (b.dataset.on === '1' ? 'off' : 'on'), b.dataset.tog, ''); loadCodes(); } catch(e){ err(e); } });
-    $('c-table').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { if(!confirm('Delete code ' + b.dataset.del + '?')) return; try { await deleteDoc(doc(db, 'vouchers', b.dataset.del)); await logAction('delete code', b.dataset.del, ''); loadCodes(); } catch(e){ err(e); } });
+    $('c-table').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { if(!confirm('Delete code ' + b.dataset.del + '?')) return; try { await deleteDoc(doc(db, 'vouchers', b.dataset.del)); try { await deleteDoc(doc(db, 'publicCodes', b.dataset.del)); } catch(e){} await logAction('delete code', b.dataset.del, ''); loadCodes(); } catch(e){ err(e); } });
   } catch(e){ err(e); }
 }
 
