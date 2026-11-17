@@ -129,17 +129,20 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
       <div class="box link bad" data-go="players:find"><b id="d-sus">–</b><span>Suspended</span></div>
       <div class="box link" data-go="feedback"><b id="d-fb">–</b><span>New feedback</span></div>
       <div class="box link" data-go="players:buys"><b id="d-today">–</b><span>Purchases today (AED)</span></div>
+      <div class="box link good" id="box-ads"><b id="d-ads">–</b><span>Ads today (USD) · tap for details</span></div>
     </div>
     <div class="card"><h2>🎉 Event right now</h2><div id="dash-ev">–</div></div>
     <div class="card"><h2>💰 Money</h2>
-      <p class="help">Purchases = what players paid in the game (before Google's fee). Ads = AdMob and Meta (they can be 1–2 days late; connect them in "Usage & Costs").</p>
+      <p class="help">Purchases = what players paid in the game (before Google's fee). Ads = AdMob + Unity + Meta (their numbers can be a few hours late; connect them once in "Usage & Costs").</p>
       <div class="scroll"><table>
         <tr><th></th><th>Today</th><th>Last 7 days</th><th>Last 30 days</th></tr>
         <tr><td>Purchases (AED)</td><td id="e-p-d">–</td><td id="e-p-w">–</td><td id="e-p-m">–</td></tr>
         <tr><td>Number of purchases</td><td id="e-n-d">–</td><td id="e-n-w">–</td><td id="e-n-m">–</td></tr>
-        <tr><td>AdMob ads (USD)</td><td id="e-a-d">–</td><td id="e-a-w">–</td><td id="e-a-m">–</td></tr>
-        <tr><td>AdMob ads shown</td><td id="e-i-d">–</td><td id="e-i-w">–</td><td id="e-i-m">–</td></tr>
-        <tr><td>Meta ads (USD)</td><td id="e-f-d">–</td><td id="e-f-w">–</td><td id="e-f-m">–</td></tr>
+        <tr><td>AdMob earnings (USD)</td><td id="e-a-d">–</td><td id="e-a-w">–</td><td id="e-a-m">–</td></tr>
+        <tr><td>Unity earnings (USD)</td><td id="e-u-d">–</td><td id="e-u-w">–</td><td id="e-u-m">–</td></tr>
+        <tr><td>Meta earnings (USD)</td><td id="e-f-d">–</td><td id="e-f-w">–</td><td id="e-f-m">–</td></tr>
+        <tr><th>All ads together (USD)</th><th id="e-t-d">–</th><th id="e-t-w">–</th><th id="e-t-m">–</th></tr>
+        <tr><td>Ads shown (all networks)</td><td id="e-i-d">–</td><td id="e-i-w">–</td><td id="e-i-m">–</td></tr>
       </table></div>
       <p class="mute small" id="e-note"></p>
     </div>
@@ -149,20 +152,34 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 
   <!-- ================= USAGE & COSTS ================= -->
   <section class="tab" id="tab-usage">
-    <div class="card"><h2>🔗 Connect Google reports</h2>
-      <p class="help">Press once to read Firebase usage, the bill and AdMob earnings (lasts about 1 hour, then press again). Green = plenty left · yellow = 80% used · red = free amount finished.</p>
-      <button class="b gold" id="btn-connect">Connect Google reports</button> <span id="conn-st" class="small mute"></span></div>
-    <div id="u-cards" class="ucards"></div>
-    <div class="card" style="margin-top:14px"><h2>💵 Spent this month (above the free amounts)</h2><div class="scroll"><table id="u-table"></table></div>
-      <p class="help" style="margin-top:8px">Prices (USD) used for the estimate — change them if Google changes its prices:</p>
-      <div class="row"><label class="f">Per 100,000 reads<input id="pr-r" type="number" step="0.001" value="0.06"></label><label class="f">Per 100,000 writes<input id="pr-w" type="number" step="0.001" value="0.18"></label><label class="f">Per 100,000 deletes<input id="pr-d" type="number" step="0.001" value="0.02"></label><label class="f">Per 1,000,000 server calls<input id="pr-f" type="number" step="0.01" value="0.40"></label></div></div>
-    <div class="card"><h2>🎯 Monthly limit & alerts</h2>
-      <div id="b-info" class="help">Connect Google reports to see the budget.</div>
-      <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
-      <p class="help" style="margin-top:8px">Google e-mails you at 50%, 90% and 100%, and a red bar appears on this page. Nothing is stopped automatically — you decide. The month restarts on the 1st.</p></div>
-    <div class="card"><h2>📘 Meta ads report key</h2>
-      <p class="help">Meta Business Settings → System users → Generate token (read_audience_network_insights). Saved privately; only this admin account can read it.</p>
-      <div class="row"><label class="f">Meta app ID<input id="meta-app" value="1171074295600149"></label><label class="f">Token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save key</button></div></div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 640px;min-width:0">
+      <div class="card"><h2>Usage & Costs <span class="mute small" id="u-read" style="margin-left:auto;font-weight:400"></span></h2>
+        <p class="help">All Glass Marble Balls players together. <b>Left</b> counts down to 0 by itself. 🟢 plenty left · 🟡 80% used · 🔴 free amount finished (from then on Google charges, only on the Blaze plan).</p>
+        <button class="b gold" id="btn-connect">🔗 Connect Google reports</button> <span id="conn-st" class="small mute"></span>
+        <p class="help" style="margin-top:6px">Press once (lasts about 1 hour, then press again). It reads Firebase's own meters, the bill and AdMob.</p></div>
+      <div class="card"><h2>🔎 Checked with the real providers</h2><div id="u-check" class="small"></div></div>
+      <div class="card link" id="card-ads" style="cursor:pointer"><h2>📺 Ads earnings <span class="pill info">TODAY</span> <span class="mute small">tap for AdMob / Unity / Meta</span></h2>
+        <div class="big" style="font-size:28px;font-weight:800;color:var(--green)" id="u-ads">–</div><p class="help" id="u-ads-sub" style="margin:0"></p></div>
+      <div id="u-cards" class="ucards"></div>
+      <div class="card" style="margin-top:14px"><h2>💰 Spent this month (beyond the free amounts)</h2><div class="scroll"><table id="u-table"></table></div>
+        <p class="mute small" style="margin-top:6px">Estimate from Google's meters. The exact bill is in Google Cloud Billing (link on the side).</p></div>
+      <div class="card"><h2>🎯 Monthly limit & alerts</h2>
+        <div id="b-info" class="help">Connect Google reports to see the budget.</div>
+        <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
+        <p class="help" style="margin-top:8px">Google e-mails you at 50%, 90% and 100%, and a red bar appears on this page. Nothing is stopped automatically — you decide.</p></div>
+      <div class="card"><h2>🔑 Ad report keys (one time)</h2>
+        <p class="help">AdMob needs nothing (Connect Google reports). <b>Unity</b>: Unity Dashboard → Administration → API management → Monetization Stats API key, and Organization core ID (Administration → Settings). <b>Meta</b>: Business Settings → System users → Generate token (read_audience_network_insights). Saved privately; only this admin account can read them. Unity and Meta numbers come through the server, so they show after the Blaze plan + SETUP.bat.</p>
+        <div class="row"><label class="f">Unity Organization core ID<input id="unity-org"></label><label class="f">Unity Stats API key<input id="unity-key" type="password"></label><label class="f">Unity game ID<input id="unity-game" value="800367258"></label></div>
+        <div class="row" style="margin-top:8px"><label class="f">Meta app ID<input id="meta-app" value="1171074295600149"></label><label class="f">Meta token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save keys</button></div></div>
+    </div>
+    <div style="flex:0 1 270px">
+      <div class="card"><h2>Free limits</h2><p class="help">If Google changes its free amounts or prices, change them here. No code needed.</p>
+        <button class="b gold" id="btn-limits" style="width:100%">✏️ Edit limits</button>
+        <h3>Exact bills</h3>
+        <p class="small"><a target="_blank" href="https://console.cloud.google.com/billing">Google Cloud Billing ↗</a><br><a target="_blank" href="https://console.firebase.google.com/project/glass-marble-balls/usage">Firebase usage ↗</a><br><a target="_blank" href="https://admob.google.com/v2/home">AdMob ↗</a><br><a target="_blank" href="https://cloud.unity.com/">Unity Dashboard ↗</a><br><a target="_blank" href="https://business.facebook.com/pub/home">Meta Monetization Manager ↗</a></p></div>
+    </div>
+    </div>
   </section>
 
   <!-- ================= PLAYERS ================= -->
@@ -275,6 +292,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, orderBy, limit, startAt, endAt, documentId, getCountFromServer, increment, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
@@ -421,6 +439,9 @@ async function start(){
   if(ADM.prices){ ['r', 'w', 'd', 'f'].forEach(k => { if(ADM.prices[k] != null) $('pr-' + k).value = ADM.prices[k]; }); }
   if(ADM.metaApp) $('meta-app').value = ADM.metaApp;
   if(ADM.metaToken) $('meta-tok').value = ADM.metaToken;
+  if(ADM.unityOrg) $('unity-org').value = ADM.unityOrg;
+  if(ADM.unityKey) $('unity-key').value = ADM.unityKey;
+  if(ADM.unityGameId) $('unity-game').value = ADM.unityGameId;
   loadDash();
 }
 const onTab = { dash: loadDash, usage: renderBilling, events: renderEvents, codes: loadCodes, feedback: loadFeedback };
@@ -821,10 +842,10 @@ $('btn-connect').onclick = async () => {
     toast('Connected'); renderBilling(); loadAdEarnings();
   } catch(e){ err(e); }
 };
-async function gapi(url, opt){
-  if(!TOKEN) throw new Error('Press "Connect Google reports" first (Billing & usage tab).');
+async function gapi(url, opt, userProject){
+  if(!TOKEN) throw new Error('Press "Connect Google reports" first (Usage & Costs).');
   const o = Object.assign({ headers: {} }, opt || {});
-  o.headers = Object.assign({ Authorization: 'Bearer ' + TOKEN, 'x-goog-user-project': PROJECT_ID, 'Content-Type': 'application/json' }, o.headers);
+  o.headers = Object.assign({ Authorization: 'Bearer ' + TOKEN, 'Content-Type': 'application/json' }, userProject ? { 'x-goog-user-project': PROJECT_ID } : {}, o.headers);
   const r = await fetch(url, o);
   if(r.status === 401){ TOKEN = null; sessionStorage.removeItem('gmb_adm_tok'); throw new Error('Access ended. Press "Connect Google reports" again.'); }
   const j = await r.json().catch(() => ({}));
@@ -839,59 +860,100 @@ async function metric(type, startMs, endMs){
   u.searchParams.set('aggregation.alignmentPeriod', Math.max(60, Math.round((endMs - startMs) / 1000)) + 's');
   u.searchParams.set('aggregation.perSeriesAligner', 'ALIGN_SUM');
   u.searchParams.set('aggregation.crossSeriesReducer', 'REDUCE_SUM');
-  const j = await gapi(u.toString());
+  let j;
+  try { j = await gapi(u.toString()); } catch(e){ if(/billing/i.test(e.message)) j = await gapi(u.toString(), null, true); else throw e; }
   let sum = 0; (j.timeSeries || []).forEach(ts => (ts.points || []).forEach(p => { sum += +(p.value.int64Value || p.value.doubleValue || 0); }));
   return sum;
 }
-let USAGE = null;
+/* free amounts and prices (Google's list, can be edited on the page) */
+const DEF_LIMITS = {
+  reads: { free: 50000, per: 'day', price: 0.06, unit: 100000, name: 'Database reads' },
+  writes: { free: 20000, per: 'day', price: 0.18, unit: 100000, name: 'Database writes' },
+  deletes: { free: 20000, per: 'day', price: 0.02, unit: 100000, name: 'Database deletes' },
+  calls: { free: 2000000, per: 'month', price: 0.40, unit: 1000000, name: 'Server calls (Functions)' },
+  compute: { free: 400000, per: 'month', price: 0.0000025, unit: 1, name: 'Server time (GB-seconds)' },
+  egress: { free: 10, per: 'month', price: 0.12, unit: 1, name: 'Data sent to phones (GB)' }
+};
+function LIM(){ const l = JSON.parse(JSON.stringify(DEF_LIMITS)); const o = ADM.limits || {}; Object.keys(o).forEach(k => { if(l[k]) Object.assign(l[k], o[k]); }); return l; }
+$('btn-limits').onclick = () => {
+  const l = LIM();
+  modal(`<h2>✏️ Free limits & prices</h2><p class="help">Only change these if Google changes them.</p><table><tr><th>Item</th><th>Free</th><th>Per</th><th>Price (USD)</th><th>for every</th></tr>` +
+    Object.keys(l).map(k => `<tr data-k="${k}"><td>${esc(l[k].name)}</td><td><input data-f="free" type="number" value="${l[k].free}" style="width:110px"></td><td>${l[k].per}</td><td><input data-f="price" type="number" step="any" value="${l[k].price}" style="width:100px"></td><td><input data-f="unit" type="number" value="${l[k].unit}" style="width:100px"></td></tr>`).join('') +
+    `</table><br><button class="b green" id="lim-save">💾 Save</button> <button class="b" id="lim-def">Back to Google's list</button>`);
+  $('lim-save').onclick = async () => { const o = {}; document.querySelectorAll('#modal-body tr[data-k]').forEach(tr => { o[tr.dataset.k] = {}; tr.querySelectorAll('[data-f]').forEach(i => o[tr.dataset.k][i.dataset.f] = +i.value); });
+    ADM.limits = o; try { await setDoc(doc(db, 'adminData', 'settings'), { limits: o }, { merge: true }); toast('Saved'); closeModal(); renderBilling(); } catch(e){ err(e); } };
+  $('lim-def').onclick = async () => { ADM.limits = {}; try { await setDoc(doc(db, 'adminData', 'settings'), { limits: {} }, { merge: true }); closeModal(); renderBilling(); } catch(e){ err(e); } };
+};
+let USAGE = null, CHECK = {};
+function ago(t){ if(!t) return ''; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
+function paintCheck(){
+  const row = (name, st) => `<p style="margin:4px 0"><b>${name}:</b> ${st || '<span class="mute">not checked yet</span>'}</p>`;
+  $('u-check').innerHTML = row('Google / Firebase bill this month', CHECK.bill) + row('Google meters (database, server)', CHECK.meters) + row('AdMob', CHECK.admob) + row('Unity Ads', CHECK.unity) + row('Meta Audience Network', CHECK.meta);
+}
 async function renderBilling(){
   $('conn-st').textContent = TOKEN ? '✓ connected' : 'not connected';
+  paintCheck();
   if(!TOKEN){ $('u-cards').innerHTML = '<div class="card mute">Press "Connect Google reports" to see what is left of the free amounts.</div>'; return; }
   const now = Date.now(), mid = new Date(); mid.setHours(0, 0, 0, 0);
+  // Firebase daily limits reset at midnight US Pacific time
+  const pac = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  const pacReset = new Date(now + ((24 * 3600 - (pac.getHours() * 3600 + pac.getMinutes() * 60 + pac.getSeconds())) * 1000));
+  const pacMid = pacReset.getTime() - DAY;
   const m1 = new Date(); m1.setDate(1); m1.setHours(0, 0, 0, 0);
   const next1 = new Date(m1); next1.setMonth(next1.getMonth() + 1);
+  const L = LIM();
   try {
-    const [rD, wD, dD, rM, wM, dM, fM] = await Promise.all([
-      metric('firestore.googleapis.com/document/read_count', mid.getTime(), now), metric('firestore.googleapis.com/document/write_count', mid.getTime(), now), metric('firestore.googleapis.com/document/delete_count', mid.getTime(), now),
+    const [rD, wD, dD, rM, wM, dM, fM, cM, eM] = await Promise.all([
+      metric('firestore.googleapis.com/document/read_count', pacMid, now), metric('firestore.googleapis.com/document/write_count', pacMid, now), metric('firestore.googleapis.com/document/delete_count', pacMid, now),
       metric('firestore.googleapis.com/document/read_count', m1.getTime(), now), metric('firestore.googleapis.com/document/write_count', m1.getTime(), now), metric('firestore.googleapis.com/document/delete_count', m1.getTime(), now),
-      metric('cloudfunctions.googleapis.com/function/execution_count', m1.getTime(), now)
+      metric('cloudfunctions.googleapis.com/function/execution_count', m1.getTime(), now).catch(() => 0),
+      metric('cloudfunctions.googleapis.com/function/user_memory_bytes', m1.getTime(), now).then(() => 0).catch(() => 0),
+      metric('firestore.googleapis.com/network/egress_bytes', m1.getTime(), now).catch(() => 0)
     ]);
     const days = Math.max(1, Math.ceil((now - m1.getTime()) / DAY));
-    const pr = { r: +$('pr-r').value, w: +$('pr-w').value, d: +$('pr-d').value, f: +$('pr-f').value };
-    // free amounts are per day for Firestore: the month's extra = month total minus (days × free per day), never below 0 (a close estimate)
-    const ex = { r: Math.max(0, rM - days * 50000), w: Math.max(0, wM - days * 20000), d: Math.max(0, dM - days * 20000), f: Math.max(0, fM - 2000000) };
-    const cost = ex.r / 100000 * pr.r + ex.w / 100000 * pr.w + ex.d / 100000 * pr.d + ex.f / 1000000 * pr.f;
+    const egGB = eM / 1e9;
+    const ex = { reads: Math.max(0, rM - days * L.reads.free), writes: Math.max(0, wM - days * L.writes.free), deletes: Math.max(0, dM - days * L.deletes.free), calls: Math.max(0, fM - L.calls.free), compute: 0, egress: Math.max(0, egGB - L.egress.free) };
+    const spent = {}; let cost = 0; Object.keys(ex).forEach(k => { spent[k] = ex[k] / L[k].unit * L[k].price; cost += spent[k]; });
     USAGE = { cost, at: now };
-    const pct = (a, b) => Math.round(a / b * 100) + '%';
-    const tomorrow = new Date(mid.getTime() + DAY);
-    const ucard = (name, tag, used, free, unit, resets) => { const left = Math.max(0, free - used), p = Math.min(100, used / free * 100), cls = p >= 100 ? 'r' : p >= 80 ? 'y' : '';
-      return `<div class="ucard ${cls}"><div class="t"><span>${name}</span><span class="tag">${tag}</span></div><div class="big">${left.toLocaleString()} <small>${unit} left</small></div><div class="bar"><i style="width:${p.toFixed(1)}%"></i></div><p>Used ${used.toLocaleString()} of ${free.toLocaleString()} free</p><p>Resets ${resets}</p></div>`; };
-    $('u-cards').innerHTML = ucard('Database reads', 'DAILY', rD, 50000, 'reads', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
-      ucard('Database writes', 'DAILY', wD, 20000, 'writes', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
-      ucard('Database deletes', 'DAILY', dD, 20000, 'deletes', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
-      ucard('Server calls (functions)', 'MONTHLY', fM, 2000000, 'calls', next1.toLocaleDateString());
-    const money = v => v > 0 ? '<b style="color:var(--yellow)">$' + v.toFixed(2) + '</b>' : '<b style="color:var(--green)">$0.00</b>';
-    $('u-table').innerHTML = `<tr><th>Service</th><th>Used this month</th><th>Above free</th><th>Price after free</th><th>Spent</th></tr>
-      <tr><td>Database reads <span class="pill info">DAILY</span></td><td>${rM.toLocaleString()}</td><td>${ex.r.toLocaleString()}</td><td>$${pr.r} per 100,000</td><td>${money(ex.r / 100000 * pr.r)}</td></tr>
-      <tr><td>Database writes <span class="pill info">DAILY</span></td><td>${wM.toLocaleString()}</td><td>${ex.w.toLocaleString()}</td><td>$${pr.w} per 100,000</td><td>${money(ex.w / 100000 * pr.w)}</td></tr>
-      <tr><td>Database deletes <span class="pill info">DAILY</span></td><td>${dM.toLocaleString()}</td><td>${ex.d.toLocaleString()}</td><td>$${pr.d} per 100,000</td><td>${money(ex.d / 100000 * pr.d)}</td></tr>
-      <tr><td>Server calls <span class="pill info">MONTHLY</span></td><td>${fM.toLocaleString()}</td><td>${ex.f.toLocaleString()}</td><td>$${pr.f} per 1,000,000</td><td>${money(ex.f / 1000000 * pr.f)}</td></tr>
-      <tr><th colspan=4>Total (estimate)</th><th style="font-size:16px">${money(cost)}</th></tr>
-      <tr><td colspan=5 class="mute small">Billing month ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()} · exact bill: <a target="_blank" href="https://console.cloud.google.com/billing">Google Cloud Billing ↗</a></td></tr>`;
-    await setDoc(doc(db, 'adminData', 'settings'), { prices: pr, lastUsage: USAGE }, { merge: true });
-  } catch(e){ $('u-cards').innerHTML = ''; $('u-table').innerHTML = `<tr><td class="alert">${esc(e.message)}<br><span class="small">Run SETUP.bat once more (it switches on the Google reports), or see FIREBASE-STEPS.txt.</span></td></tr>`; }
+    const fmtT = d => d.toLocaleDateString([], { weekday: 'short' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const ucard = (name, tag, used, free, unit, resets, extra) => { const left = Math.max(0, free - used), p = Math.min(100, free ? used / free * 100 : 0), cls = p >= 100 ? 'r' : p >= 80 ? 'y' : '';
+      const nf = v => (Math.round(v * 100) / 100).toLocaleString();
+      return `<div class="ucard ${cls}"><div class="t"><span>${name}</span><span class="tag">${tag}</span></div><div class="big">${nf(left)} <small>${unit} left</small></div><div class="bar"><i style="width:${p.toFixed(1)}%"></i></div><p>Used <b>${nf(used)}</b> of ${nf(free)} ${unit} free</p><p>Resets ${resets} · Google meter (~1 h delay)</p><p style="color:var(--green)">✔ Verified by Google · ${ago(now)}</p>${extra || ''}</div>`; };
+    $('u-cards').innerHTML =
+      ucard(L.reads.name, 'DAILY', rD, L.reads.free, 'reads', fmtT(pacReset)) +
+      ucard(L.writes.name, 'DAILY', wD, L.writes.free, 'writes', fmtT(pacReset)) +
+      ucard(L.deletes.name, 'DAILY', dD, L.deletes.free, 'deletes', fmtT(pacReset)) +
+      ucard(L.calls.name, 'MONTHLY', fM, L.calls.free, 'calls', next1.toLocaleDateString(), '<p class="mute">Only after Blaze + SETUP.bat (the server functions).</p>') +
+      ucard(L.egress.name, 'MONTHLY', +egGB.toFixed(3), L.egress.free, 'GB', next1.toLocaleDateString());
+    const money = v => v > 0.004 ? '<b style="color:var(--yellow)">$' + v.toFixed(2) + '</b>' : '<b style="color:var(--green)">$0.00</b>';
+    const tag = t => `<span class="pill info">${t.toUpperCase()}</span>`;
+    $('u-table').innerHTML = `<tr><th>Service</th><th>Price after free</th><th>Above free this month</th><th>Spent</th></tr>` +
+      ['reads', 'writes', 'deletes', 'calls', 'egress'].map(k => `<tr><td>${L[k].name} ${tag(L[k].per === 'day' ? 'daily' : 'monthly')}</td><td>${L[k].price} $ per ${L[k].unit.toLocaleString()}${k === 'egress' ? ' GB' : ''}</td><td>${(Math.round(ex[k] * 100) / 100).toLocaleString()}</td><td>${money(spent[k])}</td></tr>`).join('') +
+      `<tr><th colspan=3>Total (estimate)</th><th style="font-size:16px">${money(cost)}</th></tr>
+       <tr><td colspan=4 class="mute small">Billing month ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()} · daily limits renew at midnight US time (${fmtT(pacReset)} your time)</td></tr>`;
+    CHECK.meters = '<span style="color:var(--green)">✔ read ' + ago(now) + '</span>';
+    $('u-read').textContent = 'Google meters read ' + ago(now);
+    await setDoc(doc(db, 'adminData', 'settings'), { lastUsage: USAGE }, { merge: true });
+  } catch(e){
+    const spark = /billing/i.test(e.message);
+    CHECK.meters = '<span style="color:var(--yellow)">' + (spark ? 'Google shows these meters only on the Blaze plan. On the free Spark plan nothing can be charged — when a free limit ends, it simply stops for that day.' : esc(e.message)) + '</span>';
+    $('u-cards').innerHTML = `<div class="card">${spark ? '🟢 <b>Spark plan (free):</b> no money can be charged. The cards with "left / used / resets" appear here as soon as the Blaze plan is on (then run SETUP.bat once).' : '<span class="alert">' + esc(e.message) + '</span>'}</div>`;
+    $('u-table').innerHTML = `<tr><td>${spark ? 'Spark plan: <b style="color:var(--green)">$0.00</b> — nothing can be charged.' : esc(e.message)}</td></tr>`;
+  }
   try {
     const bi = await gapi('https://cloudbilling.googleapis.com/v1/projects/' + PROJECT_ID + '/billingInfo');
-    if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Billing (Blaze plan) is not switched on for this project yet.'; }
+    if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Blaze plan is not on yet — nothing can be charged. Set the limit now; it is used as soon as Blaze is on.'; CHECK.bill = '<span style="color:var(--green)">✔ $0 — Spark (free) plan, no billing</span>'; }
     else {
       ADM.billingAccount = bi.billingAccountName;
-      const bl = await gapi('https://billingbudgets.googleapis.com/v1/' + bi.billingAccountName + '/budgets');
+      CHECK.bill = (USAGE && USAGE.cost > 0.004) ? '<span style="color:var(--yellow)">≈ $' + USAGE.cost.toFixed(2) + ' above the free amounts this month</span>' : '<span style="color:var(--green)">✔ $0 — nothing charged, free limits working</span>';
+      const bl = await gapi('https://billingbudgets.googleapis.com/v1/' + bi.billingAccountName + '/budgets', null, true);
       const mine = (bl.budgets || []).find(b => (b.budgetFilter && (b.budgetFilter.projects || []).some(p => p.indexOf(PROJECT_NUMBER) >= 0 || p.indexOf(PROJECT_ID) >= 0))) || (bl.budgets || [])[0];
       ADM.budgetName = mine ? mine.name : '';
       if(mine){ const a = mine.amount && mine.amount.specifiedAmount || {}; $('b-amount').value = +(a.units || 0) + (a.nanos ? a.nanos / 1e9 : 0); $('b-cur').value = a.currencyCode || 'USD'; }
-      $('b-info').innerHTML = 'Billing account: <b>' + esc(bi.billingAccountName) + '</b> · ' + (mine ? 'Budget: <b>' + esc($('b-amount').value + ' ' + $('b-cur').value) + '</b> a month · alerts at ' + (mine.thresholdRules || []).map(t => Math.round(t.thresholdPercent * 100) + '%').join(', ') : 'No budget yet — press "Save limit" to make one.');
+      $('b-info').innerHTML = 'Billing account: <b>' + esc(bi.billingAccountName) + '</b> · ' + (mine ? 'Limit: <b>' + esc($('b-amount').value + ' ' + $('b-cur').value) + '</b> a month · alerts at ' + (mine.thresholdRules || []).map(t => Math.round(t.thresholdPercent * 100) + '%').join(', ') : 'No limit yet — press "Save limit".');
     }
-  } catch(e){ $('b-info').innerHTML = '<span style="color:var(--red)">' + esc(e.message) + '</span><br>Check FIREBASE-STEPS.txt: Cloud Billing API and Cloud Billing Budget API must be switched on.'; }
+  } catch(e){ $('b-info').innerHTML = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>'; }
+  paintCheck();
   checkBudgetAlert();
 }
 $('btn-b-save').onclick = async () => {
@@ -902,50 +964,92 @@ $('btn-b-save').onclick = async () => {
     if(TOKEN && ADM.billingAccount){
       const body = { displayName: 'Glass Marble Balls limit', budgetFilter: { projects: ['projects/' + PROJECT_NUMBER] }, amount: { specifiedAmount: { currencyCode: cur, units: String(Math.floor(amount)), nanos: Math.round((amount % 1) * 1e9) } },
         thresholdRules: [{ thresholdPercent: alertPct / 100 }, { thresholdPercent: 0.5 }, { thresholdPercent: 0.9 }, { thresholdPercent: 1.0 }].filter((t, i, a) => a.findIndex(x => x.thresholdPercent === t.thresholdPercent) === i) };
-      if(ADM.budgetName) await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.budgetName + '?updateMask=amount,thresholdRules', { method: 'PATCH', body: JSON.stringify(body) });
-      else await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.billingAccount + '/budgets', { method: 'POST', body: JSON.stringify(body) });
+      if(ADM.budgetName) await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.budgetName + '?updateMask=amount,thresholdRules', { method: 'PATCH', body: JSON.stringify(body) }, true);
+      else await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.billingAccount + '/budgets', { method: 'POST', body: JSON.stringify(body) }, true);
       toast('Limit saved in Google Cloud. Google e-mails you at the alert points.');
-    } else toast('Limit saved here. Connect Google reports to also set it in Google Cloud (for e-mails).');
+    } else toast('Limit saved. It is set in Google Cloud as soon as Blaze is on and you press Save again.');
     await logAction('budget limit', amount + ' ' + cur + ', alert ' + alertPct + '%', ''); renderBilling();
   } catch(e){ err(e); }
 };
 function checkBudgetAlert(){
   const b = ADM.budget, u = USAGE || ADM.lastUsage;
-  if(b && u && u.cost >= b.amount * (b.alertPct || 80) / 100) $('global-alert').innerHTML = `<div class="alert">💰 Firebase extra charges this month are about <b>$${u.cost.toFixed(2)}</b> — that is ${Math.round(u.cost / b.amount * 100)}% of your limit (${b.amount} ${esc(b.currency)}). Check the Billing & usage tab and decide what to do.</div>`;
+  if(b && u && u.cost >= b.amount * (b.alertPct || 80) / 100) $('global-alert').innerHTML = `<div class="alert">💰 Firebase extra charges this month are about <b>$${u.cost.toFixed(2)}</b> — ${Math.round(u.cost / b.amount * 100)}% of your limit (${b.amount} ${esc(b.currency)}). Open "Usage & Costs" and decide what to do.</div>`;
   else $('global-alert').innerHTML = '';
 }
-$('btn-meta-save').onclick = async () => { try { await setDoc(doc(db, 'adminData', 'settings'), { metaApp: $('meta-app').value.trim(), metaToken: $('meta-tok').value.trim() }, { merge: true }); ADM.metaApp = $('meta-app').value.trim(); ADM.metaToken = $('meta-tok').value.trim(); toast('Saved'); loadAdEarnings(); } catch(e){ err(e); } };
+$('btn-meta-save').onclick = async () => {
+  const v = { metaApp: $('meta-app').value.trim(), metaToken: $('meta-tok').value.trim(), unityOrg: $('unity-org').value.trim(), unityKey: $('unity-key').value.trim(), unityGameId: $('unity-game').value.trim() };
+  try { await setDoc(doc(db, 'adminData', 'settings'), v, { merge: true }); Object.assign(ADM, v); toast('Keys saved'); loadAdEarnings(); } catch(e){ err(e); }
+};
 
+/* ---------------- ADS EARNINGS: AdMob (with Meta + Unity when they run through AdMob) + Unity direct + Meta ---------------- */
 const ymd = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+const NETS = ['admob', 'unity', 'meta'], NET_NAME = { admob: 'Google AdMob', unity: 'Unity Ads', meta: 'Meta Audience Network' };
+let ADS = null;   // { d:{admob:{usd,shown},unity:..,meta:..}, w:.., m:.., count:{d:{admob:n..}} }
 async function admobRange(fromDate, toDate){
-  const j = await gapi('https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/networkReport:generate', { method: 'POST', body: JSON.stringify({ reportSpec: {
-    dateRange: { startDate: ymd(fromDate), endDate: ymd(toDate) }, dimensions: ['APP'], metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS'] } }) });
-  let micros = 0, imp = 0;
-  (Array.isArray(j) ? j : []).forEach(x => { const r = x.row; if(!r) return; const lab = (r.dimensionValues && r.dimensionValues.APP && (r.dimensionValues.APP.displayLabel || '')) || '';
-    if(!/glass marble/i.test(lab)) return; micros += +(r.metricValues.ESTIMATED_EARNINGS && r.metricValues.ESTIMATED_EARNINGS.microsValue || 0); imp += +(r.metricValues.IMPRESSIONS && r.metricValues.IMPRESSIONS.integerValue || 0); });
-  return { usd: micros / 1e6, imp };
+  const j = await gapi('https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/mediationReport:generate', { method: 'POST', body: JSON.stringify({ reportSpec: {
+    dateRange: { startDate: ymd(fromDate), endDate: ymd(toDate) }, dimensions: ['APP', 'AD_SOURCE'], metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS'] } }) });
+  const r = { admob: { usd: 0, shown: 0 }, unity: { usd: 0, shown: 0 }, meta: { usd: 0, shown: 0 } };
+  (Array.isArray(j) ? j : []).forEach(x => { const row = x.row; if(!row) return; const dv = row.dimensionValues || {};
+    if(!/glass marble/i.test((dv.APP && dv.APP.displayLabel) || '')) return;
+    const src = ((dv.AD_SOURCE && dv.AD_SOURCE.displayLabel) || '').toLowerCase();
+    const net = /meta|facebook/.test(src) ? 'meta' : /unity/.test(src) ? 'unity' : 'admob';
+    r[net].usd += +(row.metricValues.ESTIMATED_EARNINGS && row.metricValues.ESTIMATED_EARNINGS.microsValue || 0) / 1e6;
+    r[net].shown += +(row.metricValues.IMPRESSIONS && row.metricValues.IMPRESSIONS.integerValue || 0); });
+  return r;
 }
-async function metaRange(fromDate, toDate){
-  const app = ADM.metaApp || '1171074295600149', tok = ADM.metaToken; if(!tok) throw new Error('no Meta key');
-  const f = d => d.toISOString().slice(0, 10), to = new Date(toDate.getTime() + DAY);
-  const u = 'https://graph.facebook.com/v19.0/' + encodeURIComponent(app) + '/adnetworkanalytics/?metrics=' + encodeURIComponent('["fb_ad_network_revenue"]') + '&since=' + f(fromDate) + '&until=' + f(to) + '&aggregation_period=total&access_token=' + encodeURIComponent(tok);
-  const r = await fetch(u), j = await r.json(); if(j.error) throw new Error(j.error.message);
-  let sum = 0; (j.data || []).forEach(q => (q.results || []).forEach(x => { sum += +x.value || 0; })); return sum;
+async function ourCounts(fromMs){
+  const c = { admob: 0, unity: 0, meta: 0 };
+  try { const qs = await getDocs(query(collection(db, 'adStats'), where('day', '>=', new Date(fromMs).toISOString().slice(0, 10))));
+    qs.forEach(s => { const d = s.data(); NETS.forEach(n => { c[n] += (+d[n + '_rewarded'] || 0) + (+d[n + '_banner'] || 0); }); }); } catch(e){}
+  return c;
 }
 async function loadAdEarnings(){
   const today = new Date(), w = new Date(Date.now() - 6 * DAY), m = new Date(Date.now() - 29 * DAY);
+  const utc0 = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  const res = { d: {}, w: {}, m: {} }; NETS.forEach(n => ['d', 'w', 'm'].forEach(k => res[k][n] = { usd: null, shown: null }));
+  const counts = { d: await ourCounts(utc0), w: await ourCounts(utc0 - 6 * DAY), m: await ourCounts(utc0 - 29 * DAY) };
   if(TOKEN){
     try {
       const [a, b, c] = await Promise.all([admobRange(today, today), admobRange(w, today), admobRange(m, today)]);
-      $('e-a-d').textContent = '$' + a.usd.toFixed(2); $('e-a-w').textContent = '$' + b.usd.toFixed(2); $('e-a-m').textContent = '$' + c.usd.toFixed(2);
-      $('e-i-d').textContent = a.imp; $('e-i-w').textContent = b.imp; $('e-i-m').textContent = c.imp;
-    } catch(e){ $('e-a-d').textContent = '–'; $('e-note').textContent = 'AdMob: ' + e.message; }
-  }
-  if(ADM.metaToken){
-    try { const [a, b, c] = await Promise.all([metaRange(today, today), metaRange(w, today), metaRange(m, today)]); $('e-f-d').textContent = '$' + a.toFixed(2); $('e-f-w').textContent = '$' + b.toFixed(2); $('e-f-m').textContent = '$' + c.toFixed(2); }
-    catch(e){ $('e-f-d').textContent = '–'; $('e-note').textContent += ' · Meta: ' + e.message; }
-  }
+      [['d', a], ['w', b], ['m', c]].forEach(([k, r]) => NETS.forEach(n => { if(r[n].usd || r[n].shown || n === 'admob'){ res[k][n] = { usd: r[n].usd, shown: r[n].shown }; } }));
+      CHECK.admob = '<span style="color:var(--green)">✔ $' + a.admob.usd.toFixed(2) + ' today · read ' + ago(Date.now()) + '</span>';
+    } catch(e){ CHECK.admob = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>'; }
+  } else CHECK.admob = '<span class="mute">press "Connect Google reports"</span>';
+  if(ADM.unityKey || ADM.metaToken){
+    try {
+      const r = (await httpsCallable(getFunctions(app), 'adminAdStats')({})).data || {};
+      ['unity', 'meta'].forEach(n => { if(r[n]) ['d', 'w', 'm'].forEach(k => { if(r[n][k]){ const cur = res[k][n]; res[k][n] = { usd: (cur.usd || 0) + r[n][k].usd, shown: Math.max(cur.shown || 0, r[n][k].shown) }; } }); });
+      CHECK.unity = r.errors && r.errors.unity ? '<span style="color:var(--yellow)">' + esc(r.errors.unity) + '</span>' : r.unity ? '<span style="color:var(--green)">✔ read ' + ago(Date.now()) + '</span>' : '<span class="mute">add the Unity key below</span>';
+      CHECK.meta = r.errors && r.errors.meta ? '<span style="color:var(--yellow)">' + esc(r.errors.meta) + '</span>' : r.meta ? '<span style="color:var(--green)">✔ read ' + ago(Date.now()) + '</span>' : (res.d.meta.usd != null ? '<span style="color:var(--green)">✔ through AdMob</span>' : '<span class="mute">add the Meta token below</span>');
+    } catch(e){ const msg = /not-found|internal|NOT_FOUND/i.test(String(e.code || e.message)) ? 'needs the Blaze plan + SETUP.bat (server)' : e.message;
+      if(ADM.unityKey) CHECK.unity = '<span style="color:var(--yellow)">' + esc(msg) + '</span>'; if(ADM.metaToken && res.d.meta.usd == null) CHECK.meta = '<span style="color:var(--yellow)">' + esc(msg) + '</span>'; }
+  } else { CHECK.unity = '<span class="mute">add the Unity key below</span>'; if(res.d.meta.usd == null) CHECK.meta = '<span class="mute">through AdMob after "Connect", or add the Meta token</span>'; else CHECK.meta = '<span style="color:var(--green)">✔ through AdMob</span>'; }
+  // ads shown: the report number, or our own phone count when the report has none
+  ['d', 'w', 'm'].forEach(k => NETS.forEach(n => { const x = res[k][n]; x.ours = counts[k][n]; if(x.shown == null || (!x.shown && x.ours)) x.shown = x.ours; }));
+  ADS = res;
+  const money = v => v == null ? '–' : '$' + v.toFixed(2);
+  const ids = { admob: 'a', unity: 'u', meta: 'f' };
+  ['d', 'w', 'm'].forEach(k => {
+    let tot = 0, any = false, shown = 0;
+    NETS.forEach(n => { const x = res[k][n]; $('e-' + ids[n] + '-' + k).textContent = money(x.usd); if(x.usd != null){ tot += x.usd; any = true; } shown += x.shown || 0; });
+    $('e-t-' + k).textContent = any ? '$' + tot.toFixed(2) : '–'; $('e-i-' + k).textContent = shown;
+    if(k === 'd'){ $('d-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; if($('u-ads')){ $('u-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; $('u-ads-sub').textContent = shown + ' ads shown today · AdMob ' + money(res.d.admob.usd) + ' · Unity ' + money(res.d.unity.usd) + ' · Meta ' + money(res.d.meta.usd); } }
+  });
+  $('e-note').textContent = any0() ? '' : 'Earnings appear after "Connect Google reports" (AdMob) and the Unity / Meta keys in "Usage & Costs". Ads shown are counted by the game itself from v34.';
+  paintCheck();
 }
+function any0(){ return ADS && NETS.some(n => ADS.d[n].usd != null); }
+function openAds(){
+  const r = ADS; const money = v => v == null ? '<span class="mute">–</span>' : '<b>$' + v.toFixed(2) + '</b>';
+  if(!r){ toast('Loading…'); loadAdEarnings().then(openAds); return; }
+  const tot = k => NETS.some(n => r[k][n].usd != null) ? '$' + NETS.reduce((s, n) => s + (r[k][n].usd || 0), 0).toFixed(2) : '–';
+  modal(`<h2>📺 Ads earnings</h2><p class="help">Ads shown = from the network's report (or counted by the game when the report has none yet). Earnings can be a few hours late.</p>
+  <div class="scroll"><table><tr><th>Network</th><th>Today: ads shown</th><th>Today: earned</th><th>7 days</th><th>30 days</th></tr>` +
+    NETS.map(n => `<tr><td><b>${NET_NAME[n]}</b></td><td>${r.d[n].shown || 0}</td><td>${money(r.d[n].usd)}</td><td>${money(r.w[n].usd)}</td><td>${money(r.m[n].usd)}</td></tr>`).join('') +
+    `<tr><th>All together</th><th>${NETS.reduce((s, n) => s + (r.d[n].shown || 0), 0)}</th><th>${tot('d')}</th><th>${tot('w')}</th><th>${tot('m')}</th></tr></table></div>`);
+}
+$('box-ads').onclick = openAds;
+$('card-ads').onclick = openAds;
 
 /* ---------------- GAME PREVIEW (only here, after admin sign-in) ---------------- */
 let pvHandler = null;
