@@ -6,56 +6,81 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Glass Marble Balls — Admin</title>
 <style>
-:root{ --bg:#120a2a; --card:#1e1442; --card2:#281b57; --line:rgba(255,255,255,0.12); --text:#f2efff; --mute:#b7aedc; --gold:#ffd34d; --red:#ff5c6c; --green:#4fe08a; --blue:#6fb6ff; }
+:root{ --bg:#0f0d15; --card:#1a1724; --card2:#221e2f; --line:rgba(255,255,255,0.09); --text:#f1eff7; --mute:#a39fb3; --gold:#f5c542; --red:#ff5c6c; --green:#3ddc84; --yellow:#ffc93c; --blue:#6fb6ff; --accent:#7c5cff; }
 *{ box-sizing:border-box; }
 body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
 a{ color:var(--blue); }
-header{ position:sticky; top:0; z-index:20; background:#0d0720; border-bottom:1px solid var(--line); padding:10px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-header h1{ font-size:17px; margin:0; color:var(--gold); }
-header .who{ margin-left:auto; color:var(--mute); font-size:12px; }
-nav{ display:flex; gap:6px; flex-wrap:wrap; padding:8px 14px; background:#170e35; border-bottom:1px solid var(--line); position:sticky; top:47px; z-index:19; }
-nav button{ background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:18px; padding:6px 12px; cursor:pointer; font-size:13px; }
-nav button.on{ background:var(--gold); color:#2a1a00; font-weight:700; }
-main{ padding:14px; max-width:1200px; margin:0 auto; }
+header{ position:sticky; top:0; z-index:20; background:#13111b; border-bottom:1px solid var(--line); padding:10px 14px; }
+.hrow{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:16px; margin-right:8px; white-space:nowrap; }
+.brand i{ font-style:normal; display:inline-flex; width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,#7c5cff,#f5c542); align-items:center; justify-content:center; }
+nav{ display:flex; gap:6px; flex-wrap:wrap; }
+nav button{ background:transparent; color:var(--text); border:1px solid var(--line); border-radius:18px; padding:6px 13px; cursor:pointer; font-size:13px; white-space:nowrap; }
+nav button.on{ background:var(--accent); border-color:var(--accent); font-weight:700; }
+.who{ color:var(--mute); font-size:12px; margin-top:6px; display:flex; gap:8px; align-items:center; }
+main{ padding:14px; max-width:1180px; margin:0 auto; }
 .tab{ display:none; } .tab.on{ display:block; }
+.sub{ display:flex; gap:6px; flex-wrap:wrap; margin:0 0 12px; }
+.sub button{ background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:7px 12px; cursor:pointer; font-size:13px; }
+.sub button.on{ border-color:var(--gold); color:var(--gold); font-weight:700; }
+.subp{ display:none; } .subp.on{ display:block; }
 .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px; }
-.card h2{ margin:0 0 10px; font-size:16px; }
+.card h2{ margin:0 0 4px; font-size:16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .card h3{ margin:14px 0 8px; font-size:14px; color:var(--gold); }
-.grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
-.stat{ background:var(--card2); border-radius:12px; padding:12px; border:1px solid var(--line); }
-.stat b{ display:block; font-size:24px; color:var(--gold); margin-top:4px; }
-.stat span{ color:var(--mute); font-size:12px; }
+.help{ color:var(--mute); font-size:12.5px; margin:0 0 10px; line-height:1.45; }
+.boxes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin-bottom:14px; }
+.box{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 10px; text-align:center; cursor:default; }
+.box b{ display:block; font-size:28px; font-weight:800; }
+.box span{ color:var(--mute); font-size:12.5px; }
+.box.link{ cursor:pointer; } .box.link:hover{ border-color:var(--accent); }
+.box.warn b{ color:var(--yellow); } .box.bad b{ color:var(--red); } .box.good b{ color:var(--green); }
+.ucards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:12px; }
+.ucard{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--green); border-radius:12px; padding:14px; }
+.ucard.y{ border-left-color:var(--yellow); } .ucard.r{ border-left-color:var(--red); } .ucard.g{ border-left-color:var(--mute); }
+.ucard .t{ display:flex; justify-content:space-between; font-weight:700; }
+.ucard .tag{ font-size:10px; font-weight:800; padding:2px 7px; border-radius:8px; background:#1d2c4a; color:var(--blue); letter-spacing:.04em; }
+.ucard .big{ font-size:26px; font-weight:800; color:var(--green); margin:8px 0 6px; } .ucard.y .big{ color:var(--yellow); } .ucard.r .big{ color:var(--red); }
+.ucard .big small{ font-size:13px; color:var(--mute); font-weight:600; }
+.bar{ height:6px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; margin-bottom:8px; } .bar i{ display:block; height:100%; background:var(--green); } .ucard.y .bar i{ background:var(--yellow); } .ucard.r .bar i{ background:var(--red); }
+.ucard p{ margin:2px 0; color:var(--mute); font-size:12px; }
 table{ width:100%; border-collapse:collapse; font-size:13px; }
-th,td{ text-align:left; padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+th,td{ text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
 th{ color:var(--mute); font-weight:600; font-size:12px; }
-tr.click{ cursor:pointer; } tr.click:hover{ background:rgba(255,255,255,0.05); }
+tr.click{ cursor:pointer; } tr.click:hover{ background:rgba(255,255,255,0.04); }
 .scroll{ overflow-x:auto; }
-input,select,textarea{ background:#0f0824; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 9px; font:inherit; }
+input,select,textarea{ background:#0f0d18; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 9px; font:inherit; }
 input[type=checkbox]{ width:18px; height:18px; vertical-align:middle; }
 textarea{ width:100%; min-height:70px; }
 label.f{ display:flex; flex-direction:column; gap:4px; color:var(--mute); font-size:12px; }
 label.f input,label.f select,label.f textarea{ color:var(--text); font-size:14px; }
 .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
 .row > *{ flex:1 1 150px; }
-button.b{ background:var(--card2); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 13px; cursor:pointer; font:inherit; font-weight:600; }
-button.b:hover{ filter:brightness(1.15); }
-button.gold{ background:var(--gold); color:#2a1a00; border-color:var(--gold); }
-button.red{ background:#5a1622; border-color:var(--red); color:#ffd4d9; }
-button.green{ background:#13492c; border-color:var(--green); color:#d7ffe6; }
+button.b{ background:var(--card2); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:8px 13px; cursor:pointer; font:inherit; font-weight:600; white-space:nowrap; }
+button.b:hover{ filter:brightness(1.2); }
+button.gold{ background:var(--gold); color:#241800; border-color:var(--gold); }
+button.red{ background:#4a1520; border-color:var(--red); color:#ffd4d9; }
+button.green{ background:#123d26; border-color:var(--green); color:#d7ffe6; }
 button.sm{ padding:4px 9px; font-size:12px; }
-.pill{ display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
-.pill.ok{ background:#13492c; color:var(--green); } .pill.bad{ background:#5a1622; color:#ffb3bc; } .pill.warn{ background:#5a4a12; color:var(--gold); } .pill.info{ background:#16325a; color:var(--blue); }
+.pill{ display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; white-space:nowrap; }
+.pill.ok{ background:#123d26; color:var(--green); } .pill.bad{ background:#4a1520; color:#ffb3bc; } .pill.warn{ background:#4a3d10; color:var(--yellow); } .pill.info{ background:#16294a; color:var(--blue); }
 .mute{ color:var(--mute); } .small{ font-size:12px; }
-.alert{ background:#5a1622; border:1px solid var(--red); color:#ffe0e4; border-radius:12px; padding:10px 12px; margin-bottom:12px; }
-.note{ background:#16325a; border:1px solid #2d5c9a; border-radius:12px; padding:10px 12px; margin-bottom:12px; color:#d8ebff; font-size:13px; }
+.alert{ background:#4a1520; border:1px solid var(--red); color:#ffe0e4; border-radius:12px; padding:10px 12px; margin-bottom:12px; }
+.note{ background:#16294a; border:1px solid #2d5c9a; border-radius:12px; padding:10px 12px; margin-bottom:12px; color:#d8ebff; font-size:13px; }
+.evnow{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+.evnow .em{ font-size:44px; }
 #login{ max-width:420px; margin:12vh auto; text-align:center; }
 #login .card{ padding:26px; }
-#toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#000c; color:#fff; padding:10px 16px; border-radius:10px; display:none; z-index:100; max-width:90%; }
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:flex-start; justify-content:center; z-index:50; overflow-y:auto; padding:20px 10px; }
+#toast{ position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:#000d; color:#fff; padding:10px 16px; border-radius:10px; display:none; z-index:100; max-width:90%; }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:flex-start; justify-content:center; z-index:50; overflow-y:auto; padding:20px 10px; }
 .modal.on{ display:flex; }
 .modal .card{ width:100%; max-width:760px; position:relative; }
 .modal .x{ position:absolute; right:12px; top:10px; }
-pre{ white-space:pre-wrap; word-break:break-word; background:#0f0824; padding:10px; border-radius:8px; font-size:12px; max-height:300px; overflow:auto; }
+pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10px; border-radius:8px; font-size:12px; max-height:300px; overflow:auto; }
+.pv{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-start; }
+.pv-phone{ width:360px; max-width:100%; height:640px; border-radius:22px; overflow:hidden; border:3px solid #333; position:relative; flex:0 0 auto; }
+.pv-phone iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.pv-side{ flex:1 1 260px; }
+.pv-hud{ display:flex; gap:10px; margin-bottom:10px; } .pv-hud .box{ flex:1; padding:10px; } .pv-hud .box b{ font-size:22px; }
 </style>
 </head>
 <body>
@@ -63,7 +88,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0824; padding:10
 <div id="login">
   <div class="card">
     <div style="font-size:50px">🎪</div>
-    <h2>Glass Marble Balls — Admin</h2>
+    <h2 style="justify-content:center">Glass Marble Balls — Admin</h2>
     <p class="mute">Only the Games Crusher 97 Google account can open this page.</p>
     <button class="b gold" id="btn-login">Sign in with Google</button>
     <p id="login-msg" class="mute small"></p>
@@ -71,181 +96,175 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0824; padding:10
 </div>
 
 <div id="app" style="display:none">
-<header><h1>🎪 Glass Marble Balls — Admin</h1><span class="who" id="who"></span><button class="b sm" id="btn-logout">Sign out</button></header>
-<nav id="nav">
-  <button data-tab="dash" class="on">📊 Dashboard</button>
-  <button data-tab="players">👤 Players</button>
-  <button data-tab="passes">⭐ Passes</button>
-  <button data-tab="purchases">💳 Purchases</button>
-  <button data-tab="hack">🛡️ Hack check</button>
-  <button data-tab="events">🎉 Events</button>
-  <button data-tab="games">🕹️ Online games</button>
-  <button data-tab="rewards">🎁 Rewards & settings</button>
-  <button data-tab="messages">📢 Messages</button>
-  <button data-tab="codes">🎟️ Codes</button>
-  <button data-tab="feedback">💬 Feedback</button>
-  <button data-tab="billing">💰 Billing & usage</button>
-  <button data-tab="log">📜 Action log</button>
-</nav>
+<header>
+  <div class="hrow">
+    <div class="brand"><i>🎪</i> Glass Marble Balls Admin</div>
+    <nav id="nav">
+      <button data-tab="dash" class="on">Dashboard</button>
+      <button data-tab="usage">Usage & Costs</button>
+      <button data-tab="players">Players</button>
+      <button data-tab="events">Events & Games</button>
+      <button data-tab="codes">Codes & Messages</button>
+      <button data-tab="feedback">Feedback</button>
+    </nav>
+    <button class="b sm" id="btn-dash-refresh" style="margin-left:auto">↻ Refresh</button>
+  </div>
+  <div class="who"><span id="who"></span><button class="b sm" id="btn-logout">Sign out</button></div>
+</header>
 <main>
   <div id="global-alert"></div>
 
-  <!-- DASHBOARD -->
+  <!-- ================= DASHBOARD ================= -->
   <section class="tab on" id="tab-dash">
-    <div class="card"><h2>Players right now <button class="b sm" id="btn-dash-refresh">↻ Refresh</button></h2>
-      <div class="grid">
-        <div class="stat"><span>Online now (last 2 min)</span><b id="d-online">–</b></div>
-        <div class="stat"><span>Active in last 24 h</span><b id="d-active">–</b></div>
-        <div class="stat"><span>Played a game in last 24 h</span><b id="d-played">–</b></div>
-        <div class="stat"><span>All phones seen</span><b id="d-devices">–</b></div>
-        <div class="stat"><span>Google sign-in accounts</span><b id="d-players">–</b></div>
-        <div class="stat"><span>Guests (not signed in)</span><b id="d-guests">–</b></div>
-        <div class="stat"><span>Monthly Pass active</span><b id="d-mpass">–</b></div>
-        <div class="stat"><span>Unread feedback</span><b id="d-fb">–</b></div>
-      </div>
-      <p class="mute small">Phones are counted from v32 (build v58) on. Download numbers are only in Google Play Console.</p>
+    <div class="boxes">
+      <div class="box good"><b id="d-online">–</b><span>Online now</span></div>
+      <div class="box"><b id="d-active">–</b><span>Active (last 24 h)</span></div>
+      <div class="box"><b id="d-played">–</b><span>Played a game (24 h)</span></div>
+      <div class="box link" data-go="players:find"><b id="d-players">–</b><span>Google accounts</span></div>
+      <div class="box"><b id="d-guests">–</b><span>Guests (no sign-in)</span></div>
+      <div class="box"><b id="d-devices">–</b><span>All phones seen</span></div>
+      <div class="box link" data-go="players:passes"><b id="d-mpass">–</b><span>Monthly Pass active</span></div>
+      <div class="box link" data-go="players:passes"><b id="d-epass">–</b><span>Event Pass (this event)</span></div>
+      <div class="box link warn" data-go="players:hack"><b id="d-flag">–</b><span>Flagged players</span></div>
+      <div class="box link bad" data-go="players:find"><b id="d-sus">–</b><span>Suspended</span></div>
+      <div class="box link" data-go="feedback"><b id="d-fb">–</b><span>New feedback</span></div>
+      <div class="box link" data-go="players:buys"><b id="d-today">–</b><span>Purchases today (AED)</span></div>
     </div>
-    <div class="card"><h2>Earnings</h2>
+    <div class="card"><h2>🎉 Event right now</h2><div id="dash-ev">–</div></div>
+    <div class="card"><h2>💰 Money</h2>
+      <p class="help">Purchases = what players paid in the game (before Google's fee). Ads = AdMob and Meta (they can be 1–2 days late; connect them in "Usage & Costs").</p>
       <div class="scroll"><table>
         <tr><th></th><th>Today</th><th>Last 7 days</th><th>Last 30 days</th></tr>
-        <tr><td>Purchases (AED, before Google's fee)</td><td id="e-p-d">–</td><td id="e-p-w">–</td><td id="e-p-m">–</td></tr>
+        <tr><td>Purchases (AED)</td><td id="e-p-d">–</td><td id="e-p-w">–</td><td id="e-p-m">–</td></tr>
         <tr><td>Number of purchases</td><td id="e-n-d">–</td><td id="e-n-w">–</td><td id="e-n-m">–</td></tr>
         <tr><td>AdMob ads (USD)</td><td id="e-a-d">–</td><td id="e-a-w">–</td><td id="e-a-m">–</td></tr>
-        <tr><td>AdMob impressions</td><td id="e-i-d">–</td><td id="e-i-w">–</td><td id="e-i-m">–</td></tr>
-        <tr><td>Meta Audience Network (USD)</td><td id="e-f-d">–</td><td id="e-f-w">–</td><td id="e-f-m">–</td></tr>
+        <tr><td>AdMob ads shown</td><td id="e-i-d">–</td><td id="e-i-w">–</td><td id="e-i-m">–</td></tr>
+        <tr><td>Meta ads (USD)</td><td id="e-f-d">–</td><td id="e-f-w">–</td><td id="e-f-m">–</td></tr>
       </table></div>
-      <p class="mute small" id="e-note">Ad earnings need "Connect Google reports" (Billing & usage tab). Meta needs its report key (same tab). Ad numbers can be 1–2 days late.</p>
+      <p class="mute small" id="e-note"></p>
     </div>
+    <div class="card"><h2>🛠️ Game status</h2><div id="dash-status" class="mute">–</div></div>
+    <p class="mute small">Players are counted from v32 (build v58) on. Download numbers are only in Google Play Console.</p>
   </section>
 
-  <!-- PLAYERS -->
+  <!-- ================= USAGE & COSTS ================= -->
+  <section class="tab" id="tab-usage">
+    <div class="card"><h2>🔗 Connect Google reports</h2>
+      <p class="help">Press once to read Firebase usage, the bill and AdMob earnings (lasts about 1 hour, then press again). Green = plenty left · yellow = 80% used · red = free amount finished.</p>
+      <button class="b gold" id="btn-connect">Connect Google reports</button> <span id="conn-st" class="small mute"></span></div>
+    <div id="u-cards" class="ucards"></div>
+    <div class="card" style="margin-top:14px"><h2>💵 Spent this month (above the free amounts)</h2><div class="scroll"><table id="u-table"></table></div>
+      <p class="help" style="margin-top:8px">Prices (USD) used for the estimate — change them if Google changes its prices:</p>
+      <div class="row"><label class="f">Per 100,000 reads<input id="pr-r" type="number" step="0.001" value="0.06"></label><label class="f">Per 100,000 writes<input id="pr-w" type="number" step="0.001" value="0.18"></label><label class="f">Per 100,000 deletes<input id="pr-d" type="number" step="0.001" value="0.02"></label><label class="f">Per 1,000,000 server calls<input id="pr-f" type="number" step="0.01" value="0.40"></label></div></div>
+    <div class="card"><h2>🎯 Monthly limit & alerts</h2>
+      <div id="b-info" class="help">Connect Google reports to see the budget.</div>
+      <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
+      <p class="help" style="margin-top:8px">Google e-mails you at 50%, 90% and 100%, and a red bar appears on this page. Nothing is stopped automatically — you decide. The month restarts on the 1st.</p></div>
+    <div class="card"><h2>📘 Meta ads report key</h2>
+      <p class="help">Meta Business Settings → System users → Generate token (read_audience_network_insights). Saved privately; only this admin account can read it.</p>
+      <div class="row"><label class="f">Meta app ID<input id="meta-app" value="1171074295600149"></label><label class="f">Token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save key</button></div></div>
+  </section>
+
+  <!-- ================= PLAYERS ================= -->
   <section class="tab" id="tab-players">
-    <div class="card"><h2>Find a player</h2>
-      <div class="row"><label class="f">E-mail or name (start of it)<input id="p-q" placeholder="name@gmail.com or Sahil"></label><button class="b gold" id="btn-p-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-p-top" style="flex:0 0 auto">Top 50 by balls</button><button class="b" id="btn-p-new" style="flex:0 0 auto">Newest 50</button></div>
+    <div class="sub" data-sub="players"><button data-s="find" class="on">🔎 Find a player</button><button data-s="passes">⭐ Who has a pass</button><button data-s="buys">💳 Purchases</button><button data-s="hack">🛡️ Hack check</button></div>
+    <div class="subp on" id="players-find">
+      <div class="card"><h2>Find a player</h2><p class="help">Type an e-mail or a name. Click a player to see everything and to give / take balls, change the jar or pass, warn or suspend. The player always gets an Inbox message.</p>
+        <div class="row"><label class="f">E-mail or name<input id="p-q" placeholder="name@gmail.com or Sahil"></label><button class="b gold" id="btn-p-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-p-top" style="flex:0 0 auto">Most balls</button><button class="b" id="btn-p-new" style="flex:0 0 auto">Newest</button><button class="b" id="btn-p-sus" style="flex:0 0 auto">Suspended</button></div></div>
+      <div class="card"><div class="scroll"><table id="p-table"></table></div></div>
     </div>
-    <div class="card"><div class="scroll"><table id="p-table"></table></div></div>
-  </section>
-
-  <!-- PASSES -->
-  <section class="tab" id="tab-passes">
-    <div class="card"><h2>Monthly Pass <button class="b sm" id="btn-passes">↻ Load</button></h2>
-      <p class="mute small" id="pass-sum"></p>
-      <div class="scroll"><table id="pass-table"></table></div></div>
-    <div class="card"><h2>Weekly Event Pass (current event)</h2><div class="scroll"><table id="epass-table"></table></div></div>
-  </section>
-
-  <!-- PURCHASES -->
-  <section class="tab" id="tab-purchases">
-    <div class="card"><h2>Order ID search</h2>
-      <div class="row"><label class="f">Google Play Order ID (GPA.xxxx) or player e-mail<input id="o-q" placeholder="GPA.3312-..."></label><button class="b gold" id="btn-o-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-o-recent" style="flex:0 0 auto">Latest 100</button></div>
-      <p class="mute small">Purchases are copied here by the game from v32 on. If a player paid and did not get the item, open the player and give it (the player gets an Inbox message).</p>
+    <div class="subp" id="players-passes">
+      <div class="card"><h2>⭐ Monthly Pass <button class="b sm" id="btn-passes">↻ Load</button></h2><p class="help">Everybody with a Monthly Pass: when it was bought, when it ends and when it renewed. Click a row to change or remove it.</p><p class="mute small" id="pass-sum"></p><div class="scroll"><table id="pass-table"></table></div></div>
+      <div class="card"><h2>🎫 Weekly Event Pass (this event)</h2><div class="scroll"><table id="epass-table"></table></div></div>
     </div>
-    <div class="card"><div class="scroll"><table id="o-table"></table></div></div>
-  </section>
-
-  <!-- HACK CHECK -->
-  <section class="tab" id="tab-hack">
-    <div class="card"><h2>Hack check</h2>
-      <p class="mute small">Checks every account for things that should not be possible: more balls than the jar holds, a Monthly Pass with no payment and no code, a very big jar with no payments, very many balls, or a big jump in balls since the last saved check.</p>
-      <div class="row"><button class="b gold" id="btn-scan" style="flex:0 0 auto">Run check</button><button class="b" id="btn-snap" style="flex:0 0 auto">Save today's ball counts (for the jump check)</button>
-      <label class="f" style="flex:0 0 160px">"Very many balls" from<input id="h-max" type="number" value="5000"></label><label class="f" style="flex:0 0 160px">Jump bigger than<input id="h-jump" type="number" value="1000"></label></div>
+    <div class="subp" id="players-buys">
+      <div class="card"><h2>💳 Purchases</h2><p class="help">Search by Google Play Order ID (GPA.…) or by e-mail. If somebody paid and did not get the item, click the row and give it.</p>
+        <div class="row"><label class="f">Order ID or e-mail<input id="o-q" placeholder="GPA.3312-..."></label><button class="b gold" id="btn-o-search" style="flex:0 0 auto">Search</button><button class="b" id="btn-o-recent" style="flex:0 0 auto">Latest 100</button></div></div>
+      <div class="card"><div class="scroll"><table id="o-table"></table></div></div>
     </div>
-    <div class="card"><div class="scroll"><table id="h-table"></table></div></div>
+    <div class="subp" id="players-hack">
+      <div class="card"><h2>🛡️ Hack check</h2><p class="help">Finds accounts with impossible numbers: more balls than the jar holds, a pass with no payment or code, a huge jar with no payment, very many balls, or a big jump since the last saved count.</p>
+        <div class="row"><button class="b gold" id="btn-scan" style="flex:0 0 auto">Run check</button><button class="b" id="btn-snap" style="flex:0 0 auto">Save today's ball counts</button>
+        <label class="f" style="flex:0 0 150px">"Very many balls" from<input id="h-max" type="number" value="5000"></label><label class="f" style="flex:0 0 150px">Jump bigger than<input id="h-jump" type="number" value="1000"></label></div></div>
+      <div class="card"><div class="scroll"><table id="h-table"></table></div></div>
+    </div>
   </section>
 
-  <!-- EVENTS -->
+  <!-- ================= EVENTS & GAMES ================= -->
   <section class="tab" id="tab-events">
-    <div class="card"><h2>Now running</h2><div id="ev-now"></div></div>
-    <div class="card"><h2>Coming events <button class="b sm gold" id="btn-ev-add">+ New event</button> <label class="small mute"><input type="checkbox" id="ev-alloff"> Switch ALL events off</label></h2>
-      <div class="scroll"><table id="ev-table"></table></div>
-      <p class="mute small">Changes reach the players within 5 minutes (or when they open the game). The game for an event comes from the "Online games" list.</p></div>
-    <div class="card"><h2>Event leaderboard</h2><div class="row"><label class="f">Event<select id="lb-ev"></select></label><button class="b" id="btn-lb" style="flex:0 0 auto">Show</button><button class="b red" id="btn-lb-reset" style="flex:0 0 auto">Reset this board</button></div><div class="scroll"><table id="lb-table"></table></div></div>
-  </section>
-
-  <!-- GAMES -->
-  <section class="tab" id="tab-games">
-    <div class="card"><h2>Online event games</h2>
-      <div class="note">The games are files on your website (GitHub): <b>gmb-games/</b>. To add a new game: upload its .html file to that folder, then press "+ Add game" here and write the same file name. It can then be chosen for any event — no app update. If you changed a game file on GitHub, press "Make phones download the games again".</div>
-      <div class="row"><label class="f">Website folder of the games<input id="g-base"></label><label class="f" style="flex:0 0 120px">Games version<input id="g-ver" readonly></label><button class="b" id="btn-g-bump" style="flex:0 0 auto">Make phones download the games again</button></div>
-      <div class="scroll" style="margin-top:10px"><table id="g-table"></table></div>
-      <div class="row" style="margin-top:10px"><button class="b gold" id="btn-g-add" style="flex:0 0 auto">+ Add game</button><button class="b green" id="btn-g-save" style="flex:0 0 auto">💾 Save games</button></div>
+    <div class="sub" data-sub="events"><button data-s="cal" class="on">📅 Events</button><button data-s="games">🕹️ Mini-games</button><button data-s="rewards">🎁 Rewards & tickets</button><button data-s="settings">⚙️ Game settings</button></div>
+    <div class="subp on" id="events-cal">
+      <div class="card"><h2>🎉 Now running</h2><div id="ev-now"></div></div>
+      <div class="card"><h2>📅 Coming events <button class="b sm gold" id="btn-ev-add">+ New event</button> <label class="small mute"><input type="checkbox" id="ev-alloff"> Switch ALL events off</label></h2>
+        <p class="help">▶ Play = try the event's game here (only you can). ✏️ Change = other game, dates, name, or switch it off. Players get changes within 5 minutes.</p>
+        <div class="scroll"><table id="ev-table"></table></div></div>
+      <div class="card"><h2>🏆 Event leaderboard</h2><div class="row"><label class="f">Event<select id="lb-ev"></select></label><button class="b" id="btn-lb" style="flex:0 0 auto">Show</button><button class="b red" id="btn-lb-reset" style="flex:0 0 auto">Reset this board</button></div><div class="scroll"><table id="lb-table"></table></div></div>
+    </div>
+    <div class="subp" id="events-games">
+      <div class="card"><h2>🕹️ Mini-games</h2>
+        <p class="help">The games are files on your website (folder gmb-games). New game: put its .html file in that folder (SETUP.bat does it), then "+ Add game" with the same file name. Changed a game file? Press "Phones: download games again".</p>
+        <div class="row"><label class="f">Website folder of the games<input id="g-base"></label><label class="f" style="flex:0 0 110px">Version<input id="g-ver" readonly></label><button class="b" id="btn-g-bump" style="flex:0 0 auto">Phones: download games again</button></div>
+        <div class="scroll" style="margin-top:10px"><table id="g-table"></table></div>
+        <div class="row" style="margin-top:10px"><button class="b gold" id="btn-g-add" style="flex:0 0 auto">+ Add game</button><button class="b green" id="btn-g-save" style="flex:0 0 auto">💾 Save games</button></div></div>
+    </div>
+    <div class="subp" id="events-rewards">
+      <div class="card"><h2>🎁 Event reward ladder</h2><p class="help">Points a player needs in an event and what he gets for them.</p><div class="scroll"><table id="r-ladder"></table></div>
+        <div class="row" style="margin-top:8px"><button class="b" id="btn-r-addtier" style="flex:0 0 auto">+ Add step</button><button class="b" id="btn-r-default" style="flex:0 0 auto">Back to the built-in ladder</button></div></div>
+      <div class="card"><h2>🎫 Event Pass & tickets</h2><div class="row">
+        <label class="f">Points × with Event Pass<input id="r-mult" type="number" step="0.5" min="1"></label>
+        <label class="f">Free tickets a day<input id="r-tf" type="number" min="1"></label>
+        <label class="f">Tickets a day with pass<input id="r-tp" type="number" min="1"></label>
+        <label class="f">Balls for 1 ticket<input id="r-tc" type="number" min="1"></label></div></div>
+      <button class="b green" id="btn-r-save">💾 Save rewards & settings</button>
+    </div>
+    <div class="subp" id="events-settings">
+      <div class="card"><h2>📆 Daily bonus (7 days)</h2><div class="scroll"><table id="r-daily"></table></div></div>
+      <div class="card"><h2>📺 Ads</h2><div class="row">
+        <label class="f">Banner ads<select id="r-banner"><option value="1">On</option><option value="0">Off</option></select></label>
+        <label class="f">Watch Ad gives at least (balls)<input id="r-amin" type="number" min="1"></label>
+        <label class="f">Watch Ad gives at most (balls)<input id="r-amax" type="number" min="1"></label></div></div>
+      <div class="card"><h2>🎮 Games on / off</h2><div class="row">
+        <label class="f">Guess the Balls<select id="r-mg"><option value="1">On</option><option value="0">Off</option></select></label>
+        <label class="f">Aim the Queen<select id="r-ma"><option value="1">On</option><option value="0">Off</option></select></label>
+        <label class="f">Events button<select id="r-me"><option value="1">On</option><option value="0">Off</option></select></label></div>
+        <p class="help" style="margin-top:8px">Speed, difficulty and timers stay automatic inside each game.</p></div>
+      <button class="b green" id="btn-r-save2">💾 Save rewards & settings</button>
     </div>
   </section>
 
-  <!-- REWARDS & SETTINGS -->
-  <section class="tab" id="tab-rewards">
-    <div class="card"><h2>Event reward ladder</h2><div class="scroll"><table id="r-ladder"></table></div>
-      <div class="row" style="margin-top:8px"><button class="b" id="btn-r-addtier" style="flex:0 0 auto">+ Step</button><button class="b" id="btn-r-default" style="flex:0 0 auto">Back to built-in ladder</button></div></div>
-    <div class="card"><h2>Weekly Event Pass & tickets</h2><div class="row">
-      <label class="f">Points multiplier with pass<input id="r-mult" type="number" step="0.5" min="1"></label>
-      <label class="f">Free tickets a day<input id="r-tf" type="number" min="1"></label>
-      <label class="f">Tickets a day with pass<input id="r-tp" type="number" min="1"></label>
-      <label class="f">Balls for 1 ticket<input id="r-tc" type="number" min="1"></label></div></div>
-    <div class="card"><h2>Daily bonus (7 days)</h2><div class="scroll"><table id="r-daily"></table></div></div>
-    <div class="card"><h2>Ads</h2><div class="row">
-      <label class="f">Banner ads<select id="r-banner"><option value="1">On</option><option value="0">Off</option></select></label>
-      <label class="f">Watch Ad gives at least (balls)<input id="r-amin" type="number" min="1"></label>
-      <label class="f">Watch Ad gives at most (balls)<input id="r-amax" type="number" min="1"></label></div></div>
-    <div class="card"><h2>Games on/off</h2><div class="row">
-      <label class="f">Guess the Balls<select id="r-mg"><option value="1">On</option><option value="0">Off</option></select></label>
-      <label class="f">Aim the Queen<select id="r-ma"><option value="1">On</option><option value="0">Off</option></select></label>
-      <label class="f">Events button<select id="r-me"><option value="1">On</option><option value="0">Off</option></select></label></div>
-      <p class="mute small">Game speed, difficulty and timers stay automatic inside each game.</p></div>
-    <button class="b green" id="btn-r-save">💾 Save rewards & settings</button>
-  </section>
-
-  <!-- MESSAGES -->
-  <section class="tab" id="tab-messages">
-    <div class="card"><h2>Message to ALL players (popup, shown once)</h2>
-      <label class="f">Title<input id="m-title"></label><br><label class="f">Text<textarea id="m-text"></textarea></label><br>
-      <div class="row"><label class="f">Show until (empty = always)<input id="m-until" type="datetime-local"></label><label class="f">Status<select id="m-on"><option value="1">On</option><option value="0">Off</option></select></label></div><br>
-      <button class="b gold" id="btn-m-send">📢 Send / update message</button> <span class="mute small" id="m-cur"></span></div>
-    <div class="card"><h2>Maintenance mode</h2>
-      <p class="mute small">When ON, nobody can play: the game shows this message with "Try again" and "Exit".</p>
-      <label class="f">Title<input id="mt-title" placeholder="Short break"></label><br><label class="f">Text<textarea id="mt-text" placeholder="We are improving the game. Please come back in a little while."></textarea></label><br>
-      <button class="b red" id="btn-mt-on">Turn maintenance ON</button> <button class="b green" id="btn-mt-off">Turn maintenance OFF</button> <span id="mt-cur"></span></div>
-  </section>
-
-  <!-- CODES -->
+  <!-- ================= CODES & MESSAGES ================= -->
   <section class="tab" id="tab-codes">
-    <div class="card"><h2>New code</h2>
-      <div class="row"><label class="f">Code<input id="c-code" placeholder="DIWALI100" style="text-transform:uppercase"></label><button class="b sm" id="btn-c-gen" style="flex:0 0 auto">Random</button>
-      <label class="f">Gives<select id="c-type"><option value="balls">Balls</option><option value="monthlyPass">Monthly Pass (days)</option><option value="jarCapacity">Jar capacity</option></select></label>
-      <label class="f">Amount (balls / days / capacity)<input id="c-amount" type="number" value="50"></label>
-      <label class="f">How many players can use it (0 = no limit)<input id="c-max" type="number" value="0"></label>
-      <label class="f">Expires (empty = never)<input id="c-exp" type="datetime-local"></label>
-      <label class="f">Note (only for you)<input id="c-note"></label></div><br>
-      <button class="b gold" id="btn-c-create">Create code</button>
-      <p class="mute small">Every player can use a code only once. Put codes on your website wherever you like. Players enter them in Settings → 🎁 Redeem.</p></div>
-    <div class="card"><h2>All codes <button class="b sm" id="btn-c-load">↻ Load</button></h2><div class="scroll"><table id="c-table"></table></div></div>
+    <div class="sub" data-sub="codes"><button data-s="codes" class="on">🎟️ Codes</button><button data-s="msg">📢 Message to all</button><button data-s="maint">🛠️ Maintenance</button><button data-s="log">📜 Action log</button></div>
+    <div class="subp on" id="codes-codes">
+      <div class="card"><h2>🎟️ New code</h2><p class="help">Players type codes in the game: Settings → 🎁 Redeem. Each player can use a code once. Post codes on gamescrusher97.com.</p>
+        <div class="row"><label class="f">Code<input id="c-code" placeholder="DIWALI100" style="text-transform:uppercase"></label><button class="b sm" id="btn-c-gen" style="flex:0 0 auto">Random</button>
+        <label class="f">Gives<select id="c-type"><option value="balls">Balls</option><option value="monthlyPass">Monthly Pass (days)</option><option value="jarCapacity">Jar capacity</option></select></label>
+        <label class="f">Amount<input id="c-amount" type="number" value="50"></label>
+        <label class="f">Max players (0 = no limit)<input id="c-max" type="number" value="0"></label>
+        <label class="f">Ends (empty = never)<input id="c-exp" type="datetime-local"></label>
+        <label class="f">Note (only you see it)<input id="c-note"></label></div><br>
+        <button class="b gold" id="btn-c-create">Create code</button></div>
+      <div class="card"><h2>All codes <button class="b sm" id="btn-c-load">↻ Load</button></h2><div class="scroll"><table id="c-table"></table></div></div>
+    </div>
+    <div class="subp" id="codes-msg">
+      <div class="card"><h2>📢 Message to ALL players</h2><p class="help">Shown once as a popup when they open the game.</p>
+        <label class="f">Title<input id="m-title"></label><br><label class="f">Text<textarea id="m-text"></textarea></label><br>
+        <div class="row"><label class="f">Show until (empty = always)<input id="m-until" type="datetime-local"></label><label class="f">Status<select id="m-on"><option value="1">On</option><option value="0">Off</option></select></label></div><br>
+        <button class="b gold" id="btn-m-send">Send message</button> <span class="mute small" id="m-cur"></span></div>
+    </div>
+    <div class="subp" id="codes-maint">
+      <div class="card"><h2>🛠️ Maintenance mode</h2><p class="help">ON = nobody can play; the game shows your text with "Try again" and "Exit".</p>
+        <label class="f">Title<input id="mt-title" placeholder="Short break"></label><br><label class="f">Text<textarea id="mt-text" placeholder="We are improving the game. Please come back in a little while."></textarea></label><br>
+        <button class="b red" id="btn-mt-on">Turn maintenance ON</button> <button class="b green" id="btn-mt-off">Turn maintenance OFF</button> <span id="mt-cur"></span></div>
+    </div>
+    <div class="subp" id="codes-log">
+      <div class="card"><h2>📜 Everything done on this page <button class="b sm" id="btn-log">↻ Load</button></h2><div class="scroll"><table id="log-table"></table></div></div>
+    </div>
   </section>
 
-  <!-- FEEDBACK -->
+  <!-- ================= FEEDBACK ================= -->
   <section class="tab" id="tab-feedback">
-    <div class="card"><h2>Feedback from the game <button class="b sm" id="btn-f-load">↻ Load</button></h2><div class="scroll"><table id="f-table"></table></div></div>
-  </section>
-
-  <!-- BILLING -->
-  <section class="tab" id="tab-billing">
-    <div class="card"><h2>Connect Google reports</h2>
-      <p class="mute small">Needed for: Firebase usage & extra charges, the budget, and AdMob earnings. It asks your GamesCrusher97 Google account for read access (and budget editing). One-time setup is in FIREBASE-STEPS.txt (switch on 4 Google APIs). Access lasts about 1 hour, then press the button again.</p>
-      <button class="b gold" id="btn-connect">🔗 Connect Google reports</button> <span id="conn-st" class="small mute"></span></div>
-    <div class="card"><h2>Firebase usage (Blaze plan)</h2>
-      <div class="scroll"><table id="u-table"></table></div>
-      <p class="mute small" id="u-note">Free every day: 50,000 reads, 20,000 writes, 20,000 deletes. Free every month: 2,000,000 server function calls. Prices below are Google's list prices (USD) and can be changed.</p>
-      <div class="row"><label class="f">Price per 100,000 reads $<input id="pr-r" type="number" step="0.001" value="0.06"></label><label class="f">per 100,000 writes $<input id="pr-w" type="number" step="0.001" value="0.18"></label><label class="f">per 100,000 deletes $<input id="pr-d" type="number" step="0.001" value="0.02"></label><label class="f">per 1,000,000 function calls $<input id="pr-f" type="number" step="0.01" value="0.40"></label></div></div>
-    <div class="card"><h2>Budget & alerts</h2>
-      <div id="b-info" class="mute small">Connect Google reports to see the budget.</div>
-      <div class="row" style="margin-top:8px"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Alert me (e-mail + this page) at % of limit<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
-      <p class="mute small">Google e-mails you at 50%, 90% and 100% of the limit. Nothing is stopped automatically — you decide. The billing month renews on the 1st of every month.</p></div>
-    <div class="card"><h2>Meta Audience Network report key</h2>
-      <p class="mute small">Meta Business Settings → System users → Generate token (permission: read_audience_network_insights). Paste it here; it is saved privately in your Firebase (only this admin account can read it).</p>
-      <div class="row"><label class="f">Meta app / property ID<input id="meta-app" value="1171074295600149"></label><label class="f">Token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save</button></div></div>
-  </section>
-
-  <!-- LOG -->
-  <section class="tab" id="tab-log">
-    <div class="card"><h2>Everything done on this page <button class="b sm" id="btn-log">↻ Load</button></h2><div class="scroll"><table id="log-table"></table></div></div>
+    <div class="card"><h2>💬 Feedback from the game <button class="b sm" id="btn-f-load">↻ Load</button></h2><p class="help">Click one to read it all, reply to the player's Inbox, or mark it done.</p><div class="scroll"><table id="f-table"></table></div></div>
   </section>
 </main>
 </div>
@@ -290,11 +309,22 @@ onAuthStateChanged(auth, u => {
     $('login').style.display = 'block'; $('app').style.display = 'none';
   }
 });
-document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b));
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
-  const f = onTab[b.dataset.tab]; if(f) f();
-});
+function goTab(tab, sub){
+  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + tab));
+  const f = onTab[tab]; if(f) f();
+  if(sub) goSub(tab, sub);
+  window.scrollTo(0, 0);
+}
+function goSub(group, s){
+  const bar = document.querySelector('.sub[data-sub="' + group + '"]'); if(!bar) return;
+  bar.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.s === s));
+  document.querySelectorAll('#tab-' + group + ' .subp').forEach(p => p.classList.toggle('on', p.id === group + '-' + s));
+  const f = onSub[group + ':' + s]; if(f) f();
+}
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => goTab(b.dataset.tab));
+document.querySelectorAll('.sub').forEach(bar => bar.querySelectorAll('button').forEach(b => b.onclick = () => goSub(bar.dataset.sub, b.dataset.s)));
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const p = b.dataset.go.split(':'); goTab(p[0], p[1]); });
 
 /* ---------------- shared ---------------- */
 let CFG = {};          // config/game
@@ -377,7 +407,7 @@ const evName = e => (e.title || (THEMES[e.key] && THEMES[e.key].n) || e.key);
 const evEmoji = e => (THEMES[e.key] && THEMES[e.key].e) || '🎪';
 function currentEvent(){ const t = Date.now(); if((CFG.events || {}).off) return null; return allEvents().find(e => !e.off && e.start <= t && t < e.end) || null; }
 function gamesList(){
-  const builtin = { catch: { name: 'Catch the Balls', file: 'catch.html', time: 35 }, cards: { name: 'Match the Pairs', file: 'cards.html', time: 75 }, slice: { name: 'Marble Slice', file: 'slice.html', time: 40 }, shooter: { name: 'Marble Shooter', file: 'shooter.html', time: 60 } };
+  const builtin = { catch: { name: 'Catch the Balls', file: 'catch.html', time: 35, tip: 'Slide your finger to move the jar and catch the falling balls. Gold = 3 points. Avoid the bombs!' }, cards: { name: 'Match the Pairs', file: 'cards.html', time: 75, tip: 'Flip two cards at a time and find all 8 pairs. Fewer mistakes and a faster time give more points.' }, slice: { name: 'Marble Slice', file: 'slice.html', time: 40, tip: 'Swipe through the flying marbles to slice them. Gold = 5 points. Do not slice the bombs!' }, shooter: { name: 'Marble Shooter', file: 'shooter.html', time: 60, tip: 'Drag to aim, lift your finger to shoot. Match 3 or more marbles of the same colour to pop them.' } };
   return Object.assign({}, builtin, CFG.games || {});
 }
 
@@ -393,10 +423,9 @@ async function start(){
   if(ADM.metaToken) $('meta-tok').value = ADM.metaToken;
   loadDash();
 }
-const onTab = {
-  dash: loadDash, passes: loadPasses, purchases: () => loadPurchases(), events: renderEvents, games: renderGames, rewards: renderRewards,
-  messages: renderMessages, codes: loadCodes, feedback: loadFeedback, log: loadLog, billing: renderBilling
-};
+const onTab = { dash: loadDash, usage: renderBilling, events: renderEvents, codes: loadCodes, feedback: loadFeedback };
+const onSub = { 'players:passes': loadPasses, 'players:buys': () => loadPurchases(), 'events:cal': renderEvents, 'events:games': renderGames, 'events:rewards': renderRewards, 'events:settings': renderRewards,
+  'codes:codes': loadCodes, 'codes:msg': renderMessages, 'codes:maint': renderMessages, 'codes:log': loadLog };
 
 /* ---------------- DASHBOARD ---------------- */
 $('btn-dash-refresh').onclick = loadDash;
@@ -410,6 +439,18 @@ async function loadDash(){
   ]);
   $('d-online').textContent = on; $('d-active').textContent = act; $('d-played').textContent = played; $('d-devices').textContent = dev;
   $('d-players').textContent = players; $('d-guests').textContent = guests; $('d-mpass').textContent = mp; $('d-fb').textContent = fb;
+  const cur = currentEvent();
+  $('d-epass').textContent = cur ? await cnt(query(pl, where('eventPass.eventId', '==', cur.id))) : '–';
+  $('d-sus').textContent = await cnt(query(pl, where('suspended.on', '==', true)));
+  $('d-flag').textContent = ADM.lastHack ? ADM.lastHack.count : '–';
+  const g = gamesList();
+  $('dash-ev').innerHTML = cur ? `<div class="evnow"><span class="em">${evEmoji(cur)}</span><div><b style="font-size:17px">${esc(evName(cur))}</b><div class="mute">Game: ${esc((g[cur.engine] || {}).name || cur.engine)} · ends ${fmt(cur.end)} (${Math.max(0, Math.ceil((cur.end - now) / 3600000))} h left)</div></div><button class="b gold" id="dash-play">▶ Play this game</button> <button class="b" id="dash-chg">✏️ Change</button></div>`
+    : (() => { const nx = allEvents().find(e => !e.off && e.start > now); return 'No event right now.' + (nx ? ' Next: <b>' + evEmoji(nx) + ' ' + esc(evName(nx)) + '</b> starts ' + fmt(nx.start) + '.' : ''); })();
+  if(cur){ $('dash-play').onclick = () => previewGame(cur.engine, cur); $('dash-chg').onclick = () => { goTab('events', 'cal'); editEvent(cur.id); }; }
+  const m = CFG.maintenance || {}, b = CFG.broadcast || {};
+  $('dash-status').innerHTML = (m.on ? '<span class="pill bad">MAINTENANCE ON — nobody can play</span>' : '<span class="pill ok">Game is open</span>') + ' &nbsp; ' +
+    ((CFG.events || {}).off ? '<span class="pill bad">All events off</span>' : '<span class="pill ok">Events on</span>') + ' &nbsp; ' +
+    (b.on && b.id ? '<span class="pill info">Message to all is on</span>' : '<span class="pill">No message to all</span>');
   // purchases
   try {
     const qs = await getDocs(query(collection(db, 'purchaseLog'), where('at', '>=', now - 30 * DAY)));
@@ -418,6 +459,7 @@ async function loadDash(){
     qs.forEach(s => { const p = s.data(), a = +p.aed || 0; m += a; nm++; if(p.at >= now - 7 * DAY){ w += a; nw++; } if(p.at >= mid.getTime()){ d += a; nd++; } });
     $('e-p-d').textContent = d + ' AED'; $('e-p-w').textContent = w + ' AED'; $('e-p-m').textContent = m + ' AED';
     $('e-n-d').textContent = nd; $('e-n-w').textContent = nw; $('e-n-m').textContent = nm;
+    $('d-today').textContent = d;
   } catch(e){ err(e); }
   loadAdEarnings();
   checkBudgetAlert();
@@ -435,6 +477,7 @@ function showPlayers(rows){
 }
 const snapRows = qs => { const a = []; qs.forEach(s => a.push({ id: s.id, d: s.data() })); return a; };
 $('btn-p-top').onclick = async () => { try { showPlayers(snapRows(await getDocs(query(collection(db, 'players'), orderBy('balls', 'desc'), limit(50))))); } catch(e){ err(e); } };
+$('btn-p-sus').onclick = async () => { try { showPlayers(snapRows(await getDocs(query(collection(db, 'players'), where('suspended.on', '==', true), limit(100))))); } catch(e){ err(e); } };
 $('btn-p-new').onclick = async () => { try { showPlayers(snapRows(await getDocs(query(collection(db, 'players'), orderBy('createdAt', 'desc'), limit(50))))); } catch(e){ err(e); } };
 $('btn-p-search').onclick = async () => {
   const q = $('p-q').value.trim(); if(!q) return;
@@ -591,6 +634,7 @@ $('btn-scan').onclick = async () => {
     $('h-table').innerHTML = `<tr><th colspan=3>${rows.length} accounts checked · ${out.length} need a look</th></tr><tr><th>Player</th><th>Why</th><th>Balls</th></tr>` + out.map(o => `<tr class="click" data-email="${esc(o.id)}"><td>${esc(o.d.name || '')}<div class="mute small">${esc(o.id)}</div></td><td>${o.f.map(x => '<span class="pill bad">' + esc(x) + '</span>').join(' ')}</td><td>${o.d.balls}</td></tr>`).join('');
     $('h-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
     await logAction('hack check', out.length + ' flagged of ' + rows.length, '');
+    ADM.lastHack = { at: Date.now(), count: out.length }; await setDoc(doc(db, 'adminData', 'settings'), { lastHack: ADM.lastHack }, { merge: true });
   } catch(e){ err(e); }
 };
 $('btn-snap').onclick = async () => {
@@ -610,10 +654,11 @@ function gameOptions(sel){ const g = gamesList(); return Object.keys(g).map(k =>
 function renderEvents(){
   const evs = allEvents(), now = Date.now(), cur = currentEvent(), g = gamesList();
   $('ev-alloff').checked = !!(CFG.events && CFG.events.off);
-  $('ev-now').innerHTML = cur ? `<h3>${evEmoji(cur)} ${esc(evName(cur))}</h3><p>Game: <b>${esc((g[cur.engine] || {}).name || cur.engine)}</b> · Started ${fmt(cur.start)} · <b>Ends ${fmt(cur.end)}</b> (${Math.ceil((cur.end - now) / 3600000)} h left)</p><button class="b sm" data-ev="${esc(cur.id)}">✏️ Change</button>` : '<p class="mute">No event is running.</p>';
+  $('ev-now').innerHTML = cur ? `<h3>${evEmoji(cur)} ${esc(evName(cur))}</h3><p>Game: <b>${esc((g[cur.engine] || {}).name || cur.engine)}</b> · Started ${fmt(cur.start)} · <b>Ends ${fmt(cur.end)}</b> (${Math.ceil((cur.end - now) / 3600000)} h left)</p><button class="b sm gold" data-play="${esc(cur.id)}">▶ Play this game</button> <button class="b sm" data-ev="${esc(cur.id)}">✏️ Change</button>` : '<p class="mute">No event is running.</p>';
   const next = evs.filter(e => e.end > now).slice(0, 14);
-  $('ev-table').innerHTML = '<tr><th>Event</th><th>Starts</th><th>Ends</th><th>Game</th><th></th></tr>' + next.map(e => `<tr><td>${evEmoji(e)} ${esc(evName(e))} ${e.custom ? '<span class="pill info">new</span>' : ''} ${e.changed ? '<span class="pill warn">changed</span>' : ''} ${e.off ? '<span class="pill bad">off</span>' : ''}<div class="mute small">${esc(e.id)}</div></td><td>${fmt(e.start)}</td><td>${fmt(e.end)}</td><td>${esc((g[e.engine] || {}).name || e.engine)}</td><td><button class="b sm" data-ev="${esc(e.id)}">✏️ Change</button></td></tr>`).join('');
+  $('ev-table').innerHTML = '<tr><th>Event</th><th>Starts</th><th>Ends</th><th>Game</th><th></th></tr>' + next.map(e => `<tr><td>${evEmoji(e)} ${esc(evName(e))} ${e.custom ? '<span class="pill info">new</span>' : ''} ${e.changed ? '<span class="pill warn">changed</span>' : ''} ${e.off ? '<span class="pill bad">off</span>' : ''}<div class="mute small">${esc(e.id)}</div></td><td>${fmt(e.start)}</td><td>${fmt(e.end)}</td><td>${esc((g[e.engine] || {}).name || e.engine)}</td><td><button class="b sm gold" data-play="${esc(e.id)}">▶ Play</button> <button class="b sm" data-ev="${esc(e.id)}">✏️ Change</button></td></tr>`).join('');
   document.querySelectorAll('#tab-events [data-ev]').forEach(b => b.onclick = () => editEvent(b.dataset.ev));
+  document.querySelectorAll('#tab-events [data-play]').forEach(b => b.onclick = () => { const e = allEvents().find(x => x.id === b.dataset.play); if(e) previewGame(e.engine, e); });
   $('lb-ev').innerHTML = evs.filter(e => e.start < now).slice(-6).reverse().map(e => `<option value="${esc(e.id)}">${evEmoji(e)} ${esc(evName(e))} (${esc(e.id)})</option>`).join('');
 }
 function editEvent(id){
@@ -662,7 +707,8 @@ function renderGames(){
   drawGames();
 }
 function drawGames(){
-  $('g-table').innerHTML = '<tr><th>ID</th><th>Name</th><th>File on website</th><th>Time (s)</th><th>How to play</th><th>On</th><th></th></tr>' + Object.keys(GEDIT).map(k => { const g = GEDIT[k]; return `<tr data-g="${esc(k)}"><td><b>${esc(k)}</b></td><td><input data-f="name" value="${esc(g.name || '')}"></td><td><input data-f="file" value="${esc(g.file || '')}"></td><td><input data-f="time" type="number" style="width:70px" value="${g.time || ''}"></td><td><input data-f="tip" value="${esc(g.tip || '')}"></td><td><input data-f="on" type="checkbox" ${g.off ? '' : 'checked'}></td><td><a class="small" target="_blank" href="${esc(($('g-base').value || '') + (g.file || ''))}">open</a> <button class="b sm red" data-del="${esc(k)}">✕</button></td></tr>`; }).join('');
+  $('g-table').innerHTML = '<tr><th>ID</th><th>Name</th><th>File on website</th><th>Time (s)</th><th>How to play</th><th>On</th><th></th></tr>' + Object.keys(GEDIT).map(k => { const g = GEDIT[k]; return `<tr data-g="${esc(k)}"><td><b>${esc(k)}</b></td><td><input data-f="name" value="${esc(g.name || '')}"></td><td><input data-f="file" value="${esc(g.file || '')}"></td><td><input data-f="time" type="number" style="width:70px" value="${g.time || ''}"></td><td><input data-f="tip" value="${esc(g.tip || '')}"></td><td><input data-f="on" type="checkbox" ${g.off ? '' : 'checked'}></td><td><button class="b sm gold" data-pv="${esc(k)}">▶ Play</button> <button class="b sm red" data-del="${esc(k)}">✕</button></td></tr>`; }).join('');
+  $('g-table').querySelectorAll('[data-pv]').forEach(b => b.onclick = () => { readGames(); previewGame(b.dataset.pv, currentEvent() || allEvents().find(e => e.end > Date.now())); });
   $('g-table').querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if(confirm('Remove ' + b.dataset.del + ' from the list?')){ readGames(); delete GEDIT[b.dataset.del]; drawGames(); } });
 }
 function readGames(){ $('g-table').querySelectorAll('tr[data-g]').forEach(tr => { const g = GEDIT[tr.dataset.g]; tr.querySelectorAll('[data-f]').forEach(i => { const f = i.dataset.f; if(f === 'on') g.off = !i.checked; else if(f === 'time') g.time = +i.value || 0; else g[f] = i.value.trim(); }); }); }
@@ -689,6 +735,7 @@ function renderRewards(){
 }
 $('btn-r-addtier').onclick = () => { readLadder(); const last = LAD[LAD.length - 1]; LAD.push({ pts: (last ? last.pts : 0) + 300, balls: 20 }); drawLadder(); };
 $('btn-r-default').onclick = () => { LAD = JSON.parse(JSON.stringify(BUILTIN_LADDER)); drawLadder(); };
+$('btn-r-save2').onclick = () => $('btn-r-save').onclick();
 $('btn-r-save').onclick = async () => {
   readLadder();
   const daily = []; $('r-daily').querySelectorAll('tr[data-d]').forEach(tr => daily.push({ balls: +tr.querySelector('[data-f=balls]').value || 0, capacityPct: +tr.querySelector('[data-f=capacityPct]').value || 0 }));
@@ -799,7 +846,7 @@ async function metric(type, startMs, endMs){
 let USAGE = null;
 async function renderBilling(){
   $('conn-st').textContent = TOKEN ? '✓ connected' : 'not connected';
-  if(!TOKEN) return;
+  if(!TOKEN){ $('u-cards').innerHTML = '<div class="card mute">Press "Connect Google reports" to see what is left of the free amounts.</div>'; return; }
   const now = Date.now(), mid = new Date(); mid.setHours(0, 0, 0, 0);
   const m1 = new Date(); m1.setDate(1); m1.setHours(0, 0, 0, 0);
   const next1 = new Date(m1); next1.setMonth(next1.getMonth() + 1);
@@ -816,15 +863,23 @@ async function renderBilling(){
     const cost = ex.r / 100000 * pr.r + ex.w / 100000 * pr.w + ex.d / 100000 * pr.d + ex.f / 1000000 * pr.f;
     USAGE = { cost, at: now };
     const pct = (a, b) => Math.round(a / b * 100) + '%';
-    $('u-table').innerHTML = `<tr><th></th><th>Today</th><th>Free a day</th><th>Used of free today</th><th>This month</th><th>Above free this month</th></tr>
-      <tr><td>Firestore reads</td><td>${rD.toLocaleString()}</td><td>50,000</td><td>${pct(rD, 50000)}</td><td>${rM.toLocaleString()}</td><td>${ex.r.toLocaleString()}</td></tr>
-      <tr><td>Firestore writes</td><td>${wD.toLocaleString()}</td><td>20,000</td><td>${pct(wD, 20000)}</td><td>${wM.toLocaleString()}</td><td>${ex.w.toLocaleString()}</td></tr>
-      <tr><td>Firestore deletes</td><td>${dD.toLocaleString()}</td><td>20,000</td><td>${pct(dD, 20000)}</td><td>${dM.toLocaleString()}</td><td>${ex.d.toLocaleString()}</td></tr>
-      <tr><td>Server function calls</td><td></td><td>2,000,000 a month</td><td>${pct(fM, 2000000)} of month</td><td>${fM.toLocaleString()}</td><td>${ex.f.toLocaleString()}</td></tr>
-      <tr><th colspan=5>Estimated extra charge this month</th><th style="color:var(--gold);font-size:16px">$${cost.toFixed(2)}</th></tr>
-      <tr><td colspan=6 class="mute small">Billing month: ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()}</td></tr>`;
+    const tomorrow = new Date(mid.getTime() + DAY);
+    const ucard = (name, tag, used, free, unit, resets) => { const left = Math.max(0, free - used), p = Math.min(100, used / free * 100), cls = p >= 100 ? 'r' : p >= 80 ? 'y' : '';
+      return `<div class="ucard ${cls}"><div class="t"><span>${name}</span><span class="tag">${tag}</span></div><div class="big">${left.toLocaleString()} <small>${unit} left</small></div><div class="bar"><i style="width:${p.toFixed(1)}%"></i></div><p>Used ${used.toLocaleString()} of ${free.toLocaleString()} free</p><p>Resets ${resets}</p></div>`; };
+    $('u-cards').innerHTML = ucard('Database reads', 'DAILY', rD, 50000, 'reads', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
+      ucard('Database writes', 'DAILY', wD, 20000, 'writes', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
+      ucard('Database deletes', 'DAILY', dD, 20000, 'deletes', tomorrow.toLocaleDateString() + ' ' + tomorrow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) +
+      ucard('Server calls (functions)', 'MONTHLY', fM, 2000000, 'calls', next1.toLocaleDateString());
+    const money = v => v > 0 ? '<b style="color:var(--yellow)">$' + v.toFixed(2) + '</b>' : '<b style="color:var(--green)">$0.00</b>';
+    $('u-table').innerHTML = `<tr><th>Service</th><th>Used this month</th><th>Above free</th><th>Price after free</th><th>Spent</th></tr>
+      <tr><td>Database reads <span class="pill info">DAILY</span></td><td>${rM.toLocaleString()}</td><td>${ex.r.toLocaleString()}</td><td>$${pr.r} per 100,000</td><td>${money(ex.r / 100000 * pr.r)}</td></tr>
+      <tr><td>Database writes <span class="pill info">DAILY</span></td><td>${wM.toLocaleString()}</td><td>${ex.w.toLocaleString()}</td><td>$${pr.w} per 100,000</td><td>${money(ex.w / 100000 * pr.w)}</td></tr>
+      <tr><td>Database deletes <span class="pill info">DAILY</span></td><td>${dM.toLocaleString()}</td><td>${ex.d.toLocaleString()}</td><td>$${pr.d} per 100,000</td><td>${money(ex.d / 100000 * pr.d)}</td></tr>
+      <tr><td>Server calls <span class="pill info">MONTHLY</span></td><td>${fM.toLocaleString()}</td><td>${ex.f.toLocaleString()}</td><td>$${pr.f} per 1,000,000</td><td>${money(ex.f / 1000000 * pr.f)}</td></tr>
+      <tr><th colspan=4>Total (estimate)</th><th style="font-size:16px">${money(cost)}</th></tr>
+      <tr><td colspan=5 class="mute small">Billing month ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()} · exact bill: <a target="_blank" href="https://console.cloud.google.com/billing">Google Cloud Billing ↗</a></td></tr>`;
     await setDoc(doc(db, 'adminData', 'settings'), { prices: pr, lastUsage: USAGE }, { merge: true });
-  } catch(e){ $('u-table').innerHTML = `<tr><td class="alert">${esc(e.message)}<br><span class="small">Check FIREBASE-STEPS.txt: Cloud Monitoring API must be switched on.</span></td></tr>`; }
+  } catch(e){ $('u-cards').innerHTML = ''; $('u-table').innerHTML = `<tr><td class="alert">${esc(e.message)}<br><span class="small">Run SETUP.bat once more (it switches on the Google reports), or see FIREBASE-STEPS.txt.</span></td></tr>`; }
   try {
     const bi = await gapi('https://cloudbilling.googleapis.com/v1/projects/' + PROJECT_ID + '/billingInfo');
     if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Billing (Blaze plan) is not switched on for this project yet.'; }
@@ -891,6 +946,37 @@ async function loadAdEarnings(){
     catch(e){ $('e-f-d').textContent = '–'; $('e-note').textContent += ' · Meta: ' + e.message; }
   }
 }
+
+/* ---------------- GAME PREVIEW (only here, after admin sign-in) ---------------- */
+let pvHandler = null;
+function previewGame(engine, ev){
+  const g = gamesList()[engine]; if(!g){ toast('Unknown game'); return; }
+  const base = (CFG.gamesBase || 'https://gamescrusher97.com/gmb-games/').replace(/\/?$/, '/');
+  const url = (g.url || (base + (g.file || engine + '.html'))) + '?v=' + encodeURIComponent(CFG.gamesVersion || '1') + '&t=' + Date.now();
+  const th = Object.assign({}, THEMES[(ev && ev.key) || 'newyear'] || THEMES.newyear); if(ev && ev.title) th.n = ev.title;
+  modal(`<h2>▶ ${esc(g.name || engine)} <span class="mute small">${ev ? evEmoji(ev) + ' ' + esc(evName(ev)) : ''}</span></h2>
+    <p class="help">Test play — only you can do this. Nothing is saved and no rewards are given. Players play it only inside the app.</p>
+    <div class="pv"><div class="pv-phone" style="background:linear-gradient(160deg,${th.c1 || '#3a1f7a'},${th.c2 || '#120a2a'})"><iframe id="pv-frame" sandbox="allow-scripts" allow="autoplay"></iframe></div>
+    <div class="pv-side"><div class="pv-hud"><div class="box"><b id="pv-score">0</b><span>Score</span></div><div class="box"><b id="pv-time">–</b><span>Time</span></div></div>
+    <div id="pv-res" class="note" style="display:none"></div>
+    <button class="b gold" id="pv-again">↻ Play again</button>
+    <p class="mute small" style="margin-top:10px">How to play: ${esc(g.tip || '')}</p>
+    ${ev ? '<button class="b" id="pv-edit">✏️ Change this event</button>' : ''}</div></div>`);
+  const fr = $('pv-frame');
+  if(pvHandler) window.removeEventListener('message', pvHandler);
+  pvHandler = e => {
+    if(!fr.contentWindow || e.source !== fr.contentWindow) return; const d = e.data; if(!d || d.gmb !== 1) return;
+    if(d.t === 'ready') fr.contentWindow.postMessage({ gmb: 1, t: 'init', engine, theme: th, low: false }, '*');
+    else if(d.t === 'score') $('pv-score').textContent = d.v;
+    else if(d.t === 'time') $('pv-time').textContent = d.v;
+    else if(d.t === 'finish'){ const r = $('pv-res'); r.style.display = 'block'; r.innerHTML = '🏁 Finished: <b>' + (+d.bp || 0) + '</b> event points (×' + ((CFG.eventPass || {}).pointsMult || 2) + ' with Event Pass).'; }
+  };
+  window.addEventListener('message', pvHandler);
+  const load = () => { $('pv-res').style.display = 'none'; $('pv-score').textContent = '0'; $('pv-time').textContent = '–'; fr.src = url.replace(/&t=\d+/, '&t=' + Date.now()); };
+  $('pv-again').onclick = load; load();
+  if($('pv-edit')) $('pv-edit').onclick = () => { closeModal(); goTab('events', 'cal'); editEvent(ev.id); };
+}
+$('modal-x').addEventListener('click', () => { const f = $('pv-frame'); if(f) f.src = 'about:blank'; if(pvHandler){ window.removeEventListener('message', pvHandler); pvHandler = null; } });
 </script>
 </body>
 </html>
