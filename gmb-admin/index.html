@@ -1026,7 +1026,7 @@ async function loadAdEarnings(){
       [['d', a], ['w', b], ['m', c]].forEach(([k, r]) => NETS.forEach(n => { if(r[n].usd || r[n].shown || n === 'admob'){ res[k][n] = { usd: r[n].usd, shown: r[n].shown }; } }));
       CHECK.admob = '<span style="color:var(--green)">✔ $' + a.admob.usd.toFixed(2) + ' today · read ' + ago(Date.now()) + '</span>';
     } catch(e){
-      if(/ADMOB_NOT_LINKED/.test(e.message)){ $('btn-admob-link').style.display = ''; CHECK.admob = '<span style="color:var(--yellow)">press "Allow AdMob (one time only)" above</span>'; }
+      if(/NOT_LINKED|NEEDS_RELINK/.test(e.message)){ $('btn-admob-link').style.display = ''; CHECK.admob = '<span style="color:var(--yellow)">press "Allow AdMob (one time only)" above</span>'; }
       else CHECK.admob = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>';
     }
   }
@@ -1070,7 +1070,7 @@ $('btn-admob-link').onclick = () => {
   if(!(window.google && google.accounts && google.accounts.oauth2)){ toast('Loading Google… press again in 2 seconds'); return; }
   google.accounts.oauth2.initCodeClient({
     client_id: '35109064745-ttt47rljjmph9rr954jrpgdc1mceskvi.apps.googleusercontent.com',
-    scope: 'https://www.googleapis.com/auth/admob.readonly', ux_mode: 'popup', login_hint: ADMIN_EMAIL,
+    scope: 'https://www.googleapis.com/auth/admob.readonly https://www.googleapis.com/auth/adsense.readonly https://www.googleapis.com/auth/devstorage.read_only', ux_mode: 'popup', login_hint: ADMIN_EMAIL,
     callback: async r => {
       if(r.error){ toast('Not allowed: ' + r.error); return; }
       try { await httpsCallable(getFunctions(app), 'adminAdmobLink')({ code: r.code }); toast('✔ AdMob linked for good'); $('btn-admob-link').style.display = 'none'; ADS = null; loadAdEarnings(); }
