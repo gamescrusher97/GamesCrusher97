@@ -293,7 +293,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, orderBy, limit, startAt, endAt, documentId, getCountFromServer, increment, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, orderBy, limit, startAt, endAt, documentId, getCountFromServer, increment, writeBatch, runTransaction } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
 const PROJECT_ID = 'glass-marble-balls', PROJECT_NUMBER = '35109064745';
@@ -305,6 +305,7 @@ const app = initializeApp({
 const auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const numOr = (v, d) => { const n = parseFloat(v); return isFinite(n) ? n : d; };
 const fmt = t => t ? new Date(t).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–';
 const toLocalInput = t => { if(!t) return ''; const d = new Date(t); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
 const fromLocalInput = v => v ? new Date(v).getTime() : 0;
@@ -351,6 +352,8 @@ async function loadCfg(){ const s = await getDoc(doc(db, 'config', 'game')); CFG
 async function saveCfg(part, what){ await setDoc(doc(db, 'config', 'game'), part, { merge: true }); Object.assign(CFG, part); await logAction('settings', what || Object.keys(part).join(', '), ''); toast('Saved. Players get it within 5 minutes.'); }
 async function logAction(action, details, target){ try { await addDoc(collection(db, 'adminLog'), { at: Date.now(), action, details: String(details || '').slice(0, 1000), target: target || '', by: auth.currentUser.email }); } catch(e){ console.log(e); } }
 async function inbox(email, text, kind){ await addDoc(collection(db, 'players', email, 'inbox'), { at: Date.now(), read: false, title: 'Glass Marble Balls Team', text, kind: kind || 'admin' }); }
+/* add or take balls safely: reads the live value, so balls the player earned meanwhile are kept */
+async function addBalls(email, d){ return runTransaction(db, async t => { const r = doc(db, 'players', email); const s = await t.get(r); const cur = +((s.data() || {}).balls) || 0; t.update(r, { balls: Math.max(0, cur + d) }); }); }
 /* every change to a player: the change + a new edit number (the phone reloads) + an Inbox message + the log */
 async function playerChange(email, changes, msg, kind){
   changes.adminRev = increment(1);
@@ -490,7 +493,7 @@ async function loadDash(){
 function playerRow(id, p){
   const mp = p.monthlyPass || {}, passOn = mp.active && mp.expiryDate > Date.now();
   const sus = p.suspended && (!p.suspended.until || p.suspended.until > Date.now()) && p.suspended.on !== false;
-  return `<tr class="click" data-email="${esc(id)}"><td>${esc(p.name || '')}<div class="mute small">${esc(id)}</div></td><td>${esc(p.country || '')}</td><td><b>${p.balls ?? '–'}</b> / ${(p.ballsLimit || 100) + (p.eventCapacity || 0)}</td><td>${passOn ? '<span class="pill ok">Monthly Pass</span>' : ''} ${sus ? '<span class="pill bad">Suspended</span>' : ''}</td><td>${p.totalPayments || 0}</td><td class="small">${fmt(p.updatedAt)}</td></tr>`;
+  return `<tr class="click" data-email="${esc(id)}"><td>${esc(p.name || '')}<div class="mute small">${esc(id)}</div></td><td>${esc(p.country || '')}</td><td><b>${esc(p.balls ?? '–')}</b> / ${esc((+p.ballsLimit || 100) + (+p.eventCapacity || 0))}</td><td>${passOn ? '<span class="pill ok">Monthly Pass</span>' : ''} ${sus ? '<span class="pill bad">Suspended</span>' : ''}</td><td>${esc(p.totalPayments || 0)}</td><td class="small">${fmt(p.updatedAt)}</td></tr>`;
 }
 function showPlayers(rows){
   $('p-table').innerHTML = '<tr><th>Player</th><th>Country</th><th>Balls / jar</th><th>Status</th><th>Payments</th><th>Last save</th></tr>' + (rows.length ? rows.map(r => playerRow(r.id, r.d)).join('') : '<tr><td colspan="6" class="mute">Nothing found.</td></tr>');
@@ -522,9 +525,9 @@ async function openPlayer(email){
   const unl = p.jarUnlocks || {}, sty = p.jarStyle || {};
   modal(`<h2>👤 ${esc(p.name || '')} <span class="mute small">${esc(email)}</span></h2>
   ${sus && (!sus.until || sus.until > Date.now()) && sus.on !== false ? `<div class="alert">⛔ Suspended ${sus.until ? 'until ' + fmt(sus.until) : '(no end date)'} — ${esc(sus.reason || '')}</div>` : ''}
-  <p class="mute small">Country: ${esc(p.country || '–')} · Created: ${fmt(p.createdAt)} · Last save: ${fmt(p.updatedAt)} · Wins: ${p.totalWins || 0} · Games: ${p.totalGamesPlayed || 0} · Ads watched: ${p.totalAdsWatched || 0} · Payments: ${p.totalPayments || 0}</p>
+  <p class="mute small">Country: ${esc(p.country || '–')} · Created: ${fmt(p.createdAt)} · Last save: ${fmt(p.updatedAt)} · Wins: ${esc(p.totalWins || 0)} · Games: ${esc(p.totalGamesPlayed || 0)} · Ads watched: ${esc(p.totalAdsWatched || 0)} · Payments: ${esc(p.totalPayments || 0)}</p>
   <h3>Balls & jar</h3>
-  <div class="row"><label class="f">Balls<input id="pe-balls" type="number" value="${p.balls || 0}"></label><label class="f">Paid jar capacity (ballsLimit)<input id="pe-limit" type="number" value="${p.ballsLimit || 100}"></label><label class="f">Free jar capacity from events<input id="pe-evcap" type="number" value="${p.eventCapacity || 0}"></label></div>
+  <div class="row"><label class="f">Balls<input id="pe-balls" type="number" value="${esc(p.balls || 0)}"></label><label class="f">Paid jar capacity (ballsLimit)<input id="pe-limit" type="number" value="${esc(p.ballsLimit || 100)}"></label><label class="f">Free jar capacity from events<input id="pe-evcap" type="number" value="${esc(p.eventCapacity || 0)}"></label></div>
   <div class="row" style="margin-top:6px"><label class="f">Quick: give / take balls<input id="pe-delta" type="number" placeholder="+100 or -50"></label><button class="b" id="pe-delta-go" style="flex:0 0 auto">Apply</button></div>
   <h3>Monthly Pass</h3>
   <div class="row"><label class="f">Active<select id="pe-mp-on"><option value="1" ${mp.active ? 'selected' : ''}>Yes</option><option value="0" ${!mp.active ? 'selected' : ''}>No</option></select></label>
@@ -545,15 +548,15 @@ async function openPlayer(email){
   <h3>Send an Inbox message</h3>
   <div class="row"><label class="f">Message<input id="pe-msg"></label><button class="b" id="pe-msg-go" style="flex:0 0 auto">Send</button></div>
   <h3>Purchases (${buys.length})</h3>
-  <table><tr><th>When</th><th>Product</th><th>AED</th><th>Order ID</th></tr>${buys.map(b => `<tr><td>${fmt(b.d.at)}</td><td>${esc(b.d.productId)}</td><td>${b.d.aed}</td><td class="small">${esc(b.d.orderId || b.id)}</td></tr>`).join('') || '<tr><td colspan=4 class="mute">none</td></tr>'}</table>
-  <h3>Codes used</h3><p class="small">${redeemed.map(r => esc(r.id) + ' (' + esc(r.d.type) + ' ' + r.d.amount + ', ' + fmt(r.d.at) + ')').join(' · ') || '<span class="mute">none</span>'}</p>
+  <table><tr><th>When</th><th>Product</th><th>AED</th><th>Order ID</th></tr>${buys.map(b => `<tr><td>${fmt(b.d.at)}</td><td>${esc(b.d.productId)}</td><td>${esc(b.d.aed)}</td><td class="small">${esc(b.d.orderId || b.id)}</td></tr>`).join('') || '<tr><td colspan=4 class="mute">none</td></tr>'}</table>
+  <h3>Codes used</h3><p class="small">${redeemed.map(r => esc(r.id) + ' (' + esc(r.d.type) + ' ' + esc(r.d.amount) + ', ' + fmt(r.d.at) + ')').join(' · ') || '<span class="mute">none</span>'}</p>
   <h3>Inbox (last 20)</h3><table>${msgs.map(m => `<tr><td class="small">${fmt(m.d.at)}</td><td>${esc(m.d.text)}</td><td>${m.d.read ? '<span class="pill ok">read</span>' : '<span class="pill warn">new</span>'}</td></tr>`).join('') || '<tr><td class="mute">empty</td></tr>'}</table>
   <h3>Danger</h3><button class="b red sm" id="pe-del">Delete this account</button>`);
   const list = v => v.split(',').map(x => x.trim()).filter(Boolean);
   $('pe-save').onclick = async () => {
     try {
-      const ch = {}, said = [];
-      const nb = Math.max(0, Math.floor(+$('pe-balls').value || 0)); if(nb !== (p.balls || 0)){ ch.balls = nb; said.push((nb > (p.balls || 0) ? 'gave you ' + (nb - (p.balls || 0)) : 'removed ' + ((p.balls || 0) - nb)) + ' balls (now ' + nb + ')'); }
+      const ch = {}, said = []; let ballsDelta = 0;
+      const nb = Math.max(0, Math.floor(+$('pe-balls').value || 0)); if(nb !== (p.balls || 0)){ ballsDelta = nb - (p.balls || 0); said.push((nb > (p.balls || 0) ? 'gave you ' + (nb - (p.balls || 0)) : 'removed ' + ((p.balls || 0) - nb)) + ' balls (now ' + nb + ')'); }
       const nl = Math.max(100, Math.floor(+$('pe-limit').value || 100)); if(nl !== (p.ballsLimit || 100)){ ch.ballsLimit = nl; said.push('set your jar capacity to ' + nl); }
       const ne = Math.max(0, Math.min(5000, Math.floor(+$('pe-evcap').value || 0))); if(ne !== (p.eventCapacity || 0)){ ch.eventCapacity = ne; said.push('set your event jar capacity to ' + ne); }
       const on = $('pe-mp-on').value === '1', st = fromLocalInput($('pe-mp-start').value), ex = fromLocalInput($('pe-mp-exp').value), au = $('pe-mp-auto').value === '1';
@@ -573,14 +576,15 @@ async function openPlayer(email){
       }
       if(!said.length){ toast('Nothing changed'); return; }
       const reason = $('pe-reason').value.trim();
+      if(ballsDelta) await addBalls(email, ballsDelta);
       await playerChange(email, ch, 'Glass Marble Balls Team ' + said.join(', ') + '.' + (reason ? ' Reason: ' + reason : ''), 'edit');
       toast('Saved. The player gets an Inbox message.'); openPlayer(email);
     } catch(e){ err(e); }
   };
   $('pe-delta-go').onclick = async () => {
     const d = Math.floor(+$('pe-delta').value || 0); if(!d) return;
-    const nb = Math.max(0, (p.balls || 0) + d), reason = $('pe-reason').value.trim();
-    try { await playerChange(email, { balls: nb }, 'Glass Marble Balls Team ' + (d > 0 ? 'gave you ' + d : 'removed ' + (-d)) + ' balls.' + (reason ? ' Reason: ' + reason : ''), d > 0 ? 'give balls' : 'take balls'); toast('Done'); openPlayer(email); } catch(e){ err(e); }
+    const reason = $('pe-reason').value.trim();
+    try { await addBalls(email, d); await playerChange(email, {}, 'Glass Marble Balls Team ' + (d > 0 ? 'gave you ' + d : 'removed ' + (-d)) + ' balls.' + (reason ? ' Reason: ' + reason : ''), d > 0 ? 'give balls' : 'take balls'); toast('Done'); openPlayer(email); } catch(e){ err(e); }
   };
   $('pe-warn').onclick = async () => {
     const t = $('pe-wtext').value.trim() || 'Please follow the game rules. Using cheats or hacks can get your account suspended.';
@@ -596,7 +600,7 @@ async function openPlayer(email){
     try { await updateDoc(doc(db, 'players', email), { suspended: { on: false, until: 0, reason: '', at: Date.now() } }); await inbox(email, '✅ Glass Marble Balls Team removed the suspension from your account. Welcome back!', 'unsuspend'); await logAction('unsuspend', '', email); toast('Suspension removed'); openPlayer(email); } catch(e){ err(e); }
   };
   $('pe-msg-go').onclick = async () => { const t = $('pe-msg').value.trim(); if(!t) return; try { await inbox(email, t, 'message'); await logAction('inbox message', t, email); toast('Sent'); } catch(e){ err(e); } };
-  $('pe-del').onclick = async () => { if(!confirm('Delete the account ' + email + ' for good? Balls, passes and progress are lost.')) return; try { await deleteDoc(doc(db, 'players', email)); await logAction('delete account', '', email); toast('Deleted'); closeModal(); } catch(e){ err(e); } };
+  $('pe-del').onclick = async () => { if(!confirm('Delete the account ' + email + ' for good? Balls, passes and progress are lost.')) return; try { for(const sub of ['inbox', 'redeemed']){ const qs = await getDocs(collection(db, 'players', email, sub)); const ds = []; qs.forEach(d => ds.push(d.ref)); for(let i = 0; i < ds.length; i += 400){ const b = writeBatch(db); ds.slice(i, i + 400).forEach(r => b.delete(r)); await b.commit(); } } await deleteDoc(doc(db, 'players', email)); await logAction('delete account', '', email); toast('Deleted. Remove the login too: Firebase console > Authentication.'); closeModal(); } catch(e){ err(e); } };
 }
 
 /* ---------------- PASSES ---------------- */
@@ -620,7 +624,7 @@ async function loadPasses(){
 
 /* ---------------- PURCHASES ---------------- */
 function showBuys(rows){
-  $('o-table').innerHTML = '<tr><th>When</th><th>Player</th><th>Product</th><th>AED</th><th>Order ID</th><th>Credited by</th></tr>' + (rows.map(r => `<tr class="click" data-email="${esc(r.d.email)}"><td>${fmt(r.d.at)}</td><td>${esc(r.d.email)}</td><td>${esc(r.d.productId)}</td><td>${r.d.aed}</td><td class="small">${esc(r.d.orderId || r.id)}</td><td>${esc(r.d.via || '')}</td></tr>`).join('') || '<tr><td colspan=6 class="mute">Nothing found.</td></tr>');
+  $('o-table').innerHTML = '<tr><th>When</th><th>Player</th><th>Product</th><th>AED</th><th>Order ID</th><th>Credited by</th></tr>' + (rows.map(r => `<tr class="click" data-email="${esc(r.d.email)}"><td>${fmt(r.d.at)}</td><td>${esc(r.d.email)}</td><td>${esc(r.d.productId)}</td><td>${esc(r.d.aed)}</td><td class="small">${esc(r.d.orderId || r.id)}</td><td>${esc(r.d.via || '')}</td></tr>`).join('') || '<tr><td colspan=6 class="mute">Nothing found.</td></tr>');
   $('o-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
 }
 async function loadPurchases(){ try { showBuys(snapRows(await getDocs(query(collection(db, 'purchaseLog'), orderBy('at', 'desc'), limit(100))))); } catch(e){ err(e); } }
@@ -652,7 +656,7 @@ $('btn-scan').onclick = async () => {
       if((p.totalWins || 0) > 0 && (p.totalGamesPlayed || 0) > 0 && p.totalWins > p.totalGamesPlayed) f.push('more wins than games played');
       if(f.length) out.push({ id: r.id, d: p, f });
     });
-    $('h-table').innerHTML = `<tr><th colspan=3>${rows.length} accounts checked · ${out.length} need a look</th></tr><tr><th>Player</th><th>Why</th><th>Balls</th></tr>` + out.map(o => `<tr class="click" data-email="${esc(o.id)}"><td>${esc(o.d.name || '')}<div class="mute small">${esc(o.id)}</div></td><td>${o.f.map(x => '<span class="pill bad">' + esc(x) + '</span>').join(' ')}</td><td>${o.d.balls}</td></tr>`).join('');
+    $('h-table').innerHTML = `<tr><th colspan=3>${rows.length} accounts checked · ${out.length} need a look</th></tr><tr><th>Player</th><th>Why</th><th>Balls</th></tr>` + out.map(o => `<tr class="click" data-email="${esc(o.id)}"><td>${esc(o.d.name || '')}<div class="mute small">${esc(o.id)}</div></td><td>${o.f.map(x => '<span class="pill bad">' + esc(x) + '</span>').join(' ')}</td><td>${esc(o.d.balls)}</td></tr>`).join('');
     $('h-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => openPlayer(tr.dataset.email));
     await logAction('hack check', out.length + ' flagged of ' + rows.length, '');
     ADM.lastHack = { at: Date.now(), count: out.length }; await setDoc(doc(db, 'adminData', 'settings'), { lastHack: ADM.lastHack }, { merge: true });
@@ -692,7 +696,7 @@ function editEvent(id){
     const o = { engine: $('ee-game').value, start: fromLocalInput($('ee-start').value), end: fromLocalInput($('ee-end').value), name: $('ee-name').value.trim(), off: $('ee-off').value === '1' };
     if(!(o.end > o.start)){ toast('The end must be after the start'); return; }
     const ev = JSON.parse(JSON.stringify(CFG.events || {})); ev.overrides = ev.overrides || {}; ev.extra = ev.extra || [];
-    if(e.custom){ const x = ev.extra.find(q => q.id === id); Object.assign(x, o); }
+    if(e.custom){ const x = ev.extra.find(q => q.id === id); if(x) Object.assign(x, o); else ev.extra.push(Object.assign({ id }, o)); }
     else ev.overrides[id] = o;
     try { await saveCfg({ events: ev }, 'event ' + id + ' changed'); closeModal(); renderEvents(); } catch(er){ err(er); }
   };
@@ -714,7 +718,7 @@ $('ev-alloff').onchange = async () => { const ev = JSON.parse(JSON.stringify(CFG
 $('btn-lb').onclick = async () => {
   const id = $('lb-ev').value; if(!id) return;
   try { const s = await getDoc(doc(db, 'eventBoards', id)), rows = s.exists() ? (s.data().rows || []) : [];
-    $('lb-table').innerHTML = `<tr><th colspan=4>${rows.length} players on the board (top 20 are kept)</th></tr><tr><th>#</th><th>Player</th><th>Country</th><th>Best score</th></tr>` + rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.n)} <span class="mute small">${esc(r.k || '')}</span></td><td>${esc(r.c || '')}</td><td>${r.b}</td></tr>`).join('');
+    $('lb-table').innerHTML = `<tr><th colspan=4>${rows.length} players on the board (top 20 are kept)</th></tr><tr><th>#</th><th>Player</th><th>Country</th><th>Best score</th></tr>` + rows.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.n)} <span class="mute small">${esc(r.k || '')}</span></td><td>${esc(r.c || '')}</td><td>${esc(r.b)}</td></tr>`).join('');
   } catch(e){ err(e); }
 };
 $('btn-lb-reset').onclick = async () => { const id = $('lb-ev').value; if(!id || !confirm('Reset the leaderboard of ' + id + '?')) return; try { await deleteDoc(doc(db, 'eventBoards', id)); await logAction('reset leaderboard', id, ''); toast('Reset'); $('lb-table').innerHTML = ''; } catch(e){ err(e); } };
@@ -748,10 +752,10 @@ function drawLadder(){
 function readLadder(){ $('r-ladder').querySelectorAll('tr[data-i]').forEach(tr => { const t = LAD[+tr.dataset.i]; tr.querySelectorAll('[data-f]').forEach(i => { const f = i.dataset.f; t[f] = f === 'trophy' ? i.checked : f === 'skin' ? i.value : (+i.value || 0); }); }); }
 function renderRewards(){
   LAD = JSON.parse(JSON.stringify(CFG.rewardLadder && CFG.rewardLadder.length ? CFG.rewardLadder : BUILTIN_LADDER)); drawLadder();
-  const ep = CFG.eventPass || {}; $('r-mult').value = ep.pointsMult || 2; $('r-tf').value = ep.ticketsFree || 5; $('r-tp').value = ep.ticketsPass || 10; $('r-tc').value = ep.ticketCost || 10;
+  const ep = CFG.eventPass || {}; $('r-mult').value = ep.pointsMult ?? 2; $('r-tf').value = ep.ticketsFree ?? 5; $('r-tp').value = ep.ticketsPass ?? 10; $('r-tc').value = ep.ticketCost ?? 10;
   const db7 = CFG.dailyBonus && CFG.dailyBonus.length === 7 ? CFG.dailyBonus : BUILTIN_DAILY;
   $('r-daily').innerHTML = '<tr><th>Day</th><th>Balls</th><th>Jar capacity %</th></tr>' + db7.map((d, i) => `<tr data-d="${i}"><td>${i + 1}</td><td><input data-f="balls" type="number" value="${d.balls || 0}"></td><td><input data-f="capacityPct" type="number" value="${d.capacityPct || 0}"></td></tr>`).join('');
-  const ad = CFG.ads || {}; $('r-banner').value = ad.bannerOn === false ? '0' : '1'; $('r-amin').value = ad.watchAdMin || 1; $('r-amax').value = ad.watchAdMax || 20;
+  const ad = CFG.ads || {}; $('r-banner').value = ad.bannerOn === false ? '0' : '1'; $('r-amin').value = ad.watchAdMin ?? 1; $('r-amax').value = ad.watchAdMax ?? 20;
   const md = CFG.modes || {}; $('r-mg').value = md.guess === false ? '0' : '1'; $('r-ma').value = md.aim === false ? '0' : '1'; $('r-me').value = md.events === false ? '0' : '1';
 }
 $('btn-r-addtier').onclick = () => { readLadder(); const last = LAD[LAD.length - 1]; LAD.push({ pts: (last ? last.pts : 0) + 300, balls: 20 }); drawLadder(); };
@@ -763,9 +767,9 @@ $('btn-r-save').onclick = async () => {
   try {
     await saveCfg({
       rewardLadder: LAD.filter(t => t.pts > 0).sort((a, b) => a.pts - b.pts),
-      eventPass: { pointsMult: +$('r-mult').value || 2, ticketsFree: +$('r-tf').value || 5, ticketsPass: +$('r-tp').value || 10, ticketCost: +$('r-tc').value || 10 },
+      eventPass: { pointsMult: numOr($('r-mult').value, 2), ticketsFree: numOr($('r-tf').value, 5), ticketsPass: numOr($('r-tp').value, 10), ticketCost: numOr($('r-tc').value, 10) },
       dailyBonus: daily,
-      ads: { bannerOn: $('r-banner').value === '1', watchAdMin: +$('r-amin').value || 1, watchAdMax: +$('r-amax').value || 20 },
+      ads: { bannerOn: $('r-banner').value === '1', watchAdMin: numOr($('r-amin').value, 1), watchAdMax: numOr($('r-amax').value, 20) },
       modes: { guess: $('r-mg').value === '1', aim: $('r-ma').value === '1', events: $('r-me').value === '1' }
     }, 'rewards & settings');
   } catch(e){ err(e); }
@@ -843,7 +847,13 @@ $('btn-connect').onclick = async () => {
   } catch(e){ err(e); }
 };
 async function gapi(url, opt, userProject){
-  if(!TOKEN) throw new Error('Press "Connect Google reports" first (Usage & Costs).');
+  if(!TOKEN){
+    // no Google login on this page: ask the admin server (works all the time, no Connect needed)
+    if(/admob\.googleapis/.test(url)) throw new Error('AdMob: press "Connect Google reports".');
+    const o = opt || {};
+    try { return (await httpsCallable(getFunctions(app), 'adminGoogle')({ url, method: o.method || 'GET', body: o.body || null })).data || {}; }
+    catch(e){ throw new Error(/not-found|NOT_FOUND|internal/i.test(String(e.code || e.message)) ? 'Server not set up yet - press "Connect Google reports".' : (e.message || String(e))); }
+  }
   const o = Object.assign({ headers: {} }, opt || {});
   o.headers = Object.assign({ Authorization: 'Bearer ' + TOKEN, 'Content-Type': 'application/json' }, userProject ? { 'x-goog-user-project': PROJECT_ID } : {}, o.headers);
   const r = await fetch(url, o);
@@ -891,9 +901,8 @@ function paintCheck(){
   $('u-check').innerHTML = row('Google / Firebase bill this month', CHECK.bill) + row('Google meters (database, server)', CHECK.meters) + row('AdMob', CHECK.admob) + row('Unity Ads', CHECK.unity) + row('Meta Audience Network', CHECK.meta);
 }
 async function renderBilling(){
-  $('conn-st').textContent = TOKEN ? '✓ connected' : 'not connected';
+  $('conn-st').textContent = TOKEN ? '✓ connected (AdMob too)' : 'automatic (server) · Connect only needed for AdMob';
   paintCheck();
-  if(!TOKEN){ $('u-cards').innerHTML = '<div class="card mute">Press "Connect Google reports" to see what is left of the free amounts.</div>'; return; }
   const now = Date.now(), mid = new Date(); mid.setHours(0, 0, 0, 0);
   // Firebase daily limits reset at midnight US Pacific time
   const pac = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
@@ -961,7 +970,7 @@ $('btn-b-save').onclick = async () => {
   try {
     await setDoc(doc(db, 'adminData', 'settings'), { budget: { amount, currency: cur, alertPct } }, { merge: true });
     ADM.budget = { amount, currency: cur, alertPct };
-    if(TOKEN && ADM.billingAccount){
+    if(ADM.billingAccount){
       const body = { displayName: 'Glass Marble Balls limit', budgetFilter: { projects: ['projects/' + PROJECT_NUMBER] }, amount: { specifiedAmount: { currencyCode: cur, units: String(Math.floor(amount)), nanos: Math.round((amount % 1) * 1e9) } },
         thresholdRules: [{ thresholdPercent: alertPct / 100 }, { thresholdPercent: 0.5 }, { thresholdPercent: 0.9 }, { thresholdPercent: 1.0 }].filter((t, i, a) => a.findIndex(x => x.thresholdPercent === t.thresholdPercent) === i) };
       if(ADM.budgetName) await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.budgetName + '?updateMask=amount,thresholdRules', { method: 'PATCH', body: JSON.stringify(body) }, true);
