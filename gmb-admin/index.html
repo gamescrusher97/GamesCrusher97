@@ -82,6 +82,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 .pv-side{ flex:1 1 260px; }
 .pv-hud{ display:flex; gap:10px; margin-bottom:10px; } .pv-hud .box{ flex:1; padding:10px; } .pv-hud .box b{ font-size:22px; }
 </style>
+<script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 <body>
 
@@ -156,19 +157,20 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
     <div style="flex:1 1 640px;min-width:0">
       <div class="card"><h2>Usage & Costs <span class="mute small" id="u-read" style="margin-left:auto;font-weight:400"></span></h2>
         <p class="help">All Glass Marble Balls players together. <b>Left</b> counts down to 0 by itself. 🟢 plenty left · 🟡 80% used · 🔴 free amount finished (from then on Google charges, only on the Blaze plan).</p>
-        <button class="b gold" id="btn-connect">🔗 Connect Google reports</button> <span id="conn-st" class="small mute"></span>
-        <p class="help" style="margin-top:6px">Press once (lasts about 1 hour, then press again). It reads Firebase's own meters, the bill and AdMob.</p></div>
+        <button class="b gold" id="btn-connect" style="display:none">🔗 Connect Google reports</button>
+        <button class="b gold" id="btn-admob-link" style="display:none">🔗 Allow AdMob (one time only)</button> <span id="conn-st" class="small mute"></span>
+        <p class="help" style="margin-top:6px">Updates by itself every time you open this tab. Press ↻ Refresh (top right) to read again.</p></div>
       <div class="card"><h2>🔎 Checked with the real providers</h2><div id="u-check" class="small"></div></div>
-      <div class="card link" id="card-ads" style="cursor:pointer"><h2>📺 Ads earnings <span class="pill info">TODAY</span> <span class="mute small">tap for AdMob / Unity / Meta</span></h2>
+      <div class="card link" id="card-ads" style="cursor:pointer"><h2>📺 Ads earnings <span class="pill info">TODAY</span> <span class="mute small">tap for details</span></h2>
         <div class="big" style="font-size:28px;font-weight:800;color:var(--green)" id="u-ads">–</div><p class="help" id="u-ads-sub" style="margin:0"></p></div>
       <div id="u-cards" class="ucards"></div>
       <div class="card" style="margin-top:14px"><h2>💰 Spent this month (beyond the free amounts)</h2><div class="scroll"><table id="u-table"></table></div>
         <p class="mute small" style="margin-top:6px">Estimate from Google's meters. The exact bill is in Google Cloud Billing (link on the side).</p></div>
       <div class="card"><h2>🎯 Monthly limit & alerts</h2>
-        <div id="b-info" class="help">Connect Google reports to see the budget.</div>
+        <div id="b-info" class="help">Loading…</div>
         <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
         <p class="help" style="margin-top:8px">Google e-mails you at 50%, 90% and 100%, and a red bar appears on this page. Nothing is stopped automatically — you decide.</p></div>
-      <div class="card"><h2>🔑 Ad report keys (one time)</h2>
+      <div class="card" style="display:none"><h2>🔑 Ad report keys (one time)</h2>
         <p class="help">AdMob needs nothing (Connect Google reports). <b>Unity</b>: Unity Dashboard → Administration → API management → Monetization Stats API key, and Organization core ID (Administration → Settings). <b>Meta</b>: Business Settings → System users → Generate token (read_audience_network_insights). Saved privately; only this admin account can read them. Unity and Meta numbers come through the server, so they show after the Blaze plan + SETUP.bat.</p>
         <div class="row"><label class="f">Unity Organization core ID<input id="unity-org"></label><label class="f">Unity Stats API key<input id="unity-key" type="password"></label><label class="f">Unity game ID<input id="unity-game" value="800367258"></label></div>
         <div class="row" style="margin-top:8px"><label class="f">Meta app ID<input id="meta-app" value="1171074295600149"></label><label class="f">Meta token<input id="meta-tok" type="password"></label><button class="b" id="btn-meta-save" style="flex:0 0 auto">Save keys</button></div></div>
@@ -452,7 +454,7 @@ const onSub = { 'players:passes': loadPasses, 'players:buys': () => loadPurchase
   'codes:codes': loadCodes, 'codes:msg': renderMessages, 'codes:maint': renderMessages, 'codes:log': loadLog };
 
 /* ---------------- DASHBOARD ---------------- */
-$('btn-dash-refresh').onclick = loadDash;
+$('btn-dash-refresh').onclick = () => { const on = document.querySelector('#nav button.on'), f = on && onTab[on.dataset.tab]; (f || loadDash)(); };
 const cnt = async q => { try { return (await getCountFromServer(q)).data().count; } catch(e){ console.log(e); return '?'; } };
 async function loadDash(){
   const now = Date.now(), pres = collection(db, 'presence'), pl = collection(db, 'players');
@@ -849,7 +851,6 @@ $('btn-connect').onclick = async () => {
 async function gapi(url, opt, userProject){
   if(!TOKEN){
     // no Google login on this page: ask the admin server (works all the time, no Connect needed)
-    if(/admob\.googleapis/.test(url)) throw new Error('AdMob: press "Connect Google reports".');
     const o = opt || {};
     try { return (await httpsCallable(getFunctions(app), 'adminGoogle')({ url, method: o.method || 'GET', body: o.body || null })).data || {}; }
     catch(e){ throw new Error(/not-found|NOT_FOUND|internal/i.test(String(e.code || e.message)) ? 'Server not set up yet - press "Connect Google reports".' : (e.message || String(e))); }
@@ -898,10 +899,11 @@ let USAGE = null, CHECK = {};
 function ago(t){ if(!t) return ''; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
 function paintCheck(){
   const row = (name, st) => `<p style="margin:4px 0"><b>${name}:</b> ${st || '<span class="mute">not checked yet</span>'}</p>`;
-  $('u-check').innerHTML = row('Google / Firebase bill this month', CHECK.bill) + row('Google meters (database, server)', CHECK.meters) + row('AdMob', CHECK.admob) + row('Unity Ads', CHECK.unity) + row('Meta Audience Network', CHECK.meta);
+  $('u-check').innerHTML = row('Google / Firebase bill this month', CHECK.bill) + row('Google meters (database, server)', CHECK.meters) + row('AdMob earnings', CHECK.admob);
 }
 async function renderBilling(){
-  $('conn-st').textContent = TOKEN ? '✓ connected (AdMob too)' : 'automatic (server) · Connect only needed for AdMob';
+  $('conn-st').textContent = '';
+  $('u-cards').innerHTML = '<div class="card mute">⏳ Reading Google meters… (first time can take 10 seconds)</div>';
   paintCheck();
   const now = Date.now(), mid = new Date(); mid.setHours(0, 0, 0, 0);
   // Firebase daily limits reset at midnight US Pacific time
@@ -1017,13 +1019,17 @@ async function loadAdEarnings(){
   const utc0 = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
   const res = { d: {}, w: {}, m: {} }; NETS.forEach(n => ['d', 'w', 'm'].forEach(k => res[k][n] = { usd: null, shown: null }));
   const counts = { d: await ourCounts(utc0), w: await ourCounts(utc0 - 6 * DAY), m: await ourCounts(utc0 - 29 * DAY) };
-  if(TOKEN){
+  {
     try {
       const [a, b, c] = await Promise.all([admobRange(today, today), admobRange(w, today), admobRange(m, today)]);
+      $('btn-admob-link').style.display = 'none';
       [['d', a], ['w', b], ['m', c]].forEach(([k, r]) => NETS.forEach(n => { if(r[n].usd || r[n].shown || n === 'admob'){ res[k][n] = { usd: r[n].usd, shown: r[n].shown }; } }));
       CHECK.admob = '<span style="color:var(--green)">✔ $' + a.admob.usd.toFixed(2) + ' today · read ' + ago(Date.now()) + '</span>';
-    } catch(e){ CHECK.admob = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>'; }
-  } else CHECK.admob = '<span class="mute">press "Connect Google reports"</span>';
+    } catch(e){
+      if(/ADMOB_NOT_LINKED/.test(e.message)){ $('btn-admob-link').style.display = ''; CHECK.admob = '<span style="color:var(--yellow)">press "Allow AdMob (one time only)" above</span>'; }
+      else CHECK.admob = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>';
+    }
+  }
   if(ADM.unityKey || ADM.metaToken){
     try {
       const r = (await httpsCallable(getFunctions(app), 'adminAdStats')({})).data || {};
@@ -1044,7 +1050,7 @@ async function loadAdEarnings(){
     $('e-t-' + k).textContent = any ? '$' + tot.toFixed(2) : '–'; $('e-i-' + k).textContent = shown;
     if(k === 'd'){ $('d-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; if($('u-ads')){ $('u-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; $('u-ads-sub').textContent = shown + ' ads shown today · AdMob ' + money(res.d.admob.usd) + ' · Unity ' + money(res.d.unity.usd) + ' · Meta ' + money(res.d.meta.usd); } }
   });
-  $('e-note').textContent = any0() ? '' : 'Earnings appear after "Connect Google reports" (AdMob) and the Unity / Meta keys in "Usage & Costs". Ads shown are counted by the game itself from v34.';
+  $('e-note').textContent = any0() ? '' : 'Press "Allow AdMob (one time only)" in Usage & Costs to see the money.';
   paintCheck();
 }
 function any0(){ return ADS && NETS.some(n => ADS.d[n].usd != null); }
@@ -1059,6 +1065,19 @@ function openAds(){
 }
 $('box-ads').onclick = openAds;
 $('card-ads').onclick = openAds;
+/* one time: give the server a permanent read-only AdMob permission (no more logins after this) */
+$('btn-admob-link').onclick = () => {
+  if(!(window.google && google.accounts && google.accounts.oauth2)){ toast('Loading Google… press again in 2 seconds'); return; }
+  google.accounts.oauth2.initCodeClient({
+    client_id: '35109064745-ttt47rljjmph9rr954jrpgdc1mceskvi.apps.googleusercontent.com',
+    scope: 'https://www.googleapis.com/auth/admob.readonly', ux_mode: 'popup', login_hint: ADMIN_EMAIL,
+    callback: async r => {
+      if(r.error){ toast('Not allowed: ' + r.error); return; }
+      try { await httpsCallable(getFunctions(app), 'adminAdmobLink')({ code: r.code }); toast('✔ AdMob linked for good'); $('btn-admob-link').style.display = 'none'; ADS = null; loadAdEarnings(); }
+      catch(e){ err(e); }
+    }
+  }).requestCode();
+};
 
 /* ---------------- GAME PREVIEW (only here, after admin sign-in) ---------------- */
 let pvHandler = null;
