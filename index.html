@@ -12,6 +12,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#16112f">
+<meta name="google-adsense-account" content="ca-pub-1732207620591859">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732207620591859" crossorigin="anonymous"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -3508,8 +3510,18 @@ const db = getDatabase(app);
 const $ = (s, r) => (r || document).querySelector(s);
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const firstVisit = !store.get("gc97uid");
 let uid = store.get("gc97uid");
 if (!uid) { uid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now(); store.set("gc97uid", uid); }
+// visitor counter for the site admin page: views (once per browser session), people (once per day), new people
+(function () {
+  const day = new Date().toISOString().slice(0, 10), inc = k => runTransaction(ref(db, "visits/" + day + "/" + k), v => (v || 0) + 1).catch(() => {});
+  let seen = false; try { seen = sessionStorage.getItem("gc97s") === day; sessionStorage.setItem("gc97s", day); } catch (e) {}
+  if (seen) return;
+  inc("views");
+  if (store.get("gc97day") !== day) { store.set("gc97day", day); inc("people"); }
+  if (firstVisit) inc("new");
+})();
 // anonymous login: each visitor can only change their own rating
 let authP = null;
 const rater = () => { if (!API_KEY) return Promise.resolve(uid); if (!authP) authP = signInAnonymously(getAuth(app)).then(c => c.user.uid).catch(e => { authP = null; throw e; }); return authP; };
