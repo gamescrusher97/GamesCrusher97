@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Games Crusher 97 — Admin</title>
+<link rel="icon" href="../favicon.png">
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+/* same look as the Glass Marble Balls admin page */
+:root{ --bg:#0f0d15; --card:#1a1724; --card2:#221e2f; --line:rgba(255,255,255,0.09); --text:#f1eff7; --mute:#a39fb3; --gold:#f5c542; --red:#ff5c6c; --green:#3ddc84; --yellow:#ffc93c; --blue:#6fb6ff; --accent:#7c5cff; }
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+a{ color:var(--blue); }
+header{ position:sticky; top:0; z-index:20; background:#13111b; border-bottom:1px solid var(--line); padding:10px 14px; }
+.hrow{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:16px; margin-right:8px; white-space:nowrap; }
+.brand img{ width:28px; height:28px; border-radius:8px; }
+nav{ display:flex; gap:6px; flex-wrap:wrap; }
+nav button{ background:transparent; color:var(--text); border:1px solid var(--line); border-radius:18px; padding:6px 13px; cursor:pointer; font-size:13px; white-space:nowrap; }
+nav button.on{ background:var(--accent); border-color:var(--accent); font-weight:700; }
+.who{ color:var(--mute); font-size:12px; margin-top:6px; display:flex; gap:8px; align-items:center; }
+main{ padding:14px; max-width:1180px; margin:0 auto; }
+.tab{ display:none; } .tab.on{ display:block; }
+.card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:14px; min-width:0; }
+.card h2{ margin:0 0 8px; font-size:16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.help{ color:var(--mute); font-size:12.5px; margin:0 0 10px; line-height:1.45; }
+.boxes{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin-bottom:14px; }
+.box{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 10px; text-align:center; }
+.box b{ display:block; font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; }
+.box span{ color:var(--mute); font-size:12.5px; }
+.box.good b{ color:var(--green); }
+.hero{ background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(245,197,66,.18)); border:1px solid rgba(245,197,66,.35); border-radius:18px; padding:20px 16px; margin-bottom:14px; text-align:center; }
+.hero .lbl{ color:#e7e2ff; font-size:14px; }
+.hero .big{ font-size:clamp(38px,10vw,64px); font-weight:900; color:var(--green); line-height:1.1; margin:6px 0; font-variant-numeric:tabular-nums; }
+.hero .sub2{ color:var(--mute); font-size:13px; }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+.chip{ background:rgba(15,13,21,.55); border:1px solid var(--line); border-radius:12px; padding:8px 12px; font-size:13px; }
+.chip b{ color:var(--green); font-variant-numeric:tabular-nums; }
+.b{ border:1px solid var(--line); background:var(--card2); color:var(--text); padding:7px 13px; border-radius:10px; font:inherit; cursor:pointer; }
+.b.gold{ background:var(--gold); color:#1a1300; border:0; font-weight:700; }
+.b.sm{ padding:4px 10px; font-size:12px; }
+table{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+th,td{ text-align:left; padding:7px 6px; border-bottom:1px solid var(--line); }
+th{ color:var(--mute); font-weight:600; font-size:12px; }
+.n{ text-align:right; }
+.scroll{ overflow-x:auto; }
+.pill{ display:inline-block; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:700; background:rgba(111,182,255,.15); color:var(--blue); }
+.alert{ background:rgba(245,197,66,.12); border:1px solid rgba(245,197,66,.35); color:#ffe6a0; border-radius:12px; padding:10px 12px; margin:0 0 14px; }
+.chart{ width:100%; height:180px; display:block; }
+.chart .bar{ fill:var(--gold); } .chart .bar2{ fill:rgba(111,182,255,.55); } .chart .bar3{ fill:var(--green); }
+.chart text{ fill:var(--mute); font-size:10px; }
+.legend{ display:flex; gap:14px; font-size:12px; color:var(--mute); margin-top:6px; }
+.legend i{ display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+.cm{ border-bottom:1px solid var(--line); padding:8px 0; } .cm:last-child{ border:0; } .cm p{ margin:2px 0 0; }
+.mute{ color:var(--mute); } .small{ font-size:12.5px; }
+.row{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+input{ background:var(--card2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:8px 10px; font:inherit; min-width:0; flex:1; }
+#login{ max-width:380px; margin:14vh auto; text-align:center; }
+#app{ display:none; }
+#toast{ position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#2b2640; border:1px solid var(--line); padding:10px 16px; border-radius:12px; display:none; z-index:30; max-width:90vw; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="brand"><img src="../favicon.png" alt="">Games Crusher 97 Admin</div>
+    <nav id="nav" style="display:none">
+      <button data-tab="money" class="on">💰 Earnings</button>
+      <button data-tab="visits">👥 Visitors</button>
+      <button data-tab="dl">⬇️ Downloads</button>
+      <button data-tab="site">⭐ Website</button>
+      <button data-tab="set">⚙️ Settings</button>
+    </nav>
+    <button class="b sm" id="btn-refresh" style="margin-left:auto;display:none">↻ Refresh</button>
+  </div>
+  <div class="who" id="who-row" style="display:none"><span id="who"></span><button class="b sm" id="btn-out">Sign out</button></div>
+</header>
+
+<div id="login" class="card">
+  <h2 style="justify-content:center">🔒 Admin only</h2>
+  <p class="help">Sign in with the admin Google account.</p>
+  <button class="b gold" id="btn-in">Sign in with Google</button>
+  <p id="login-msg" class="small" style="color:var(--red)"></p>
+</div>
+
+<main id="app">
+  <div id="link-box" class="alert" style="display:none">
+    <b>One time only:</b> allow this page to read your AdMob, AdSense and Play Console reports. After this, no more logins.<br>
+    <button class="b gold" id="btn-link" style="margin-top:8px">🔗 Allow reports (one time only)</button>
+  </div>
+
+  <!-- EARNINGS -->
+  <section class="tab on" id="tab-money">
+    <div class="hero">
+      <div class="lbl">💰 Total earned today · all apps + website</div>
+      <div class="big" id="m-today">–</div>
+      <div class="sub2" id="m-sub">Loading…</div>
+      <div class="chips" id="m-chips"></div>
+    </div>
+    <div class="boxes">
+      <div class="box good"><b id="m-y">–</b><span>Yesterday</span></div>
+      <div class="box good"><b id="m-7">–</b><span>Last 7 days</span></div>
+      <div class="box good"><b id="m-30">–</b><span>Last 30 days</span></div>
+      <div class="box"><b id="m-ads">–</b><span>Ads shown today</span></div>
+    </div>
+    <div class="card">
+      <h2>📊 Earnings per day <span class="pill">LAST 30 DAYS</span></h2>
+      <svg class="chart" id="m-chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Earnings per day"></svg>
+    </div>
+    <div class="card">
+      <h2>📋 Per app</h2>
+      <div class="scroll"><table id="m-table"></table></div>
+      <p class="help" style="margin:8px 0 0">Estimated earnings (AdMob for apps, AdSense for the website), in AED. Every new app on your AdMob account (for example Loviko) is added here by itself. Can be a few hours late.</p>
+    </div>
+  </section>
+
+  <!-- VISITORS -->
+  <section class="tab" id="tab-visits">
+    <div class="boxes">
+      <div class="box"><b id="v-people">–</b><span>Visitors today</span></div>
+      <div class="box"><b id="v-new">–</b><span>New visitors today</span></div>
+      <div class="box"><b id="v-views">–</b><span>Page views today</span></div>
+      <div class="box"><b id="v-7">–</b><span>Visitors last 7 days</span></div>
+      <div class="box"><b id="v-30">–</b><span>Visitors last 30 days</span></div>
+    </div>
+    <div class="card">
+      <h2>📈 Website visitors <span class="pill">LAST 30 DAYS</span></h2>
+      <svg class="chart" id="v-chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Visitors per day"></svg>
+      <div class="legend"><span><i style="background:var(--gold)"></i>Visitors</span><span><i style="background:rgba(111,182,255,.55)"></i>New visitors</span></div>
+      <p class="help" style="margin:8px 0 0">Counting started on 19 Nov 2026.</p>
+    </div>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section class="tab" id="tab-dl">
+    <div class="boxes">
+      <div class="box good"><b id="d-total">–</b><span>Total installs (all apps)</span></div>
+      <div class="box"><b id="d-30">–</b><span>New installs last 30 days</span></div>
+      <div class="box"><b id="d-active">–</b><span>On phones now</span></div>
+    </div>
+    <div class="card">
+      <h2>⬇️ Per app</h2>
+      <div class="scroll"><table id="d-table"></table></div>
+      <p class="help" style="margin:8px 0 0">From Play Console (updated once a day). New apps appear by themselves.</p>
+    </div>
+  </section>
+
+  <!-- WEBSITE -->
+  <section class="tab" id="tab-site">
+    <div class="card">
+      <h2>⭐ Ratings, comments & download clicks</h2>
+      <div class="scroll"><table id="s-table"></table></div>
+      <p class="help" style="margin:8px 0 0">Download clicks = people who pressed the download button on your website.</p>
+    </div>
+    <div class="card"><h2>💬 Latest comments</h2><div id="s-comments"></div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="tab" id="tab-set">
+    <div class="card">
+      <h2>⬇️ Play Console reports</h2>
+      <p class="help">Play Console → <b>Download reports</b> → <b>Statistics</b> → <b>Copy Cloud Storage URI</b>. Paste it here once (looks like gs://pubsite_prod_…).</p>
+      <div class="row"><input id="s-bucket" placeholder="gs://pubsite_prod_..."><button class="b gold" id="btn-save">Save</button></div>
+    </div>
+    <div class="card">
+      <h2>🔗 Reports permission</h2>
+      <p class="help" id="link-st"></p>
+      <button class="b" id="btn-link2">Allow again</button>
+    </div>
+  </section>
+</main>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getDatabase, ref, get, query, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
+const ADMOB_PUBLISHER = 'pub-1732207620591859';
+const OAUTH_CLIENT = '35109064745-ttt47rljjmph9rr954jrpgdc1mceskvi.apps.googleusercontent.com';
+const SCOPES = 'https://www.googleapis.com/auth/admob.readonly https://www.googleapis.com/auth/adsense.readonly https://www.googleapis.com/auth/devstorage.read_only';
+const USD_TO_AED = 3.6725;   // fixed rate (the dirham is pegged to the dollar)
+// apps on the website (for clicks, ratings, comments). Earnings and installs find new apps by themselves.
+const SITE_APPS = [
+  { name: 'Glass Marble Balls', slug: 'glass-marble-balls' },
+  { name: 'M3 Player', slug: 'm3-player' },
+  { name: 'Loviko', slug: 'loviko' }
+];
+const PKG_NAME = { 'com.sahilsheemar.glassmarbleballs': 'Glass Marble Balls', 'com.sahilsheemar.m3player': 'M3 Player' };
+
+const app = initializeApp({
+  apiKey: "AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E", authDomain: "glass-marble-balls.firebaseapp.com", projectId: "glass-marble-balls",
+  storageBucket: "glass-marble-balls.firebasestorage.app", messagingSenderId: "35109064745", appId: "1:35109064745:web:7f844923b50914d0930c38"
+});
+const site = initializeApp({
+  apiKey: "AIzaSyCB4u7dSVFUEl-T43lkLWY8x1s9n0bI9VE", authDomain: "gamescrusher97-website.firebaseapp.com", projectId: "gamescrusher97-website",
+  databaseURL: "https://gamescrusher97-website-default-rtdb.asia-southeast1.firebasedatabase.app", appId: "1:1079009384611:web:f6d0720e6314a61781c716"
+}, 'site');
+const auth = getAuth(app), fs = getFirestore(app), rtdb = getDatabase(site), call = n => httpsCallable(getFunctions(app), n);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nf = n => (n == null ? '–' : Math.round(n).toLocaleString());
+const aed = n => n == null ? '–' : (Math.round(n * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' AED';
+const toAED = (v, cur) => !cur || cur === 'AED' ? v : cur === 'USD' ? v * USD_TO_AED : v;   // other currencies are shown as they are
+const DAY = 864e5;
+const keyOf = d => d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+const toast = t => { const e = $('toast'); e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => e.style.display = 'none', 4000); };
+let SET = {}, LINK = null;
+
+/* ---------- login + tabs ---------- */
+$('btn-in').onclick = async () => { const p = new GoogleAuthProvider(); p.setCustomParameters({ login_hint: ADMIN_EMAIL }); try { await signInWithPopup(auth, p); } catch (e) { $('login-msg').textContent = e.message; } };
+$('btn-out').onclick = () => signOut(auth);
+$('btn-refresh').onclick = () => loadAll();
+document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
+  window.scrollTo(0, 0);
+});
+onAuthStateChanged(auth, u => {
+  const ok = u && String(u.email).toLowerCase() === ADMIN_EMAIL && u.emailVerified;
+  if (u && !ok) { $('login-msg').textContent = 'This account is not the admin account.'; signOut(auth); }
+  $('login').style.display = ok ? 'none' : 'block'; $('app').style.display = ok ? 'block' : 'none';
+  ['nav', 'btn-refresh'].forEach(id => $(id).style.display = ok ? '' : 'none'); $('who-row').style.display = ok ? 'flex' : 'none';
+  if (ok) { $('who').textContent = u.email; start(); }
+});
+async function start() {
+  try { const s = await getDoc(doc(fs, 'adminData', 'site')); SET = s.exists() ? s.data() : {}; } catch (e) { SET = {}; }
+  if (SET.bucket) $('s-bucket').value = 'gs://' + SET.bucket;
+  loadAll();
+}
+function loadAll() { loadVisits(); loadSite(); loadLink(); }
+
+/* ---------- small bar chart ---------- */
+function bars(svg, days, series) {
+  const W = 600, H = 180, pad = 20, max = Math.max(0.01, ...days.map(x => x[series[0].k] || 0)), bw = (W - 8) / days.length;
+  let h = '';
+  days.forEach((x, i) => {
+    const X = 4 + i * bw;
+    series.forEach(s => { const v = x[s.k] || 0, bh = v / max * (H - pad - 14); if (bh > 0) h += `<rect class="${s.cls}" x="${X + 1}" y="${H - pad - bh}" width="${Math.max(1, bw - 3)}" height="${bh}" rx="2"><title>${x.label}: ${s.fmt(v)}</title></rect>`; });
+    if (i % 5 === 4 || i === days.length - 1) h += `<text x="${X + bw / 2}" y="${H - 5}" text-anchor="middle">${x.short}</text>`;
+  });
+  h += `<text x="4" y="11">${series[0].fmt(max)}</text>`;
+  svg.innerHTML = h;
+}
+function last30() { const a = []; for (let i = 29; i >= 0; i--) { const d = new Date(Date.now() - i * DAY); a.push({ d, key: keyOf(d), iso: keyOf(d).replace(/(\d{4})(\d\d)(\d\d)/, '$1-$2-$3'), label: d.toLocaleDateString(), short: d.getDate() + '/' + (d.getMonth() + 1) }); } return a; }
+
+/* ---------- visitors ---------- */
+async function loadVisits() {
+  try {
+    const s = await get(query(ref(rtdb, 'visits'), limitToLast(40))), all = s.exists() ? s.val() : {};
+    const days = last30().map(x => ({ ...x, ...(all[x.iso] || {}) }));
+    // the website counts by UTC day
+    const t = all[new Date().toISOString().slice(0, 10)] || {};
+    const sum = n => days.slice(-n).reduce((a, x) => a + (x.people || 0), 0);
+    $('v-people').textContent = nf(t.people || 0); $('v-new').textContent = nf(t.new || 0); $('v-views').textContent = nf(t.views || 0);
+    $('v-7').textContent = nf(sum(7)); $('v-30').textContent = nf(sum(30));
+    bars($('v-chart'), days, [{ k: 'people', cls: 'bar', fmt: v => nf(v) + ' visitors' }, { k: 'new', cls: 'bar2', fmt: v => nf(v) + ' new' }]);
+  } catch (e) { toast('Visitors: ' + e.message); }
+}
+
+/* ---------- website: clicks, ratings, comments ---------- */
+async function loadSite() {
+  const rows = [], cms = [];
+  for (const a of SITE_APPS) {
+    const [c, r, m] = await Promise.all([get(ref(rtdb, 'clicks/' + a.slug)), get(ref(rtdb, 'ratings/' + a.slug)), get(query(ref(rtdb, 'comments/' + a.slug), limitToLast(20)))].map(p => p.catch(() => null)));
+    const vals = r && r.exists() ? Object.values(r.val()).filter(v => typeof v === 'number') : [];
+    const list = m && m.exists() ? Object.values(m.val()) : [];
+    list.forEach(x => cms.push({ ...x, app: a.name }));
+    rows.push(`<tr><td>${esc(a.name)}</td><td class="n">${vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1) + ' ★' : '–'}</td><td class="n">${vals.length}</td><td class="n">${list.length}</td><td class="n">${nf(c && c.exists() ? c.val() : 0)}</td></tr>`);
+  }
+  $('s-table').innerHTML = '<tr><th>App</th><th class="n">Average</th><th class="n">Ratings</th><th class="n">Comments</th><th class="n">Download clicks</th></tr>' + rows.join('');
+  cms.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  $('s-comments').innerHTML = cms.slice(0, 10).map(x => `<div class="cm"><b>${esc(x.name)}</b> <span class="mute small">· ${esc(x.app)} · ${new Date(x.ts).toLocaleDateString()}</span><p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No comments yet.</p>';
+}
+
+/* ---------- reports through the server ---------- */
+async function gcall(data) { return (await call('adminGoogle')(data)).data; }
+async function loadLink() {
+  try { LINK = await gcall({ op: 'linkStatus' }); } catch (e) { LINK = { linked: false }; toast(e.message); }
+  const need = !LINK.linked || !/adsense/.test(LINK.scope || '') || !/devstorage/.test(LINK.scope || '');
+  $('link-box').style.display = need ? '' : 'none';
+  $('link-st').textContent = LINK.linked ? (need ? 'Saved, but AdSense / Play need one more Allow.' : '✔ Saved for good. AdMob, AdSense and Play Console reports are read automatically.') : 'Not given yet.';
+  loadMoney(); loadInstalls();
+}
+
+// AdMob: one report, last 30 days, per day and per app (every app on the account, also new ones)
+async function admob30() {
+  const from = new Date(Date.now() - 29 * DAY), to = new Date();
+  const dt = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+  const body = { reportSpec: { dateRange: { startDate: dt(from), endDate: dt(to) }, dimensions: ['DATE', 'APP'], metrics: ['ESTIMATED_EARNINGS', 'IMPRESSIONS'] } };
+  const j = await gcall({ url: 'https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/mediationReport:generate', method: 'POST', body: JSON.stringify(body) });
+  const arr = Array.isArray(j) ? j : [];
+  const cur = ((arr.find(x => x.header) || {}).header || {}).localizationSettings?.currencyCode || 'USD';
+  const rows = [];
+  arr.forEach(x => { const r = x.row; if (!r) return; const dv = r.dimensionValues || {}, mv = r.metricValues || {};
+    rows.push({ day: dv.DATE && dv.DATE.value, app: (dv.APP && dv.APP.displayLabel) || 'App', v: toAED(+(mv.ESTIMATED_EARNINGS && mv.ESTIMATED_EARNINGS.microsValue || 0) / 1e6, cur), ads: +(mv.IMPRESSIONS && mv.IMPRESSIONS.integerValue || 0) }); });
+  return { rows, cur };
+}
+// AdSense (website): last 30 days per day
+async function adsense30() {
+  const a = await gcall({ url: 'https://adsense.googleapis.com/v2/accounts' });
+  const acc = a.accounts && a.accounts[0] && a.accounts[0].name;
+  if (!acc) return null;
+  const r = await gcall({ url: 'https://adsense.googleapis.com/v2/' + acc + '/reports:generate?dateRange=LAST_30_DAYS&dimensions=DATE&metrics=ESTIMATED_EARNINGS&metrics=IMPRESSIONS' });
+  const cur = ((r.headers || []).find(h => h.currencyCode) || {}).currencyCode || 'USD';
+  return (r.rows || []).map(x => ({ day: String(x.cells[0].value).replace(/-/g, ''), app: '🌐 Website', v: toAED(+x.cells[1].value || 0, cur), ads: +x.cells[2].value || 0 }));
+}
+async function loadMoney() {
+  if (!LINK || !LINK.linked) { $('m-sub').textContent = 'Press "Allow reports (one time only)" above.'; $('m-table').innerHTML = ''; return; }
+  $('m-sub').textContent = 'Loading…';
+  let rows = [], notes = [];
+  try { rows = rows.concat((await admob30()).rows); } catch (e) { notes.push('AdMob: ' + e.message); }
+  if (/adsense/.test(LINK.scope || '')) { try { const s = await adsense30(); if (s) rows = rows.concat(s); else notes.push('Website ads: AdSense not approved yet'); } catch (e) { notes.push('AdSense: ' + e.message); } }
+  else notes.push('Website ads: press "Allow reports" once more');
+
+  const days = last30(), today = days[29].key, yest = days[28].key, k7 = days[23].key;
+  const per = {}, byDay = {};
+  rows.forEach(r => {
+    const p = per[r.app] = per[r.app] || { d: 0, y: 0, w: 0, m: 0, ads: 0 };
+    p.m += r.v; if (r.day >= k7) p.w += r.v; if (r.day === today) { p.d += r.v; p.ads += r.ads; } if (r.day === yest) p.y += r.v;
+    byDay[r.day] = (byDay[r.day] || 0) + r.v;
+  });
+  const names = Object.keys(per).sort((a, b) => per[b].m - per[a].m);
+  const tot = k => names.reduce((s, n) => s + per[n][k], 0);
+  $('m-today').textContent = aed(tot('d'));
+  $('m-sub').textContent = names.length ? 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (notes.length ? ' · ' + notes.join(' · ') : '') : (notes.join(' · ') || 'No earnings yet.');
+  $('m-chips').innerHTML = names.map(n => `<div class="chip">${esc(n)}: <b>${aed(per[n].d)}</b></div>`).join('');
+  $('m-y').textContent = aed(tot('y')); $('m-7').textContent = aed(tot('w')); $('m-30').textContent = aed(tot('m')); $('m-ads').textContent = nf(tot('ads'));
+  $('m-table').innerHTML = '<tr><th>From</th><th class="n">Today</th><th class="n">Yesterday</th><th class="n">7 days</th><th class="n">30 days</th></tr>' +
+    names.map(n => `<tr><td>${esc(n)}</td><td class="n">${aed(per[n].d)}</td><td class="n">${aed(per[n].y)}</td><td class="n">${aed(per[n].w)}</td><td class="n">${aed(per[n].m)}</td></tr>`).join('') +
+    `<tr><th>Total</th><th class="n">${aed(tot('d'))}</th><th class="n">${aed(tot('y'))}</th><th class="n">${aed(tot('w'))}</th><th class="n">${aed(tot('m'))}</th></tr>`;
+  bars($('m-chart'), days.map(x => ({ ...x, v: byDay[x.key] || 0 })), [{ k: 'v', cls: 'bar3', fmt: v => aed(v) }]);
+}
+
+async function loadInstalls() {
+  const T = $('d-table');
+  if (!SET.bucket) { T.innerHTML = '<tr><td class="mute">Paste the Play Console address in ⚙️ Settings once.</td></tr>'; return; }
+  if (!LINK || !LINK.linked || !/devstorage/.test(LINK.scope || '')) { T.innerHTML = '<tr><td class="mute">Press "Allow reports (one time only)" above.</td></tr>'; return; }
+  T.innerHTML = '<tr><td class="mute">⏳ Loading…</td></tr>';
+  let r; try { r = await gcall({ op: 'playInstalls', bucket: SET.bucket, packages: [] }); } catch (e) { T.innerHTML = `<tr><td class="mute">${esc(e.message)}</td></tr>`; return; }
+  const pk = Object.keys(r).filter(k => r[k].lastDate);
+  let tot = 0, n30 = 0, act = 0;
+  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0); tot += p.totalInstalls; n30 += m; act += p.activeDevices;
+    return `<tr><td>${esc(PKG_NAME[k] || k)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n small mute">${esc(p.lastDate)}</td></tr>`; });
+  $('d-total').textContent = pk.length ? nf(tot) : '–'; $('d-30').textContent = pk.length ? nf(n30) : '–'; $('d-active').textContent = pk.length ? nf(act) : '–';
+  T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Report date</th></tr>' + (rows.join('') || '<tr><td colspan="5" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+}
+
+/* ---------- settings + one-time permission ---------- */
+$('btn-save').onclick = async () => {
+  const v = $('s-bucket').value.trim().replace(/^gs:\/\//, '').replace(/\/.*$/, '');
+  if (v && !/^pubsite_prod_[a-z0-9_]+$/i.test(v)) { toast('That does not look like gs://pubsite_prod_…'); return; }
+  try { await setDoc(doc(fs, 'adminData', 'site'), { bucket: v }, { merge: true }); SET.bucket = v; toast('Saved'); loadInstalls(); } catch (e) { toast(e.message); }
+};
+function allow() {
+  if (!(window.google && google.accounts && google.accounts.oauth2)) { toast('Loading Google… press again in 2 seconds'); return; }
+  google.accounts.oauth2.initCodeClient({
+    client_id: OAUTH_CLIENT, scope: SCOPES, ux_mode: 'popup', login_hint: ADMIN_EMAIL,
+    callback: async r => {
+      if (r.error) { toast('Not allowed: ' + r.error); return; }
+      try { await call('adminAdmobLink')({ code: r.code }); toast('✔ Saved for good'); loadLink(); } catch (e) { toast(e.message); }
+    }
+  }).requestCode();
+}
+$('btn-link').onclick = allow; $('btn-link2').onclick = allow;
+</script>
+</body>
+</html>
