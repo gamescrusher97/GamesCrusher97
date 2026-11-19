@@ -7,6 +7,8 @@
 <title>Games Crusher 97 — Admin</title>
 <link rel="icon" href="../favicon.png">
 <script src="https://accounts.google.com/gsi/client" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* same look as the Glass Marble Balls admin page */
 :root{ --bg:#0f0d15; --card:#1a1724; --card2:#221e2f; --line:rgba(255,255,255,0.09); --text:#f1eff7; --mute:#a39fb3; --gold:#f5c542; --red:#ff5c6c; --green:#3ddc84; --yellow:#ffc93c; --blue:#6fb6ff; --accent:#7c5cff; }
@@ -61,6 +63,31 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
 #login{ max-width:380px; margin:14vh auto; text-align:center; }
 #app{ display:none; }
 #toast{ position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:#2b2640; border:1px solid var(--line); padding:10px 16px; border-radius:12px; display:none; z-index:30; max-width:90vw; }
+/* ---- polish ---- */
+body{ font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:radial-gradient(1200px 600px at 15% -10%,rgba(124,92,255,.18),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(245,197,66,.10),transparent 60%),var(--bg); background-attachment:fixed; }
+header{ background:rgba(19,17,27,.85); backdrop-filter:blur(10px); }
+.card{ background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01)),var(--card); box-shadow:0 10px 30px rgba(0,0,0,.25); border-radius:18px; }
+.boxes{ grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); }
+.box{ position:relative; overflow:hidden; border-radius:16px; padding:18px 12px 14px; background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015)),var(--card); box-shadow:0 8px 22px rgba(0,0,0,.22); transition:transform .15s, box-shadow .15s; }
+.box:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(0,0,0,.35); }
+.box::before{ content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--accent); opacity:.9; }
+.box.good::before{ background:linear-gradient(90deg,#3ddc84,#1fbf6b); } .box.gold::before{ background:linear-gradient(90deg,#ffe08a,#f5a524); }
+.box.blue::before{ background:linear-gradient(90deg,#9fd0ff,#4f8cff); } .box.purple::before{ background:linear-gradient(90deg,#b9a6ff,#7c5cff); }
+.box.gold b{ color:#ffd86f; } .box.blue b{ color:#9fd0ff; }
+.box b{ font-size:27px; letter-spacing:-.3px; }
+.box span{ display:block; margin-top:2px; color:#cfcbe0; font-weight:500; }
+.box small{ display:block; margin-top:4px; color:var(--mute); font-size:11.5px; min-height:1em; }
+.hero{ position:relative; overflow:hidden; border-radius:22px; padding:26px 16px 22px; background:radial-gradient(600px 220px at 50% 0%,rgba(61,220,132,.18),transparent 70%),linear-gradient(135deg,rgba(124,92,255,.35),rgba(245,197,66,.20)); box-shadow:0 18px 45px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06); }
+.hero .big{ text-shadow:0 0 28px rgba(61,220,132,.45); }
+.chip{ background:rgba(15,13,21,.6); backdrop-filter:blur(4px); }
+.chart{ height:240px; }
+.chart .grid{ stroke:rgba(255,255,255,.07); stroke-width:1; }
+.chart .ax{ fill:var(--mute); font-size:11px; font-family:inherit; }
+.chart .b{ transition:opacity .15s; } .chart .b:hover{ opacity:.75; }
+.chart .avg{ stroke:rgba(255,255,255,.35); stroke-dasharray:4 4; }
+.chart .avgt{ fill:rgba(255,255,255,.6); font-size:11px; font-family:inherit; }
+nav button{ transition:background .15s, border-color .15s; } nav button:hover{ border-color:var(--accent); }
+table tr:hover td{ background:rgba(255,255,255,.025); }
 </style>
 </head>
 <body>
@@ -102,21 +129,20 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
       <div class="chips" id="m-chips"></div>
     </div>
     <div class="boxes">
-      <div class="box good"><b id="m-all">–</b><span>🏆 Total earned so far (all time)</span></div>
+      <div class="box good gold"><b id="m-all">–</b><span>🏆 Total earned (all time)</span></div>
       <div class="box good"><b id="m-y">–</b><span>Yesterday</span></div>
       <div class="box good"><b id="m-7">–</b><span>Last 7 days</span></div>
       <div class="box good"><b id="m-30">–</b><span>Last 30 days</span></div>
-      <div class="box"><b id="m-ads">–</b><span>Ads shown today</span></div>
+      <div class="box good"><b id="m-month">–</b><span>📅 This month</span></div>
+      <div class="box"><b id="m-ads">–</b><span>📺 Ads shown today</span><small id="m-ads-s"></small></div>
     </div>
     <div class="boxes">
-      <div class="box"><b id="o-vis">–</b><span>👥 Website visitors today</span></div>
-      <div class="box"><b id="o-inst">–</b><span>⬇️ Total app installs</span></div>
-      <div class="box"><b id="o-new">–</b><span>⬇️ New installs (30 days)</span></div>
-      <div class="box"><b id="o-star">–</b><span>⭐ Play Store rating</span></div>
-      <div class="box"><b id="o-rev">–</b><span>📝 Play reviews (2 months)</span></div>
-      <div class="box"><b id="o-cm">–</b><span>💬 Website comments</span></div>
-      <div class="box"><b id="o-rt">–</b><span>⭐ Website ratings</span></div>
-      <div class="box"><b id="o-clk">–</b><span>👆 Download clicks (website)</span></div>
+      <div class="box blue"><b id="o-vis">–</b><span>👥 Website visits today</span><small id="o-vis-s"></small></div>
+      <div class="box blue"><b id="o-inst">–</b><span>⬇️ Total app installs</span><small id="o-new"></small></div>
+      <div class="box gold"><b id="o-star">–</b><span>⭐ Play Store rating</span><small id="o-rev"></small></div>
+      <div class="box gold"><b id="o-rt">–</b><span>⭐ Website rating</span><small id="o-rt-n"></small></div>
+      <div class="box purple"><b id="o-cm">–</b><span>💬 Website comments</span><small id="o-fb"></small></div>
+      <div class="box purple"><b id="o-clk">–</b><span>👆 Download clicks</span><small>from the website</small></div>
     </div>
     <div class="card">
       <h2>📊 Earnings per day <span class="pill">LAST 30 DAYS</span></h2>
@@ -132,17 +158,22 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
   <!-- VISITORS -->
   <section class="tab" id="tab-visits">
     <div class="boxes">
-      <div class="box"><b id="v-people">–</b><span>Visitors today</span></div>
-      <div class="box"><b id="v-new">–</b><span>New visitors today</span></div>
-      <div class="box"><b id="v-views">–</b><span>Page views today</span></div>
-      <div class="box"><b id="v-7">–</b><span>Visitors last 7 days</span></div>
-      <div class="box"><b id="v-30">–</b><span>Visitors last 30 days</span></div>
+      <div class="box blue"><b id="v-views">–</b><span>👥 Visits today</span><small>every visit, also repeat visits</small></div>
+      <div class="box blue"><b id="v-people">–</b><span>🧍 Different people today</span><small id="v-new"></small></div>
+      <div class="box purple"><b id="v-7">–</b><span>Visits last 7 days</span><small id="v-7p"></small></div>
+      <div class="box purple"><b id="v-30">–</b><span>Visits last 30 days</span><small id="v-30p"></small></div>
+      <div class="box gold"><b id="v-all">–</b><span>🏆 Visits all time</span><small>since 19 Nov 2026</small></div>
     </div>
     <div class="card">
       <h2>📈 Website visitors <span class="pill">LAST 30 DAYS</span></h2>
       <svg class="chart" id="v-chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Visitors per day"></svg>
-      <div class="legend"><span><i style="background:var(--gold)"></i>Visitors</span><span><i style="background:rgba(111,182,255,.55)"></i>New visitors</span></div>
+      <div class="legend"><span><i style="background:var(--gold)"></i>Visits</span><span><i style="background:rgba(111,182,255,.55)"></i>Different people</span></div>
       <p class="help" style="margin:8px 0 0">Counting started on 19 Nov 2026.</p>
+    </div>
+    <div class="card">
+      <h2>🌍 Visitors by country</h2>
+      <div class="scroll"><table id="v-country"></table></div>
+      <p class="help" style="margin:8px 0 0">Each person is counted once per day. Countries counted from 19 Nov 2026.</p>
     </div>
   </section>
 
@@ -270,6 +301,7 @@ $('btn-refresh').onclick = () => loadAll();
 document.querySelectorAll('#nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.tab));
+  setTimeout(() => Object.values(CHARTS).forEach(a => bars(...a)), 0);
   window.scrollTo(0, 0);
 });
 onAuthStateChanged(auth, u => {
@@ -289,35 +321,57 @@ async function loadFeedback() {
   try {
     const qs = await getDocs(fq(collection(fs, 'feedback'), where('appVersion', '==', 'website')));
     const list = []; qs.forEach(d => list.push(d.data())); list.sort((a, b) => (b.at || 0) - (a.at || 0));
+    $('o-fb').textContent = list.length ? nf(list.length) + ' feedback messages' : 'no feedback yet';
     $('s-feedback').innerHTML = list.slice(0, 30).map(x => `<div class="cm"><b>${esc(x.email || 'no email')}</b> <span class="mute small">· ${x.at ? new Date(x.at).toLocaleString() : ''}</span>${x.email ? ` · <a href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Re: your feedback - Games Crusher 97')}">reply</a>` : ''}<p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No feedback yet.</p>';
   } catch (e) { $('s-feedback').innerHTML = '<p class="mute">' + esc(e.message) + '</p>'; }
 }
 
 /* ---------- small bar chart ---------- */
+const CHARTS = {};
+function niceMax(v) { if (v <= 0) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
 function bars(svg, days, series) {
-  const W = 600, H = 180, pad = 20, max = Math.max(0.01, ...days.map(x => x[series[0].k] || 0)), bw = (W - 8) / days.length;
-  let h = '';
+  CHARTS[svg.id] = [svg, days, series];
+  const W = Math.max(320, Math.round(svg.getBoundingClientRect().width) || 640), H = 240, L = 54, R = 10, T = 16, B = 28;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  const max = niceMax(Math.max(0, ...days.map(x => series.reduce((m, s) => Math.max(m, x[s.k] || 0), 0))));
+  const cw = W - L - R, ch = H - T - B, bw = cw / days.length, gap = Math.max(2, bw * 0.22);
+  const grad = { bar: ['#ffe08a', '#f5a524'], bar2: ['#9fd0ff', '#4f8cff'], bar3: ['#7dffb2', '#1fbf6b'] };
+  let h = '<defs>' + Object.entries(grad).map(([k, c]) => `<linearGradient id="g-${svg.id}-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}" stop-opacity=".75"/></linearGradient>`).join('') + '</defs>';
+  for (let i = 0; i <= 4; i++) { const y = T + ch - ch * i / 4; h += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" class="grid"/><text x="${L - 6}" y="${y + 3}" text-anchor="end" class="ax">${series[0].ax(max * i / 4)}</text>`; }
+  const n = series.length, sub = (bw - gap) / n;
   days.forEach((x, i) => {
-    const X = 4 + i * bw;
-    series.forEach(s => { const v = x[s.k] || 0, bh = v / max * (H - pad - 14); if (bh > 0) h += `<rect class="${s.cls}" x="${X + 1}" y="${H - pad - bh}" width="${Math.max(1, bw - 3)}" height="${bh}" rx="2"><title>${x.label}: ${s.fmt(v)}</title></rect>`; });
-    if (i % 5 === 4 || i === days.length - 1) h += `<text x="${X + bw / 2}" y="${H - 5}" text-anchor="middle">${x.short}</text>`;
+    const X = L + i * bw + gap / 2;
+    series.forEach((s, j) => { const v = x[s.k] || 0, bh = v / max * ch; if (v > 0) h += `<rect class="b" x="${(X + j * sub).toFixed(1)}" y="${(T + ch - Math.max(2, bh)).toFixed(1)}" width="${Math.max(1, sub - (n > 1 ? 1 : 0)).toFixed(1)}" height="${Math.max(2, bh).toFixed(1)}" rx="${Math.min(4, sub / 2).toFixed(1)}" fill="url(#g-${svg.id}-${s.cls})"><title>${x.label}: ${s.fmt(v)}</title></rect>`; });
+    if (i % 5 === 4 || i === 0 || i === days.length - 1) h += `<text x="${(L + i * bw + bw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle" class="ax">${x.short}</text>`;
   });
-  h += `<text x="4" y="11">${series[0].fmt(max)}</text>`;
+  const tot = days.reduce((a, x) => a + (x[series[0].k] || 0), 0), avg = tot / days.length;
+  if (avg > 0) { const y = T + ch - avg / max * ch; h += `<line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" class="avg"/><text x="${W - R}" y="${y - 4}" text-anchor="end" class="avgt">avg ${series[0].fmt(avg)}</text>`; }
   svg.innerHTML = h;
 }
+window.addEventListener('resize', () => { clearTimeout(bars.t); bars.t = setTimeout(() => Object.values(CHARTS).forEach(a => bars(...a)), 150); });
 function last30() { const a = []; for (let i = 29; i >= 0; i--) { const d = new Date(Date.now() - i * DAY); a.push({ d, key: keyOf(d), iso: keyOf(d).replace(/(\d{4})(\d\d)(\d\d)/, '$1-$2-$3'), label: d.toLocaleDateString(), short: d.getDate() + '/' + (d.getMonth() + 1) }); } return a; }
 
 /* ---------- visitors ---------- */
 async function loadVisits() {
   try {
-    const s = await get(query(ref(rtdb, 'visits'), limitToLast(40))), all = s.exists() ? s.val() : {};
+    const s = await get(ref(rtdb, 'visits')), all = s.exists() ? s.val() : {};
     const days = last30().map(x => ({ ...x, ...(all[x.iso] || {}) }));
     // the website counts by UTC day
     const t = all[new Date().toISOString().slice(0, 10)] || {};
-    const sum = n => days.slice(-n).reduce((a, x) => a + (x.people || 0), 0);
-    $('v-people').textContent = $('o-vis').textContent = nf(t.people || 0); $('v-new').textContent = nf(t.new || 0); $('v-views').textContent = nf(t.views || 0);
+    const sum = (n, k) => days.slice(-n).reduce((a, x) => a + (x[k || 'views'] || 0), 0);
+    $('o-vis-s').textContent = nf(t.people || 0) + ' different people · ' + nf(t.new || 0) + ' new';
+    $('v-views').textContent = $('o-vis').textContent = nf(t.views || 0);
+    $('v-people').textContent = nf(t.people || 0); $('v-new').textContent = nf(t.new || 0) + ' came for the first time';
     $('v-7').textContent = nf(sum(7)); $('v-30').textContent = nf(sum(30));
-    bars($('v-chart'), days, [{ k: 'people', cls: 'bar', fmt: v => nf(v) + ' visitors' }, { k: 'new', cls: 'bar2', fmt: v => nf(v) + ' new' }]);
+    $('v-7p').textContent = nf(sum(7, 'people')) + ' people'; $('v-30p').textContent = nf(sum(30, 'people')) + ' people';
+    $('v-all').textContent = nf(Object.values(all).reduce((a, x) => a + (x.views || 0), 0));
+    // visitors by country: today, 7 days, 30 days
+    const cc = {}; days.forEach((x, i) => Object.entries(x.c || {}).forEach(([k, n]) => { const o = cc[k] = cc[k] || { d: 0, w: 0, m: 0 }; o.m += n; if (i >= 23) o.w += n; if (i === 29) o.d += n; }));
+    const flag = k => String.fromCodePoint(...[...k].map(ch => 127397 + ch.charCodeAt(0)));
+    const rowsC = Object.entries(cc).sort((a, b) => b[1].m - a[1].m);
+    $('v-country').innerHTML = '<tr><th>Country</th><th class="n">Today</th><th class="n">7 days</th><th class="n">30 days</th></tr>' +
+      (rowsC.map(([k, o]) => `<tr><td>${flag(k)} ${esc(country(k))}</td><td class="n">${nf(o.d)}</td><td class="n">${nf(o.w)}</td><td class="n">${nf(o.m)}</td></tr>`).join('') || '<tr><td colspan="4" class="mute">No countries yet (they appear with the next visitors).</td></tr>');
+    bars($('v-chart'), days, [{ k: 'views', cls: 'bar', fmt: v => nf(v) + ' visits', ax: v => nf(v) }, { k: 'people', cls: 'bar2', fmt: v => nf(v) + ' people', ax: v => nf(v) }]);
   } catch (e) { toast('Visitors: ' + e.message); }
 }
 
@@ -333,8 +387,9 @@ async function loadSite() {
     tC += list.length; tR += vals.length; tS += vals.reduce((s, v) => s + v, 0); tK += c && c.exists() ? +c.val() || 0 : 0;
     rows.push(`<tr><td>${esc(a.name)}</td><td class="n">${vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1) + ' ★' : '–'}</td><td class="n">${vals.length}</td><td class="n">${list.length}</td><td class="n">${nf(c && c.exists() ? c.val() : 0)}</td></tr>`);
   }
-  $('s-cm').textContent = $('o-cm').textContent = nf(tC); $('s-rt').textContent = $('o-rt').textContent = nf(tR);
-  $('s-avg').textContent = tR ? (tS / tR).toFixed(1) + ' ★' : '–'; $('s-clk').textContent = $('o-clk').textContent = nf(tK);
+  $('s-cm').textContent = $('o-cm').textContent = nf(tC); $('s-rt').textContent = nf(tR);
+  $('s-avg').textContent = $('o-rt').textContent = tR ? (tS / tR).toFixed(1) + ' ★' : '–';
+  $('o-rt-n').textContent = tR === 1 ? '1 person rated' : nf(tR) + ' people rated'; $('s-clk').textContent = $('o-clk').textContent = nf(tK);
   $('s-table').innerHTML = '<tr><th>App</th><th class="n">Average</th><th class="n">Ratings</th><th class="n">Comments</th><th class="n">Download clicks</th></tr>' + rows.join('');
   loadComments();
 }
@@ -449,10 +504,12 @@ async function loadMoney() {
   $('m-sub').textContent = names.length ? 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (notes.length ? ' · ' + notes.join(' · ') : '') : (notes.join(' · ') || 'No earnings yet.');
   $('m-chips').innerHTML = names.map(n => `<div class="chip">${esc(n)}: <b>${aed(per[n].d)}</b></div>`).join('');
   $('m-y').textContent = aed(tot('y')); $('m-7').textContent = aed(tot('w')); $('m-30').textContent = aed(tot('m')); $('m-ads').textContent = nf(tot('ads'));
+  const mk = keyOf(new Date()).slice(0, 6); $('m-month').textContent = aed(Object.keys(byDay).filter(k => k.slice(0, 6) === mk).reduce((a, k) => a + byDay[k], 0));
+  $('m-ads-s').textContent = tot('ads') ? '≈ ' + aed(tot('d') / tot('ads') * 1000) + ' per 1000 ads' : '';
   $('m-table').innerHTML = '<tr><th>From</th><th class="n">Today</th><th class="n">Yesterday</th><th class="n">7 days</th><th class="n">30 days</th></tr>' +
     names.map(n => `<tr><td>${esc(n)}</td><td class="n">${aed(per[n].d)}</td><td class="n">${aed(per[n].y)}</td><td class="n">${aed(per[n].w)}</td><td class="n">${aed(per[n].m)}</td></tr>`).join('') +
     `<tr><th>Total</th><th class="n">${aed(tot('d'))}</th><th class="n">${aed(tot('y'))}</th><th class="n">${aed(tot('w'))}</th><th class="n">${aed(tot('m'))}</th></tr>`;
-  bars($('m-chart'), days.map(x => ({ ...x, v: byDay[x.key] || 0 })), [{ k: 'v', cls: 'bar3', fmt: v => aed(v) }]);
+  bars($('m-chart'), days.map(x => ({ ...x, v: byDay[x.key] || 0 })), [{ k: 'v', cls: 'bar3', fmt: v => aed(v), ax: v => (Math.round(v * 100) / 100) + '' }]);
 }
 
 let REG;
@@ -476,11 +533,11 @@ async function loadInstalls() {
     return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
   const has = pk.length > 0;
   $('d-total').textContent = $('o-inst').textContent = has ? nf(tot) : '–';
-  $('d-30').textContent = $('o-new').textContent = has ? nf(n30) : '–';
+  $('d-30').textContent = has ? nf(n30) : '–'; $('o-new').textContent = has ? '+' + nf(n30) + ' in last 30 days' : '';
   $('d-active').textContent = has ? nf(act) : '–';
-  $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) : '–';
+  $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) + ' reviews (2 months)' : '';
   T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="6" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
-  bars($('d-chart'), last30().map(x => ({ ...x, i: (byDay[x.iso] || {}).i || 0, u: (byDay[x.iso] || {}).u || 0 })), [{ k: 'i', cls: 'bar3', fmt: v => nf(v) + ' installs' }, { k: 'u', cls: 'bar2', fmt: v => nf(v) + ' uninstalls' }]);
+  bars($('d-chart'), last30().map(x => ({ ...x, i: (byDay[x.iso] || {}).i || 0, u: (byDay[x.iso] || {}).u || 0 })), [{ k: 'i', cls: 'bar3', fmt: v => nf(v) + ' installs', ax: v => nf(v) }, { k: 'u', cls: 'bar2', fmt: v => nf(v) + ' uninstalls', ax: v => nf(v) }]);
   const ct = Object.entries(cty).sort((a, b) => b[1] - a[1]).slice(0, 15);
   $('d-country').innerHTML = '<tr><th>Country</th><th class="n">New installs</th></tr>' + (ct.map(([c, n]) => `<tr><td>${esc(country(c))}</td><td class="n">${nf(n)}</td></tr>`).join('') || '<tr><td colspan="2" class="mute">No data yet.</td></tr>');
   reviews.sort((a, b) => b.at - a.at);
