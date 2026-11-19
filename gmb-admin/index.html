@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="logo.png">
 <title>Glass Marble Balls — Admin</title>
 <style>
 :root{ --bg:#0f0d15; --card:#1a1724; --card2:#221e2f; --line:rgba(255,255,255,0.09); --text:#f1eff7; --mute:#a39fb3; --gold:#f5c542; --red:#ff5c6c; --green:#3ddc84; --yellow:#ffc93c; --blue:#6fb6ff; --accent:#7c5cff; }
@@ -88,7 +89,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 
 <div id="login">
   <div class="card">
-    <div style="font-size:50px">🎪</div>
+    <img src="logo.png" alt="" style="width:72px;height:72px;border-radius:16px">
     <h2 style="justify-content:center">Glass Marble Balls — Admin</h2>
     <p class="mute">Only the Games Crusher 97 Google account can open this page.</p>
     <button class="b gold" id="btn-login">Sign in with Google</button>
@@ -99,7 +100,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
 <div id="app" style="display:none">
 <header>
   <div class="hrow">
-    <div class="brand"><i>🎪</i> Glass Marble Balls Admin</div>
+    <div class="brand"><img src="logo.png" alt="" style="width:28px;height:28px;border-radius:8px"> Glass Marble Balls Admin</div>
     <nav id="nav">
       <button data-tab="dash" class="on">Dashboard</button>
       <button data-tab="usage">Usage & Costs</button>
@@ -1024,7 +1025,7 @@ async function loadAdEarnings(){
       const [a, b, c] = await Promise.all([admobRange(today, today), admobRange(w, today), admobRange(m, today)]);
       $('btn-admob-link').style.display = 'none';
       [['d', a], ['w', b], ['m', c]].forEach(([k, r]) => NETS.forEach(n => { if(r[n].usd || r[n].shown || n === 'admob'){ res[k][n] = { usd: r[n].usd, shown: r[n].shown }; } }));
-      CHECK.admob = '<span style="color:var(--green)">✔ $' + a.admob.usd.toFixed(2) + ' today · read ' + ago(Date.now()) + '</span>';
+      CHECK.admob = '<span style="color:var(--green)">✔ AED ' + a.admob.usd.toFixed(2) + ' today · read ' + ago(Date.now()) + '</span>';
     } catch(e){
       if(/NOT_LINKED|NEEDS_RELINK/.test(e.message)){ $('btn-admob-link').style.display = ''; CHECK.admob = '<span style="color:var(--yellow)">press "Allow AdMob (one time only)" above</span>'; }
       else CHECK.admob = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>';
@@ -1042,13 +1043,13 @@ async function loadAdEarnings(){
   // ads shown: the report number, or our own phone count when the report has none
   ['d', 'w', 'm'].forEach(k => NETS.forEach(n => { const x = res[k][n]; x.ours = counts[k][n]; if(x.shown == null || (!x.shown && x.ours)) x.shown = x.ours; }));
   ADS = res;
-  const money = v => v == null ? '–' : '$' + v.toFixed(2);
+  const money = v => v == null ? '–' : 'AED ' + v.toFixed(2);
   const ids = { admob: 'a', unity: 'u', meta: 'f' };
   ['d', 'w', 'm'].forEach(k => {
     let tot = 0, any = false, shown = 0;
     NETS.forEach(n => { const x = res[k][n]; $('e-' + ids[n] + '-' + k).textContent = money(x.usd); if(x.usd != null){ tot += x.usd; any = true; } shown += x.shown || 0; });
-    $('e-t-' + k).textContent = any ? '$' + tot.toFixed(2) : '–'; $('e-i-' + k).textContent = shown;
-    if(k === 'd'){ $('d-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; if($('u-ads')){ $('u-ads').textContent = any ? '$' + tot.toFixed(2) : '–'; $('u-ads-sub').textContent = shown + ' ads shown today · AdMob ' + money(res.d.admob.usd) + ' · Unity ' + money(res.d.unity.usd) + ' · Meta ' + money(res.d.meta.usd); } }
+    $('e-t-' + k).textContent = any ? 'AED ' + tot.toFixed(2) : '–'; $('e-i-' + k).textContent = shown;
+    if(k === 'd'){ $('d-ads').textContent = any ? 'AED ' + tot.toFixed(2) : '–'; if($('u-ads')){ $('u-ads').textContent = any ? 'AED ' + tot.toFixed(2) : '–'; $('u-ads-sub').textContent = shown + ' ads shown today · AdMob ' + money(res.d.admob.usd) + ' · Unity ' + money(res.d.unity.usd) + ' · Meta ' + money(res.d.meta.usd); } }
   });
   $('e-note').textContent = any0() ? '' : 'Press "Allow AdMob (one time only)" in Usage & Costs to see the money.';
   paintCheck();
@@ -1057,7 +1058,7 @@ function any0(){ return ADS && NETS.some(n => ADS.d[n].usd != null); }
 function openAds(){
   const r = ADS; const money = v => v == null ? '<span class="mute">–</span>' : '<b>$' + v.toFixed(2) + '</b>';
   if(!r){ toast('Loading…'); loadAdEarnings().then(openAds); return; }
-  const tot = k => NETS.some(n => r[k][n].usd != null) ? '$' + NETS.reduce((s, n) => s + (r[k][n].usd || 0), 0).toFixed(2) : '–';
+  const tot = k => NETS.some(n => r[k][n].usd != null) ? 'AED ' + NETS.reduce((s, n) => s + (r[k][n].usd || 0), 0).toFixed(2) : '–';
   modal(`<h2>📺 Ads earnings</h2><p class="help">Ads shown = from the network's report (or counted by the game when the report has none yet). Earnings can be a few hours late.</p>
   <div class="scroll"><table><tr><th>Network</th><th>Today: ads shown</th><th>Today: earned</th><th>7 days</th><th>30 days</th></tr>` +
     NETS.map(n => `<tr><td><b>${NET_NAME[n]}</b></td><td>${r.d[n].shown || 0}</td><td>${money(r.d[n].usd)}</td><td>${money(r.w[n].usd)}</td><td>${money(r.m[n].usd)}</td></tr>`).join('') +
