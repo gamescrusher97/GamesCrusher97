@@ -3525,10 +3525,18 @@ if (!uid) { uid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : S
 // visitor counter for the site admin page: views (once per browser session), people (once per day), new people
 (function () {
   const day = new Date().toISOString().slice(0, 10), inc = k => runTransaction(ref(db, "visits/" + day + "/" + k), v => (v || 0) + 1).catch(() => {});
-  let seen = false; try { seen = sessionStorage.getItem("gc97s") === day; sessionStorage.setItem("gc97s", day); } catch (e) {}
-  if (seen) return;
+  // every visit counts (morning, afternoon, evening...). A reload within 30 minutes is the same visit.
+  const last = +store.get("gc97last_visit") || 0; store.set("gc97last_visit", Date.now());
+  if (Date.now() - last < 30 * 60000 && new Date(last).toISOString().slice(0, 10) === day) return;
   inc("views");
-  if (store.get("gc97day") !== day) { store.set("gc97day", day); inc("people"); }
+  if (store.get("gc97day") !== day) {
+    store.set("gc97day", day); inc("people");
+    // country only (no IP is saved): asks Cloudflare which country this connection is from
+    const ctl = window.AbortController ? new AbortController() : null; if (ctl) setTimeout(() => ctl.abort(), 4000);
+    fetch("https://www.cloudflare.com/cdn-cgi/trace", ctl ? { signal: ctl.signal } : {}).then(r => r.text()).then(t => {
+      const m = /\nloc=([A-Z]{2})\n/.exec("\n" + t); if (m && m[1] !== "XX" && m[1] !== "T1") inc("c/" + m[1]);
+    }).catch(() => {});
+  }
   if (firstVisit) inc("new");
 })();
 // anonymous login: each visitor can only change their own rating
