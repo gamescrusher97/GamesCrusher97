@@ -31,6 +31,7 @@ main{ padding:14px; max-width:1180px; margin:0 auto; }
 .box b{ display:block; font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; }
 .box span{ color:var(--mute); font-size:12.5px; }
 .box.good b{ color:var(--green); }
+.box .logo{ display:block; width:64px; height:64px; border-radius:14px; margin:0 auto 8px; object-fit:cover; }
 .hero{ background:linear-gradient(135deg,rgba(124,92,255,.28),rgba(245,197,66,.18)); border:1px solid rgba(245,197,66,.35); border-radius:18px; padding:20px 16px; margin-bottom:14px; text-align:center; }
 .hero .lbl{ color:#e7e2ff; font-size:14px; }
 .hero .big{ font-size:clamp(38px,10vw,64px); font-weight:900; color:var(--green); line-height:1.1; margin:6px 0; font-variant-numeric:tabular-nums; }
@@ -101,6 +102,7 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
       <div class="chips" id="m-chips"></div>
     </div>
     <div class="boxes">
+      <div class="box good"><b id="m-all">–</b><span>🏆 Total earned so far (all time)</span></div>
       <div class="box good"><b id="m-y">–</b><span>Yesterday</span></div>
       <div class="box good"><b id="m-7">–</b><span>Last 7 days</span></div>
       <div class="box good"><b id="m-30">–</b><span>Last 30 days</span></div>
@@ -192,11 +194,11 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
     <div class="card">
       <h2>🔗 Our admin pages</h2>
       <div class="boxes" style="margin:0">
-        <div class="box" style="opacity:.55"><b>🎵</b><span>M3 Player Admin<br><small>not made yet</small></span></div>
-        <a class="box" href="../gmb-admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><b>🎪</b><span>Glass Marble Balls Admin</span></a>
+        <a class="box" href="https://m3-player-9b855.web.app/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><img src="m3.png" alt="" class="logo"><span>M3 Player Admin</span></a>
+        <a class="box" href="../gmb-admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><img src="gmb.png" alt="" class="logo"><span>Glass Marble Balls Admin</span></a>
         <a class="box" href="https://loviko-90a8b.web.app/admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><b>💞</b><span>Loviko Admin</span></a>
       </div>
-      <p class="help" style="margin:10px 0 0">Glass Marble Balls Admin opens already signed in. Loviko Admin asks for sign-in only the first time, then remembers you.</p>
+      <p class="help" style="margin:10px 0 0">Glass Marble Balls Admin opens already signed in. M3 Player and Loviko Admin ask for sign-in only the first time, then remember you.</p>
     </div>
   </section>
 
@@ -332,6 +334,7 @@ async function loadLink() {
   try { LINK = await gcall({ op: 'linkStatus' }); } catch (e) { LINK = { linked: false }; toast(e.message); }
   const sc = LINK.scope || '', has = k => new RegExp(k).test(sc);
   $('link-box').style.display = LINK.linked ? 'none' : '';
+  $('btn-link2').style.display = (LINK.linked && has('admob') && has('adsense') && has('devstorage')) ? 'none' : '';
   $('link-st').innerHTML = LINK.linked
     ? 'Saved for good: AdMob ' + (has('admob') ? '✔' : '✖') + ' · AdSense ' + (has('adsense') ? '✔' : '✖') + ' · Play Console ' + (has('devstorage') ? '✔' : '✖') +
       ((has('adsense') && has('devstorage')) ? '' : '<br>For a ✖: press "Allow again" and tick <b>every</b> box in the Google window.')
@@ -361,9 +364,32 @@ async function adsense30() {
   const cur = ((r.headers || []).find(h => h.currencyCode) || {}).currencyCode || 'USD';
   return (r.rows || []).map(x => ({ day: String(x.cells[0].value).replace(/-/g, ''), app: '🌐 Website', v: toAED(+x.cells[1].value || 0, cur), ads: +x.cells[2].value || 0 }));
 }
+// all-time total (since the first ad), all apps + website
+async function loadAllTime() {
+  const to = new Date(), dt = d => ({ year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() });
+  let sum = 0;
+  try {
+    const body = { reportSpec: { dateRange: { startDate: { year: 2020, month: 1, day: 1 }, endDate: dt(to) }, dimensions: ['APP'], metrics: ['ESTIMATED_EARNINGS'] } };
+    const j = await gcall({ url: 'https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/mediationReport:generate', method: 'POST', body: JSON.stringify(body) });
+    const arr = Array.isArray(j) ? j : [], cur = ((arr.find(x => x.header) || {}).header || {}).localizationSettings?.currencyCode || 'USD';
+    arr.forEach(x => { if (x.row) sum += toAED(+(x.row.metricValues.ESTIMATED_EARNINGS && x.row.metricValues.ESTIMATED_EARNINGS.microsValue || 0) / 1e6, cur); });
+  } catch (e) { $('m-all').textContent = '–'; return; }
+  if (/adsense/.test(LINK.scope || '')) {
+    try {
+      const a = await gcall({ url: 'https://adsense.googleapis.com/v2/accounts' }), acc = a.accounts && a.accounts[0] && a.accounts[0].name;
+      if (acc) {
+        const r = await gcall({ url: 'https://adsense.googleapis.com/v2/' + acc + '/reports:generate?dateRange=CUSTOM&startDate.year=2020&startDate.month=1&startDate.day=1&endDate.year=' + to.getFullYear() + '&endDate.month=' + (to.getMonth() + 1) + '&endDate.day=' + to.getDate() + '&metrics=ESTIMATED_EARNINGS' });
+        const cur = ((r.headers || []).find(h => h.currencyCode) || {}).currencyCode || 'USD';
+        sum += toAED(+(r.totals && r.totals.cells && r.totals.cells[0] && r.totals.cells[0].value || 0), cur);
+      }
+    } catch (e) {}
+  }
+  $('m-all').textContent = aed(sum);
+}
 async function loadMoney() {
   if (!LINK || !LINK.linked) { $('m-sub').textContent = 'Press "Allow reports (one time only)" above.'; $('m-table').innerHTML = ''; return; }
   $('m-sub').textContent = 'Loading…';
+  loadAllTime();
   let rows = [], notes = [];
   try { rows = rows.concat((await admob30()).rows); } catch (e) { notes.push('AdMob: ' + e.message); }
   if (/adsense/.test(LINK.scope || '')) { try { const s = await adsense30(); if (s) rows = rows.concat(s); else notes.push('Website ads: AdSense not approved yet'); } catch (e) { notes.push('AdSense: ' + e.message); } }
