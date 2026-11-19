@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://gamescrusher97.com/">
 <meta property="og:image" content="https://gamescrusher97.com/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Games Crusher 97","url":"https://gamescrusher97.com/","logo":"https://gamescrusher97.com/favicon.png","email":"gamescrusher97@gmail.com","sameAs":["https://www.youtube.com/@GamesCrusher97","https://www.facebook.com/profile.php?id=61574901268541","https://www.tiktok.com/@gamescrusher1997"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Games Crusher 97","url":"https://gamescrusher97.com/","logo":"https://gamescrusher97.com/favicon.png","email":"gamescrusher97@gmail.com","sameAs":["https://www.youtube.com/@GamesCrusher97","https://www.facebook.com/profile.php?id=61574901268541","https://www.instagram.com/gamescrusher97/","https://www.tiktok.com/@gamescrusher1997"]}</script>
 <meta name="google-adsense-account" content="ca-pub-1732207620591859">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732207620591859" crossorigin="anonymous"></script>
 <style>
@@ -84,6 +84,15 @@
     position: relative;
     z-index: 1;
   }
+  /* ===== Follow us: one button, the 4 icons slide out next to it ===== */
+  .follow-wrap { display: inline-flex; align-items: center; gap: 0; padding: 6px; border-radius: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,216,111,0.35); transition: gap .3s; }
+  .follow-wrap.open { gap: 10px; }
+  .follow-main { border: 0; cursor: pointer; font: inherit; font-weight: 700; font-size: 0.95em; padding: 10px 22px; border-radius: 30px; color: #2a1a00; background: linear-gradient(90deg, #ffd86f, #ff9a6b); box-shadow: 0 4px 12px rgba(255,216,111,0.3); white-space: nowrap; }
+  .follow-icons { display: flex; gap: 10px; max-width: 0; overflow: hidden; opacity: 0; transition: max-width .35s ease, opacity .25s ease; }
+  .follow-wrap.open .follow-icons { max-width: 220px; opacity: 1; }
+  .f-ic { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; transition: transform .15s; }
+  .f-ic:hover { transform: scale(1.12); }
+  @media (max-width: 360px) { .follow-main { padding: 9px 14px; } .f-ic { width: 36px; height: 36px; flex-basis: 36px; } .follow-icons, .follow-wrap.open { gap: 7px; } }
   .social-card {
     text-decoration:none;
     color:#fff;
@@ -117,6 +126,7 @@
   .yt-circle { background: #ff0000; }
   .fb-circle { background: #1877f2; }
   .tt-circle { background: #000; border: 1px solid rgba(255,255,255,0.3); }
+  .ig-circle { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
   .social-label {
     white-space: nowrap;
     font-size: 1.05em;
@@ -135,6 +145,7 @@
   }
   .social-youtube:hover { border-color: rgba(255,0,0,0.5); background: rgba(255,0,0,0.1); }
   .social-facebook:hover { border-color: rgba(24,119,242,0.5); background: rgba(24,119,242,0.1); }
+  .social-instagram:hover { border-color: rgba(214,36,159,0.5); background: rgba(214,36,159,0.1); }
   .social-tiktok:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.1); }
   section {
     max-width: 1000px;
@@ -557,6 +568,27 @@
   .side-menu.open { right: 0; transform: none; visibility: visible; }
   .games-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 560px)); justify-content: center; }
 
+  /* ===== messages bell (left of the menu button) ===== */
+  .news-btn { position: fixed; top: 16px; right: 78px; width: 48px; height: 48px; padding: 0; z-index: 998; border-radius: 50%; cursor: pointer; color: #ffd86f; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+  .news-btn:hover, .news-btn.on { background: rgba(255,216,111,0.15); border-color: rgba(255,216,111,0.5); }
+  .news-btn.ring svg { animation: newsRing 1.2s ease 2; transform-origin: 50% 10%; }
+  @keyframes newsRing { 0%,100% { transform: rotate(0); } 15% { transform: rotate(14deg); } 30% { transform: rotate(-12deg); } 45% { transform: rotate(8deg); } 60% { transform: rotate(-5deg); } }
+  .news-badge { position: absolute; top: -3px; right: -3px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 10px; background: #ff4d5e; color: #fff; font-size: 11px; font-weight: 700; line-height: 19px; text-align: center; box-shadow: 0 0 0 2px #16112f; }
+  .news-panel { position: fixed; top: 74px; right: 14px; z-index: 1001; width: min(380px, calc(100vw - 28px)); max-height: calc(100vh - 90px); display: flex; flex-direction: column; background: rgba(26,21,52,0.97); border: 1px solid rgba(255,216,111,0.35); border-radius: 16px; box-shadow: 0 18px 50px rgba(0,0,0,0.55); backdrop-filter: blur(10px); }
+  .news-panel[hidden] { display: none; }
+  .news-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #ffd86f; }
+  .news-x { background: none; border: 0; color: #fff; font-size: 24px; line-height: 1; cursor: pointer; padding: 0 4px; }
+  .news-list { overflow-y: auto; padding: 6px 14px 10px; }
+  .news-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: left; }
+  .news-item:last-child { border-bottom: 0; }
+  .news-item b { display: block; color: #fff; font-size: 0.95em; }
+  .news-item p { margin: 4px 0 0; color: #dcd8f0; font-size: 0.9em; white-space: pre-line; word-wrap: break-word; }
+  .news-item small { display: block; margin-top: 4px; color: #a39fc4; font-size: 0.75em; }
+  .news-item.new b::after { content: "NEW"; margin-left: 8px; padding: 1px 6px; border-radius: 6px; background: #ff4d5e; color: #fff; font-size: 0.65em; vertical-align: 2px; }
+  .news-empty { margin: 14px 0; color: #a39fc4; text-align: center; font-size: 0.9em; }
+  @media (min-width: 700px) { .news-btn { right: 88px; } .news-panel { right: 28px; } }
+  @media (max-width: 340px) { .news-btn { right: 70px; } }
+
   /* ===== top bar: clock | search icon | menu ===== */
   .top-bar { border-bottom-color: var(--bar-line, rgba(255,255,255,0.08)); }
   .menu-btn { top: 16px; right: 18px; }
@@ -838,6 +870,11 @@
   <div class="bc-hint">Tap anywhere to close</div>
 </div>
 <div class="clock-btn" id="clockBtn" role="img" aria-label="Clock"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="c-face" cx="50" cy="50" r="46"/><line class="c-tick" x1="50.0" y1="15.0" x2="50.0" y2="7.0" stroke-width="3"/><line class="c-tick" x1="69.5" y1="16.2" x2="71.5" y2="12.8" stroke-width="1.8"/><line class="c-tick" x1="83.8" y1="30.5" x2="87.2" y2="28.5" stroke-width="1.8"/><line class="c-tick" x1="85.0" y1="50.0" x2="93.0" y2="50.0" stroke-width="3"/><line class="c-tick" x1="83.8" y1="69.5" x2="87.2" y2="71.5" stroke-width="1.8"/><line class="c-tick" x1="69.5" y1="83.8" x2="71.5" y2="87.2" stroke-width="1.8"/><line class="c-tick" x1="50.0" y1="85.0" x2="50.0" y2="93.0" stroke-width="3"/><line class="c-tick" x1="30.5" y1="83.8" x2="28.5" y2="87.2" stroke-width="1.8"/><line class="c-tick" x1="16.2" y1="69.5" x2="12.8" y2="71.5" stroke-width="1.8"/><line class="c-tick" x1="15.0" y1="50.0" x2="7.0" y2="50.0" stroke-width="3"/><line class="c-tick" x1="16.2" y1="30.5" x2="12.8" y2="28.5" stroke-width="1.8"/><line class="c-tick" x1="30.5" y1="16.2" x2="28.5" y2="12.8" stroke-width="1.8"/><line class="c-hand" id="clkH" x1="50" y1="50" x2="50" y2="29" stroke-width="4.5"/><line class="c-hand" id="clkM" x1="50" y1="50" x2="50" y2="16" stroke-width="3"/><line class="c-sec" id="clkS" x1="50" y1="57" x2="50" y2="13"/><circle class="c-dot" cx="50" cy="50" r="3.6"/></svg></div>
+<button type="button" class="news-btn" id="newsBtn" aria-label="Messages" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="news-badge" id="newsBadge" hidden></span></button>
+<div class="news-panel" id="newsPanel" role="dialog" aria-label="Messages" hidden>
+  <div class="news-head"><b>📢 Messages</b><button type="button" class="news-x" id="newsClose" aria-label="Close">&times;</button></div>
+  <div class="news-list" id="newsList"><p class="news-empty">Loading…</p></div>
+</div>
 <button type="button" class="search-toggle" id="searchToggle" onclick="toggleSearch()" aria-label="Search"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg></button>
 <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
 <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
@@ -858,33 +895,15 @@
     <p>Simple, fun Android apps and games, made with care.</p>
     <div class="day-strip" id="dayStrip" aria-live="polite"><div class="ds-date"><span class="ds-flag" id="dsFlag"></span><span class="ds-icon" id="dsIcon"></span><span id="dsDate"></span></div><div class="ds-greet" id="dsGreet" style="display:none"></div><div class="ds-list" id="dsList" style="display:none"></div></div>
     <div class="socials">
-      <a href="javascript:void(0)" id="link-youtube" data-href="https://www.youtube.com/@GamesCrusher97" onclick="socialClick(this)" class="social-card social-youtube">
-        <span class="social-left">
-          <span class="social-icon-circle yt-circle">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12Z"/></svg>
-          </span>
-          <span class="social-label">YouTube</span>
-        </span>
-        <span class="follow-btn">Subscribe</span>
-      </a>
-      <a href="javascript:void(0)" id="link-facebook" data-href="https://www.facebook.com/profile.php?id=61574901268541" onclick="socialClick(this)" class="social-card social-facebook">
-        <span class="social-left">
-          <span class="social-icon-circle fb-circle">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
-          </span>
-          <span class="social-label">Facebook</span>
-        </span>
-        <span class="follow-btn">Follow</span>
-      </a>
-      <a href="javascript:void(0)" id="link-tiktok" data-href="https://www.tiktok.com/@gamescrusher1997" onclick="socialClick(this)" class="social-card social-tiktok">
-        <span class="social-left">
-          <span class="social-icon-circle tt-circle">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M16.6 5.8a4.3 4.3 0 0 1-3-3.8h-3v13.4a2.6 2.6 0 1 1-2.1-2.6V9.7a5.8 5.8 0 1 0 5.1 5.7V9.4a7.3 7.3 0 0 0 4.3 1.4V7.7a4.3 4.3 0 0 1-1.3-1.9Z"/></svg>
-          </span>
-          <span class="social-label">TikTok</span>
-        </span>
-        <span class="follow-btn">Follow</span>
-      </a>
+      <div class="follow-wrap" id="followWrap">
+        <button type="button" class="follow-main" id="followMain" aria-expanded="false" aria-controls="followIcons">Follow us</button>
+        <div class="follow-icons" id="followIcons">
+          <a href="https://www.youtube.com/@GamesCrusher97" target="_blank" rel="noopener" class="f-ic yt-circle" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg></a>
+          <a href="https://www.facebook.com/profile.php?id=61574901268541" target="_blank" rel="noopener" class="f-ic fb-circle" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg></a>
+          <a href="https://www.instagram.com/gamescrusher97/" target="_blank" rel="noopener" class="f-ic ig-circle" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="#fff" stroke="none"/></svg></a>
+          <a href="https://www.tiktok.com/@gamescrusher1997" target="_blank" rel="noopener" class="f-ic tt-circle" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M16.6 5.8a4.3 4.3 0 0 1-3-3.8h-3v13.4a2.6 2.6 0 1 1-2.1-2.6V9.7a5.8 5.8 0 1 0 5.1 5.7V9.4a7.3 7.3 0 0 0 4.3 1.4V7.7a4.3 4.3 0 0 1-1.3-1.9Z"/></svg></a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -1701,6 +1720,13 @@ function closeMenuUI() {
   document.getElementById('sideMenu').classList.remove('open');
   document.getElementById('menuOverlay').classList.remove('open');
 }
+/* Follow us button: show / hide the 4 icons in the same line */
+(function () {
+  var w = document.getElementById('followWrap'), b = document.getElementById('followMain');
+  if (!w || !b) return;
+  b.onclick = function (e) { e.stopPropagation(); var o = w.classList.toggle('open'); b.setAttribute('aria-expanded', o ? 'true' : 'false'); };
+  document.addEventListener('click', function (e) { if (w.classList.contains('open') && !w.contains(e.target)) { w.classList.remove('open'); b.setAttribute('aria-expanded', 'false'); } });
+})();
 function socialClick(el) {
   el.classList.add('clicked');
   var url = el.getAttribute('data-href');
@@ -3636,6 +3662,38 @@ async function loadComments(id) {
     });
   } catch (e) { box.innerHTML = '<p class="d-note">Could not load comments right now.</p>'; }
 }
+/* ===== messages from the admin page (bell next to the menu) ===== */
+(function () {
+  const btn = $("#newsBtn"), panel = $("#newsPanel"), list = $("#newsList"), badge = $("#newsBadge");
+  if (!btn) return;
+  let items = [];
+  const seen = () => +store.get("gc97news_seen") || 0;
+  const paint = () => {
+    const unread = items.filter(x => x.ts > seen()).length;
+    badge.hidden = !unread; badge.textContent = unread > 9 ? "9+" : unread;
+    list.textContent = "";
+    if (!items.length) { list.innerHTML = '<p class="news-empty">No messages</p>'; return; }
+    items.forEach(x => {
+      const it = document.createElement("div"); it.className = "news-item" + (x.ts > seen() ? " new" : "");
+      if (x.title) { const b = document.createElement("b"); b.textContent = x.title; it.appendChild(b); }
+      const p = document.createElement("p"); p.textContent = x.text || ""; it.appendChild(p);
+      const sm = document.createElement("small"); sm.textContent = new Date(x.ts).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }); it.appendChild(sm);
+      list.appendChild(it);
+    });
+  };
+  const open = () => { panel.hidden = false; btn.classList.add("on"); btn.setAttribute("aria-expanded", "true"); paint(); if (items.length) store.set("gc97news_seen", items[0].ts); badge.hidden = true; };
+  const close = () => { panel.hidden = true; btn.classList.remove("on"); btn.setAttribute("aria-expanded", "false"); paint(); };
+  btn.onclick = e => { e.stopPropagation(); panel.hidden ? open() : close(); };
+  $("#newsClose").onclick = close;
+  document.addEventListener("click", e => { if (!panel.hidden && !panel.contains(e.target)) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !panel.hidden) close(); });
+  get(query(ref(db, "news"), limitToLast(20))).then(s => {
+    items = s.exists() ? Object.values(s.val()).filter(x => x && x.text).sort((a, b) => b.ts - a.ts) : [];
+    paint();
+    if (items.some(x => x.ts > seen())) btn.classList.add("ring");
+  }).catch(() => { list.innerHTML = '<p class="news-empty">No messages</p>'; });
+})();
+
 /* ===== share an app: phone share sheet, or WhatsApp / Facebook / Telegram / X / copy link ===== */
 (function () {
   const st = document.createElement("style");
