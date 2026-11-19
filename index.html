@@ -12,6 +12,15 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#16112f">
+<script>window.__h0 = location.hash;</script>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Games Crusher 97">
+<meta property="og:title" content="Games Crusher 97">
+<meta property="og:description" content="Simple, fun Android apps and games by Sahil Sheemar: Glass Marble Balls, M3 Player and more, plus free online tools.">
+<meta property="og:url" content="https://gamescrusher97.com/">
+<meta property="og:image" content="https://gamescrusher97.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Games Crusher 97","url":"https://gamescrusher97.com/","logo":"https://gamescrusher97.com/favicon.png","email":"gamescrusher97@gmail.com","sameAs":["https://www.youtube.com/@GamesCrusher97","https://www.facebook.com/profile.php?id=61574901268541","https://www.tiktok.com/@gamescrusher1997"]}</script>
 <meta name="google-adsense-account" content="ca-pub-1732207620591859">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1732207620591859" crossorigin="anonymous"></script>
 <style>
@@ -3566,6 +3575,7 @@ function openDetail(card) {
     '<textarea id="cText" maxlength="500" placeholder="Write your comment"></textarea>' +
     '<button type="button" class="thank-ok" id="cSend">Post comment</button><p class="d-note" id="cMsg"></p></div>' +
     '<div class="c-list" id="cList"></div>';
+  c.appendChild(shareBox(card.querySelector("h3").textContent.trim(), "https://gamescrusher97.com/#app-" + id));
   $("#detail-root").replaceChildren(c, r);
   window.showView("detail");
   paintStars(+store.get("gc97r_" + id) || 0);
@@ -3607,10 +3617,51 @@ async function loadComments(id) {
       const b = document.createElement("b"); b.textContent = x.name;
       const sm = document.createElement("small"); sm.textContent = x.em + " \u00b7 " + new Date(x.ts).toLocaleDateString();
       const p = document.createElement("p"); p.textContent = x.text;
-      it.append(b, sm, p); box.appendChild(it);
+      it.append(b, sm, p);
+      if (x.reply && x.reply.text) {
+        const rp = document.createElement("div"); rp.className = "c-reply";
+        const rb = document.createElement("b"); rb.textContent = "\u2714 Games Crusher 97 replied";
+        const rt = document.createElement("p"); rt.textContent = x.reply.text;
+        rp.append(rb, rt); it.appendChild(rp);
+      }
+      box.appendChild(it);
     });
   } catch (e) { box.innerHTML = '<p class="d-note">Could not load comments right now.</p>'; }
 }
+/* ===== share an app: phone share sheet, or WhatsApp / Facebook / Telegram / X / copy link ===== */
+(function () {
+  const st = document.createElement("style");
+  st.textContent = ".share-box{margin:16px 0 4px;text-align:center}.share-main{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:30px;border:0;cursor:pointer;font:inherit;font-weight:700;color:#1a1300;background:linear-gradient(90deg,#ffd86f,#ff9a6b)}.share-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}.share-row a,.share-row button{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:18px;cursor:pointer;text-decoration:none}.share-row a:hover,.share-row button:hover{background:rgba(255,255,255,.18)}.share-msg{font-size:.8em;color:#c9c6e0;margin:8px 0 0;min-height:1em}.c-reply{margin:8px 0 0 12px;padding:8px 12px;border-left:3px solid #ffd86f;background:rgba(255,216,111,.08);border-radius:8px}.c-reply b{color:#ffd86f;font-size:.85em}.c-reply p{margin:4px 0 0}";
+  document.head.appendChild(st);
+})();
+function shareBox(name, url) {
+  const text = name + " - free on Google Play. Get it here:";
+  const enc = encodeURIComponent, full = text + " " + url;
+  const box = document.createElement("div"); box.className = "share-box";
+  box.innerHTML = '<button type="button" class="share-main">\ud83d\udce4 Share ' + name.replace(/[&<>"]/g, "") + '</button>' +
+    '<div class="share-row">' +
+    '<a target="_blank" rel="noopener" title="WhatsApp" href="https://wa.me/?text=' + enc(full) + '">\ud83d\udcac</a>' +
+    '<a target="_blank" rel="noopener" title="Facebook" href="https://www.facebook.com/sharer/sharer.php?u=' + enc(url) + '">f</a>' +
+    '<a target="_blank" rel="noopener" title="Telegram" href="https://t.me/share/url?url=' + enc(url) + '&text=' + enc(text) + '">\u2708\ufe0f</a>' +
+    '<a target="_blank" rel="noopener" title="X / Twitter" href="https://twitter.com/intent/tweet?url=' + enc(url) + '&text=' + enc(text) + '">\ud835\udd4f</a>' +
+    '<button type="button" title="Copy link" class="share-copy">\ud83d\udd17</button></div><p class="share-msg"></p>';
+  const msg = box.querySelector(".share-msg");
+  const copy = () => { (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(() => { msg.textContent = "Link copied!"; }, () => { msg.textContent = url; }); };
+  box.querySelector(".share-copy").onclick = copy;
+  box.querySelector(".share-main").onclick = () => {
+    if (navigator.share) navigator.share({ title: name, text: text, url: url }).catch(() => {});
+    else copy();
+  };
+  return box;
+}
+/* open an app straight from a shared link, e.g. gamescrusher97.com/#app-glass-marble-balls */
+(function () {
+  const h = (window.__h0 || location.hash || "").slice(1);
+  if (!/^app-[a-z0-9-]+$/.test(h)) return;
+  const want = h.slice(4);
+  const card = Array.from(document.querySelectorAll(".has-detail")).find(c => slug(c.querySelector("h3").textContent) === want);
+  if (card) setTimeout(() => openDetail(card), 50);
+})();
 async function sendComment(id) {
   const name = $("#cName").value.trim(), email = $("#cEmail").value.trim(), text = $("#cText").value.trim(), m = $("#cMsg");
   if (!name || !text) { m.textContent = "Please enter your name and comment."; return; }
@@ -3636,7 +3687,11 @@ if (fbForm) fbForm.addEventListener("submit", async e => {
   if (Date.now() - (+store.get("gc97fb") || 0) < 60000) { out.textContent = "Please wait a minute before sending again."; return; }
   btn.disabled = true; out.textContent = "Sending...";
   try {
-    await set(push(ref(db, "feedback")), { email: em.slice(0, 100), message: msg.slice(0, 2000), ts: Date.now() });
+    // goes to the admin inbox (shown on the Site Admin page and the Glass Marble Balls admin page)
+    const [{ initializeApp: initA, getApps }, { getFirestore, collection, addDoc }] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"), import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")]);
+    const gapp = getApps().find(x => x.name === "inbox") || initA({ apiKey: "AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E", authDomain: "glass-marble-balls.firebaseapp.com", projectId: "glass-marble-balls", appId: "1:35109064745:web:7f844923b50914d0930c38" }, "inbox");
+    await addDoc(collection(getFirestore(gapp), "feedback"), { text: msg.slice(0, 2000), email: em.slice(0, 100), name: "Website visitor", at: Date.now(), appVersion: "website", device: "web", status: "new" });
     store.set("gc97fb", Date.now()); fbForm.reset(); out.textContent = "Thanks! Your feedback was sent.";
   } catch (err) { out.textContent = "Could not send right now. Please try again."; }
   btn.disabled = false;
