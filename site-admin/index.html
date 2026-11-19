@@ -191,7 +191,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <p class="help" style="margin:8px 0 0">From Play Console (updated once a day). New apps appear by themselves. Google never shares <b>who</b> downloaded — only how many and from which country.</p>
     </div>
     <div class="card">
-      <h2>📈 New installs per day <span class="pill">LAST 30 DAYS</span></h2>
+      <h2>📈 New installs per day <span class="pill">LAST 30 DAYS</span> <select id="d-app" style="margin-left:auto;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font:inherit"><option value="">All apps</option></select></h2>
       <svg class="chart" id="d-chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Installs per day"></svg>
       <div class="legend"><span><i style="background:var(--green)"></i>Installs</span><span><i style="background:rgba(111,182,255,.55)"></i>Uninstalls</span></div>
     </div>
@@ -249,8 +249,14 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
         <a class="box" href="https://m3-player-9b855.web.app/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><img src="m3.png" alt="" class="logo"><span>M3 Player Admin</span></a>
         <a class="box" href="../gmb-admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><img src="gmb.png" alt="" class="logo"><span>Glass Marble Balls Admin</span></a>
         <a class="box" href="https://loviko-90a8b.web.app/admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><b>💞</b><span>Loviko Admin</span></a>
+        <span id="l-custom" style="display:contents"></span>
       </div>
-      <p class="help" style="margin:10px 0 0">Glass Marble Balls Admin opens already signed in. M3 Player and Loviko Admin ask for sign-in only the first time, then remember you.</p>
+      <p class="help" style="margin:10px 0 0">Glass Marble Balls Admin opens already signed in. The others ask for sign-in only the first time, then remember you.</p>
+    </div>
+    <div class="card">
+      <h2>➕ Add a new admin page</h2>
+      <p class="help">For a new app or game: give it a name and the admin page link. It is added above for good.</p>
+      <div class="row"><input id="l-name" maxlength="40" placeholder="Name, e.g. New Game Admin"><input id="l-url" placeholder="https://…"><button class="b gold" id="btn-l-add">Add</button></div>
     </div>
   </section>
 
@@ -258,8 +264,11 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
   <section class="tab" id="tab-set">
     <div class="card">
       <h2>⬇️ Play Console reports</h2>
-      <p class="help">Play Console → <b>Download reports</b> → <b>Statistics</b> → <b>Copy Cloud Storage URI</b>. Paste it here once (looks like gs://pubsite_prod_…).</p>
-      <div class="row"><input id="s-bucket" placeholder="gs://pubsite_prod_..."><button class="b gold" id="btn-save">Save</button></div>
+      <p class="help" id="b-done" style="display:none;margin:0">✔ Connected — downloads, countries and reviews are read automatically. <a href="#" id="b-change">Change</a></p>
+      <div id="b-form">
+        <p class="help">Play Console → <b>Download reports</b> → <b>Statistics</b> → <b>Copy Cloud Storage URI</b>. Paste it here once (looks like gs://pubsite_prod_…).</p>
+        <div class="row"><input id="s-bucket" placeholder="gs://pubsite_prod_..."><button class="b gold" id="btn-save">Save</button></div>
+      </div>
     </div>
     <div class="card">
       <h2>🔗 Reports permission</h2>
@@ -288,7 +297,14 @@ const SITE_APPS = [
   { name: 'M3 Player', slug: 'm3-player' },
   { name: 'Loviko', slug: 'loviko' }
 ];
-const PKG_NAME = { 'com.sahilsheemar.glassmarbleballs': 'Glass Marble Balls', 'com.sahilsheemar.m3player': 'M3 Player' };
+// every app / game / tool on the website is found by itself (from clicks, ratings and comments)
+async function siteApps() {
+  const keys = new Set(SITE_APPS.map(a => a.slug));
+  for (const root of ['clicks', 'ratings', 'comments']) { try { const s = await get(ref(rtdb, root)); if (s.exists()) Object.keys(s.val()).forEach(k => keys.add(k)); } catch (e) {} }
+  const nice = k => (SITE_APPS.find(a => a.slug === k) || {}).name || k.split('-').map(w => w ? w[0].toUpperCase() + w.slice(1) : w).join(' ');
+  return Array.from(keys).map(slug => ({ slug, name: nice(slug) }));
+}
+let PKG_NAME = { 'com.sahilsheemar.glassmarbleballs': 'Glass Marble Balls', 'com.sahilsheemar.m3player': 'M3 Player' };
 
 const app = initializeApp({
   apiKey: "AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E", authDomain: "glass-marble-balls.firebaseapp.com", projectId: "glass-marble-balls",
@@ -330,6 +346,7 @@ onAuthStateChanged(auth, u => {
 async function start() {
   try { const s = await getDoc(doc(fs, 'adminData', 'site')); SET = s.exists() ? s.data() : {}; } catch (e) { SET = {}; }
   if (SET.bucket) $('s-bucket').value = 'gs://' + SET.bucket;
+  showBucket(); drawLinks();
   loadAll();
 }
 function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); }
@@ -413,7 +430,7 @@ async function loadVisits() {
 async function loadSite() {
   const rows = [], cms = [];
   let tC = 0, tR = 0, tS = 0, tK = 0;
-  for (const a of SITE_APPS) {
+  for (const a of await siteApps()) {
     const [c, r, m] = await Promise.all([get(ref(rtdb, 'clicks/' + a.slug)), get(ref(rtdb, 'ratings/' + a.slug)), get(query(ref(rtdb, 'comments/' + a.slug), limitToLast(20)))].map(p => p.catch(() => null)));
     const vals = r && r.exists() ? Object.values(r.val()).filter(v => typeof v === 'number') : [];
     const list = m && m.exists() ? Object.values(m.val()) : [];
@@ -436,7 +453,7 @@ async function loadComments() {
   const admin = isSiteAdmin();
   $('c-connect').style.display = admin ? 'none' : '';
   const all = [];
-  for (const a of SITE_APPS) {
+  for (const a of await siteApps()) {
     const m = await get(query(ref(rtdb, 'comments/' + a.slug), limitToLast(50))).catch(() => null);
     const em = admin ? await get(ref(rtdb, 'private/emails/' + a.slug)).catch(() => null) : null;
     const emails = em && em.exists() ? em.val() : {};
@@ -559,13 +576,13 @@ async function loadInstalls() {
   let r; try { r = await gcall({ op: 'playStats', bucket: SET.bucket, packages: [] }); } catch (e) { T.innerHTML = `<tr><td class="mute">${esc(e.message)}</td></tr>`; return; }
   const pk = Object.keys(r).filter(k => r[k].lastDate);
   let tot = 0, n30 = 0, act = 0, revs = 0, sw = 0, sn = 0;
-  const byDay = {}, cty = {}, reviews = [];
-  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = PKG_NAME[k] || k;
+  PLAY = r;
+  // names of new apps (for example Loviko) come from AdMob by themselves
+  if (pk.some(k => !PKG_NAME[k])) { try { const a = await gcall({ url: 'https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/apps?pageSize=100' });
+    (a.apps || []).forEach(x => { const id = x.linkedAppInfo && x.linkedAppInfo.appStoreId, nm = (x.linkedAppInfo && x.linkedAppInfo.displayName) || (x.manualAppInfo && x.manualAppInfo.displayName); if (id && nm && !PKG_NAME[id]) PKG_NAME[id] = nm; }); } catch (e) {} }
+  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = appName(k);
     tot += p.totalInstalls; n30 += m; act += p.activeDevices; revs += p.reviews30;
     if (p.rating) { sw += p.rating * Math.max(1, p.totalInstalls); sn += Math.max(1, p.totalInstalls); }
-    p.daily.forEach(x => { const o = byDay[x.d] = byDay[x.d] || { i: 0, u: 0 }; o.i += x.i; o.u += x.u; });
-    p.countries.forEach(([c, n]) => cty[c] = (cty[c] || 0) + n);
-    p.reviews.forEach(v => reviews.push({ ...v, app: name }));
     return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
   const has = pk.length > 0;
   $('d-total').textContent = $('o-inst').textContent = has ? nf(tot) : '–';
@@ -573,18 +590,49 @@ async function loadInstalls() {
   $('d-active').textContent = has ? nf(act) : '–';
   $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) + ' reviews (2 months)' : '';
   T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="6" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+  const sel = $('d-app'), keep = sel.value;
+  sel.innerHTML = '<option value="">All apps</option>' + pk.map(k => `<option value="${esc(k)}">${esc(appName(k))}</option>`).join('');
+  if (pk.includes(keep)) sel.value = keep;
+  drawPlay();
+}
+// chart, countries and reviews for the app picked in the list (or all apps)
+let PLAY = null;
+const appName = k => PKG_NAME[k] || k.split('.').pop().replace(/[_-]+/g, ' ').replace(/^./, c => c.toUpperCase());
+function drawPlay() {
+  if (!PLAY) return;
+  const pick = $('d-app').value, pk = Object.keys(PLAY).filter(k => PLAY[k].lastDate && (!pick || k === pick));
+  const byDay = {}, cty = {}, reviews = [];
+  pk.forEach(k => { const p = PLAY[k], name = appName(k);
+    p.daily.forEach(x => { const o = byDay[x.d] = byDay[x.d] || { i: 0, u: 0 }; o.i += x.i; o.u += x.u; });
+    p.countries.forEach(([c, n]) => cty[c] = (cty[c] || 0) + n);
+    p.reviews.forEach(v => reviews.push({ ...v, app: name })); });
   bars($('d-chart'), last30().map(x => ({ ...x, i: (byDay[x.iso] || {}).i || 0, u: (byDay[x.iso] || {}).u || 0 })), [{ k: 'i', cls: 'bar3', fmt: v => nf(v) + ' installs', ax: v => nf(v) }, { k: 'u', cls: 'bar2', fmt: v => nf(v) + ' uninstalls', ax: v => nf(v) }]);
   const ct = Object.entries(cty).sort((a, b) => b[1] - a[1]).slice(0, 15);
   $('d-country').innerHTML = '<tr><th>Country</th><th class="n">New installs</th></tr>' + (ct.map(([c, n]) => `<tr><td>${esc(country(c))}</td><td class="n">${nf(n)}</td></tr>`).join('') || '<tr><td colspan="2" class="mute">No data yet.</td></tr>');
   reviews.sort((a, b) => b.at - a.at);
   $('d-reviews').innerHTML = reviews.slice(0, 15).map(v => `<div class="cm"><b>${'★'.repeat(Math.max(0, Math.min(5, v.stars)))}${'☆'.repeat(5 - Math.max(0, Math.min(5, v.stars)))}</b> <span class="mute small">· ${esc(v.app)} · ${v.at ? new Date(v.at).toLocaleDateString() : ''}${v.device ? ' · ' + esc(v.device) : ''}${v.replied ? ' · ✔ replied' : ''}</span>${v.title ? '<p><b>' + esc(v.title) + '</b></p>' : ''}<p>${esc(v.text) || '<span class="mute">(stars only)</span>'}</p></div>`).join('') || '<p class="mute">No reviews in the last 2 months.</p>';
 }
+$('d-app').onchange = drawPlay;
 
 /* ---------- settings + one-time permission ---------- */
+/* other admin pages added from this page (saved in adminData/site.links) */
+function drawLinks() {
+  const L = Array.isArray(SET.links) ? SET.links : [];
+  $('l-custom').innerHTML = L.map((x, i) => `<div class="box" style="position:relative"><a href="${esc(x.url)}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block"><b>🔗</b><span>${esc(x.name)}</span></a><button class="b sm" data-lrm="${i}" title="Remove" style="position:absolute;top:6px;right:6px;padding:0 7px">✕</button></div>`).join('');
+  $('l-custom').querySelectorAll('[data-lrm]').forEach(b => b.onclick = async () => { if (!confirm('Remove this link?')) return; const n = L.slice(); n.splice(+b.dataset.lrm, 1); try { await setDoc(doc(fs, 'adminData', 'site'), { links: n }, { merge: true }); SET.links = n; drawLinks(); } catch (e) { toast(e.message); } });
+}
+$('btn-l-add').onclick = async () => {
+  const name = $('l-name').value.trim(), url = $('l-url').value.trim();
+  if (!name || !/^https:\/\/[^\s]+$/.test(url)) { toast('Write a name and a link starting with https://'); return; }
+  const n = (Array.isArray(SET.links) ? SET.links : []).concat([{ name, url }]);
+  try { await setDoc(doc(fs, 'adminData', 'site'), { links: n }, { merge: true }); SET.links = n; $('l-name').value = ''; $('l-url').value = ''; drawLinks(); toast('Added'); } catch (e) { toast(e.message); }
+};
+function showBucket() { const ok = !!SET.bucket; $('b-done').style.display = ok ? '' : 'none'; $('b-form').style.display = ok ? 'none' : ''; }
+$('b-change').onclick = e => { e.preventDefault(); $('b-done').style.display = 'none'; $('b-form').style.display = ''; };
 $('btn-save').onclick = async () => {
   const v = $('s-bucket').value.trim().replace(/^gs:\/\//, '').replace(/\/.*$/, '');
   if (v && !/^pubsite_prod_[a-z0-9_]+$/i.test(v)) { toast('That does not look like gs://pubsite_prod_…'); return; }
-  try { await setDoc(doc(fs, 'adminData', 'site'), { bucket: v }, { merge: true }); SET.bucket = v; toast('Saved'); loadInstalls(); } catch (e) { toast(e.message); }
+  try { await setDoc(doc(fs, 'adminData', 'site'), { bucket: v }, { merge: true }); SET.bucket = v; toast('Saved'); showBucket(); loadInstalls(); } catch (e) { toast(e.message); }
 };
 function allow() {
   if (!(window.google && google.accounts && google.accounts.oauth2)) { toast('Loading Google… press again in 2 seconds'); return; }
