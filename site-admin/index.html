@@ -186,7 +186,12 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
       <div class="scroll"><table id="s-table"></table></div>
       <p class="help" style="margin:8px 0 0">Download clicks = people who pressed the download button on your website.</p>
     </div>
-    <div class="card"><h2>💬 Latest comments</h2><div id="s-comments"></div></div>
+    <div class="card"><h2>💬 Comments <span class="pill">REPLY / DELETE</span></h2>
+      <div id="c-connect" style="display:none"><p class="help">One time only: connect the website so you can reply to and delete comments.</p><button class="b gold" id="btn-c-connect">🔓 Connect website comments</button></div>
+      <div id="s-comments"></div>
+      <p class="help" style="margin:8px 0 0">Your reply shows on the website under the comment as “✔ Games Crusher 97 replied”.</p>
+    </div>
+    <div class="card"><h2>📩 Feedback from the website form</h2><div id="s-feedback"></div><p class="help" style="margin:8px 0 0">Reply by email. These also show in the Glass Marble Balls admin → Feedback.</p></div>
   </section>
 
   <!-- OTHER ADMIN PAGES -->
@@ -222,8 +227,8 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
-import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getDatabase, ref, get, query, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+import { getFirestore, doc, getDoc, setDoc, collection, query as fq, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getDatabase, ref, get, set, remove, query, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
 const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
 const ADMOB_PUBLISHER = 'pub-1732207620591859';
@@ -246,7 +251,7 @@ const site = initializeApp({
   apiKey: "AIzaSyCB4u7dSVFUEl-T43lkLWY8x1s9n0bI9VE", authDomain: "gamescrusher97-website.firebaseapp.com", projectId: "gamescrusher97-website",
   databaseURL: "https://gamescrusher97-website-default-rtdb.asia-southeast1.firebasedatabase.app", appId: "1:1079009384611:web:f6d0720e6314a61781c716"
 }, 'site');
-const auth = getAuth(app), fs = getFirestore(app), rtdb = getDatabase(site), call = n => httpsCallable(getFunctions(app), n);
+const auth = getAuth(app), siteAuth = getAuth(site), fs = getFirestore(app), rtdb = getDatabase(site), call = n => httpsCallable(getFunctions(app), n);
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -279,7 +284,14 @@ async function start() {
   if (SET.bucket) $('s-bucket').value = 'gs://' + SET.bucket;
   loadAll();
 }
-function loadAll() { loadVisits(); loadSite(); loadLink(); }
+function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); }
+async function loadFeedback() {
+  try {
+    const qs = await getDocs(fq(collection(fs, 'feedback'), where('appVersion', '==', 'website')));
+    const list = []; qs.forEach(d => list.push(d.data())); list.sort((a, b) => (b.at || 0) - (a.at || 0));
+    $('s-feedback').innerHTML = list.slice(0, 30).map(x => `<div class="cm"><b>${esc(x.email || 'no email')}</b> <span class="mute small">· ${x.at ? new Date(x.at).toLocaleString() : ''}</span>${x.email ? ` · <a href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Re: your feedback - Games Crusher 97')}">reply</a>` : ''}<p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No feedback yet.</p>';
+  } catch (e) { $('s-feedback').innerHTML = '<p class="mute">' + esc(e.message) + '</p>'; }
+}
 
 /* ---------- small bar chart ---------- */
 function bars(svg, days, series) {
@@ -324,8 +336,37 @@ async function loadSite() {
   $('s-cm').textContent = $('o-cm').textContent = nf(tC); $('s-rt').textContent = $('o-rt').textContent = nf(tR);
   $('s-avg').textContent = tR ? (tS / tR).toFixed(1) + ' ★' : '–'; $('s-clk').textContent = $('o-clk').textContent = nf(tK);
   $('s-table').innerHTML = '<tr><th>App</th><th class="n">Average</th><th class="n">Ratings</th><th class="n">Comments</th><th class="n">Download clicks</th></tr>' + rows.join('');
-  cms.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  $('s-comments').innerHTML = cms.slice(0, 10).map(x => `<div class="cm"><b>${esc(x.name)}</b> <span class="mute small">· ${esc(x.app)} · ${new Date(x.ts).toLocaleDateString()}</span><p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No comments yet.</p>';
+  loadComments();
+}
+
+/* ---------- comments: reply / delete (needs the admin signed in on the website project too) ---------- */
+const isSiteAdmin = () => { const u = siteAuth.currentUser; return !!(u && String(u.email).toLowerCase() === ADMIN_EMAIL && u.emailVerified); };
+onAuthStateChanged(siteAuth, () => { if (auth.currentUser) loadComments(); });
+$('btn-c-connect').onclick = async () => { const p = new GoogleAuthProvider(); p.setCustomParameters({ login_hint: ADMIN_EMAIL }); try { await signInWithPopup(siteAuth, p); } catch (e) { toast(e.code === 'auth/operation-not-allowed' || /configuration-not-found|unauthorized-domain/.test(e.code || '') ? 'Website project: Google sign-in not set up yet' : e.message); } };
+async function loadComments() {
+  const admin = isSiteAdmin();
+  $('c-connect').style.display = admin ? 'none' : '';
+  const all = [];
+  for (const a of SITE_APPS) {
+    const m = await get(query(ref(rtdb, 'comments/' + a.slug), limitToLast(50))).catch(() => null);
+    const em = admin ? await get(ref(rtdb, 'private/emails/' + a.slug)).catch(() => null) : null;
+    const emails = em && em.exists() ? em.val() : {};
+    if (m && m.exists()) Object.entries(m.val()).forEach(([id, x]) => all.push({ ...x, id, slug: a.slug, app: a.name, email: emails[id] || '' }));
+  }
+  all.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  const box = $('s-comments');
+  box.innerHTML = all.map((x, i) => `<div class="cm" data-i="${i}"><b>${esc(x.name)}</b> <span class="mute small">· ${esc(x.app)} · ${new Date(x.ts).toLocaleString()} · ${x.email ? `<a href="mailto:${esc(x.email)}">${esc(x.email)}</a>` : esc(x.em)}</span><p>${esc(x.text)}</p>` +
+    (x.reply && x.reply.text ? `<p class="small" style="border-left:3px solid var(--gold);padding-left:8px;margin:6px 0"><b style="color:var(--gold)">✔ Your reply:</b> ${esc(x.reply.text)}</p>` : '') +
+    (admin ? `<div class="row" style="margin-top:6px"><input placeholder="Write a reply…" maxlength="1000" data-r="${i}"><button class="b sm gold" data-send="${i}">Reply</button><button class="b sm" data-del="${i}" style="color:var(--red)">Delete</button></div>` : '') + `</div>`).join('') || '<p class="mute">No comments yet.</p>';
+  if (!admin) return;
+  box.querySelectorAll('[data-send]').forEach(b => b.onclick = async () => {
+    const x = all[+b.dataset.send], t = box.querySelector(`[data-r="${b.dataset.send}"]`).value.trim(); if (!t) return;
+    try { await set(ref(rtdb, 'comments/' + x.slug + '/' + x.id + '/reply'), { text: t, ts: Date.now() }); toast('Reply posted'); loadComments(); } catch (e) { toast(e.message); }
+  });
+  box.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    const x = all[+b.dataset.del]; if (!confirm('Delete this comment from ' + x.name + '?')) return;
+    try { await remove(ref(rtdb, 'comments/' + x.slug + '/' + x.id)); await remove(ref(rtdb, 'private/emails/' + x.slug + '/' + x.id)).catch(() => {}); toast('Deleted'); loadSite(); } catch (e) { toast(e.message); }
+  });
 }
 
 /* ---------- reports through the server ---------- */
