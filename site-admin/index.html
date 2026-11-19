@@ -99,6 +99,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <button data-tab="visits">👥 Visitors</button>
       <button data-tab="dl">⬇️ Downloads</button>
       <button data-tab="site">⭐ Website</button>
+      <button data-tab="news">📢 Messages</button>
       <button data-tab="links">🔗 Other admins</button>
       <button data-tab="set">⚙️ Settings</button>
     </nav>
@@ -225,6 +226,21 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
     <div class="card"><h2>📩 Feedback from the website form</h2><div id="s-feedback"></div><p class="help" style="margin:8px 0 0">Reply by email. These also show in the Glass Marble Balls admin → Feedback.</p></div>
   </section>
 
+  <!-- MESSAGES TO THE WEBSITE -->
+  <section class="tab" id="tab-news">
+    <div class="card">
+      <h2>📢 Send a message to the website</h2>
+      <p class="help">It shows at once under the 🔔 bell on gamescrusher97.com (news, updates, offers…). Visitors see a red number for new messages.</p>
+      <div id="n-connect" style="display:none"><p class="help">One time only: connect the website first.</p><button class="b gold" id="btn-n-connect">🔓 Connect website</button></div>
+      <div id="n-form">
+        <input id="n-title" maxlength="80" placeholder="Title (optional)" style="width:100%;margin-bottom:8px">
+        <textarea id="n-text" maxlength="1000" rows="4" placeholder="Your message…" style="width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px;font:inherit;resize:vertical"></textarea>
+        <div class="row" style="margin-top:8px"><button class="b gold" id="btn-n-send">📢 Send to website</button><span class="small mute" id="n-count">0 / 1000</span></div>
+      </div>
+    </div>
+    <div class="card"><h2>🗂️ Messages on the website now</h2><div id="n-list"></div><p class="help" style="margin:8px 0 0">The website shows the newest 20. Delete a message to remove it from the website.</p></div>
+  </section>
+
   <!-- OTHER ADMIN PAGES -->
   <section class="tab" id="tab-links">
     <div class="card">
@@ -316,7 +332,25 @@ async function start() {
   if (SET.bucket) $('s-bucket').value = 'gs://' + SET.bucket;
   loadAll();
 }
-function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); }
+function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); }
+async function loadNews() {
+  const admin = isSiteAdmin();
+  $('n-connect').style.display = admin ? 'none' : ''; $('n-form').style.display = admin ? '' : 'none';
+  try {
+    const s = await get(ref(rtdb, 'news')), list = s.exists() ? Object.entries(s.val()).map(([id, x]) => ({ id, ...x })).sort((a, b) => b.ts - a.ts) : [];
+    $('n-list').innerHTML = list.map(x => `<div class="cm"><b>${esc(x.title || '(no title)')}</b> <span class="mute small">· ${new Date(x.ts).toLocaleString()}</span><p style="white-space:pre-line">${esc(x.text)}</p>${admin ? `<button class="b sm" data-ndel="${esc(x.id)}" style="color:var(--red)">Delete</button>` : ''}</div>`).join('') || '<p class="mute">No messages — the website shows “No messages”.</p>';
+    $('n-list').querySelectorAll('[data-ndel]').forEach(b => b.onclick = async () => { if (!confirm('Delete this message from the website?')) return; try { await remove(ref(rtdb, 'news/' + b.dataset.ndel)); toast('Deleted'); loadNews(); } catch (e) { toast(e.message); } });
+  } catch (e) { $('n-list').innerHTML = '<p class="mute">' + esc(e.message) + '</p>'; }
+}
+$('n-text').oninput = () => $('n-count').textContent = $('n-text').value.length + ' / 1000';
+$('btn-n-connect').onclick = () => $('btn-c-connect').click();
+$('btn-n-send').onclick = async () => {
+  const text = $('n-text').value.trim(), title = $('n-title').value.trim();
+  if (!text) { toast('Write a message first'); return; }
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const msg = { text, ts: Date.now() }; if (title) msg.title = title;
+  try { await set(ref(rtdb, 'news/' + id), msg); $('n-text').value = ''; $('n-title').value = ''; $('n-count').textContent = '0 / 1000'; toast('✔ Sent — it is on the website now'); loadNews(); } catch (e) { toast(e.message); }
+};
 async function loadFeedback() {
   try {
     const qs = await getDocs(fq(collection(fs, 'feedback'), where('appVersion', '==', 'website')));
@@ -396,7 +430,7 @@ async function loadSite() {
 
 /* ---------- comments: reply / delete (needs the admin signed in on the website project too) ---------- */
 const isSiteAdmin = () => { const u = siteAuth.currentUser; return !!(u && String(u.email).toLowerCase() === ADMIN_EMAIL && u.emailVerified); };
-onAuthStateChanged(siteAuth, () => { if (auth.currentUser) loadComments(); });
+onAuthStateChanged(siteAuth, () => { if (auth.currentUser) { loadComments(); loadNews(); } });
 $('btn-c-connect').onclick = async () => { const p = new GoogleAuthProvider(); p.setCustomParameters({ login_hint: ADMIN_EMAIL }); try { await signInWithPopup(siteAuth, p); } catch (e) { toast(e.code === 'auth/operation-not-allowed' || /configuration-not-found|unauthorized-domain/.test(e.code || '') ? 'Website project: Google sign-in not set up yet' : e.message); } };
 async function loadComments() {
   const admin = isSiteAdmin();
@@ -498,6 +532,8 @@ async function loadMoney() {
     p.m += r.v; if (r.day >= k7) p.w += r.v; if (r.day === today) { p.d += r.v; p.ads += r.ads; } if (r.day === yest) p.y += r.v;
     byDay[r.day] = (byDay[r.day] || 0) + r.v;
   });
+  // the website (AdSense) always has its own line, also before the first earnings
+  if (/adsense/.test(LINK.scope || '') && !per['🌐 Website']) per['🌐 Website'] = { d: 0, y: 0, w: 0, m: 0, ads: 0 };
   const names = Object.keys(per).sort((a, b) => per[b].m - per[a].m);
   const tot = k => names.reduce((s, n) => s + per[n][k], 0);
   $('m-today').textContent = aed(tot('d'));
