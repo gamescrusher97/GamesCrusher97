@@ -67,10 +67,11 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
   <div class="hrow">
     <div class="brand"><img src="../favicon.png" alt="">Games Crusher 97 Admin</div>
     <nav id="nav" style="display:none">
-      <button data-tab="money" class="on">💰 Earnings</button>
+      <button data-tab="money" class="on">📊 Dashboard</button>
       <button data-tab="visits">👥 Visitors</button>
       <button data-tab="dl">⬇️ Downloads</button>
       <button data-tab="site">⭐ Website</button>
+      <button data-tab="links">🔗 Other admins</button>
       <button data-tab="set">⚙️ Settings</button>
     </nav>
     <button class="b sm" id="btn-refresh" style="margin-left:auto;display:none">↻ Refresh</button>
@@ -104,6 +105,16 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
       <div class="box good"><b id="m-7">–</b><span>Last 7 days</span></div>
       <div class="box good"><b id="m-30">–</b><span>Last 30 days</span></div>
       <div class="box"><b id="m-ads">–</b><span>Ads shown today</span></div>
+    </div>
+    <div class="boxes">
+      <div class="box"><b id="o-vis">–</b><span>👥 Website visitors today</span></div>
+      <div class="box"><b id="o-inst">–</b><span>⬇️ Total app installs</span></div>
+      <div class="box"><b id="o-new">–</b><span>⬇️ New installs (30 days)</span></div>
+      <div class="box"><b id="o-star">–</b><span>⭐ Play Store rating</span></div>
+      <div class="box"><b id="o-rev">–</b><span>📝 Play reviews (2 months)</span></div>
+      <div class="box"><b id="o-cm">–</b><span>💬 Website comments</span></div>
+      <div class="box"><b id="o-rt">–</b><span>⭐ Website ratings</span></div>
+      <div class="box"><b id="o-clk">–</b><span>👆 Download clicks (website)</span></div>
     </div>
     <div class="card">
       <h2>📊 Earnings per day <span class="pill">LAST 30 DAYS</span></h2>
@@ -143,18 +154,50 @@ input{ background:var(--card2); border:1px solid var(--line); color:var(--text);
     <div class="card">
       <h2>⬇️ Per app</h2>
       <div class="scroll"><table id="d-table"></table></div>
-      <p class="help" style="margin:8px 0 0">From Play Console (updated once a day). New apps appear by themselves.</p>
+      <p class="help" style="margin:8px 0 0">From Play Console (updated once a day). New apps appear by themselves. Google never shares <b>who</b> downloaded — only how many and from which country.</p>
+    </div>
+    <div class="card">
+      <h2>📈 New installs per day <span class="pill">LAST 30 DAYS</span></h2>
+      <svg class="chart" id="d-chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Installs per day"></svg>
+      <div class="legend"><span><i style="background:var(--green)"></i>Installs</span><span><i style="background:rgba(111,182,255,.55)"></i>Uninstalls</span></div>
+    </div>
+    <div class="card">
+      <h2>🌍 Installs by country <span class="pill">LAST 30 DAYS</span></h2>
+      <div class="scroll"><table id="d-country"></table></div>
+    </div>
+    <div class="card">
+      <h2>📝 Latest Play Store reviews</h2>
+      <div id="d-reviews"></div>
     </div>
   </section>
 
   <!-- WEBSITE -->
   <section class="tab" id="tab-site">
+    <div class="boxes">
+      <div class="box"><b id="s-cm">–</b><span>💬 Comments</span></div>
+      <div class="box"><b id="s-rt">–</b><span>⭐ Ratings</span></div>
+      <div class="box"><b id="s-avg">–</b><span>⭐ Average stars</span></div>
+      <div class="box"><b id="s-clk">–</b><span>👆 Download clicks</span></div>
+    </div>
     <div class="card">
       <h2>⭐ Ratings, comments & download clicks</h2>
       <div class="scroll"><table id="s-table"></table></div>
       <p class="help" style="margin:8px 0 0">Download clicks = people who pressed the download button on your website.</p>
     </div>
     <div class="card"><h2>💬 Latest comments</h2><div id="s-comments"></div></div>
+  </section>
+
+  <!-- OTHER ADMIN PAGES -->
+  <section class="tab" id="tab-links">
+    <div class="card">
+      <h2>🔗 Our admin pages</h2>
+      <div class="boxes" style="margin:0">
+        <div class="box" style="opacity:.55"><b>🎵</b><span>M3 Player Admin<br><small>not made yet</small></span></div>
+        <a class="box" href="../gmb-admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><b>🎪</b><span>Glass Marble Balls Admin</span></a>
+        <a class="box" href="https://loviko-90a8b.web.app/admin/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><b>💞</b><span>Loviko Admin</span></a>
+      </div>
+      <p class="help" style="margin:10px 0 0">Glass Marble Balls Admin opens already signed in. Loviko Admin asks for sign-in only the first time, then remembers you.</p>
+    </div>
   </section>
 
   <!-- SETTINGS -->
@@ -258,7 +301,7 @@ async function loadVisits() {
     // the website counts by UTC day
     const t = all[new Date().toISOString().slice(0, 10)] || {};
     const sum = n => days.slice(-n).reduce((a, x) => a + (x.people || 0), 0);
-    $('v-people').textContent = nf(t.people || 0); $('v-new').textContent = nf(t.new || 0); $('v-views').textContent = nf(t.views || 0);
+    $('v-people').textContent = $('o-vis').textContent = nf(t.people || 0); $('v-new').textContent = nf(t.new || 0); $('v-views').textContent = nf(t.views || 0);
     $('v-7').textContent = nf(sum(7)); $('v-30').textContent = nf(sum(30));
     bars($('v-chart'), days, [{ k: 'people', cls: 'bar', fmt: v => nf(v) + ' visitors' }, { k: 'new', cls: 'bar2', fmt: v => nf(v) + ' new' }]);
   } catch (e) { toast('Visitors: ' + e.message); }
@@ -267,13 +310,17 @@ async function loadVisits() {
 /* ---------- website: clicks, ratings, comments ---------- */
 async function loadSite() {
   const rows = [], cms = [];
+  let tC = 0, tR = 0, tS = 0, tK = 0;
   for (const a of SITE_APPS) {
     const [c, r, m] = await Promise.all([get(ref(rtdb, 'clicks/' + a.slug)), get(ref(rtdb, 'ratings/' + a.slug)), get(query(ref(rtdb, 'comments/' + a.slug), limitToLast(20)))].map(p => p.catch(() => null)));
     const vals = r && r.exists() ? Object.values(r.val()).filter(v => typeof v === 'number') : [];
     const list = m && m.exists() ? Object.values(m.val()) : [];
     list.forEach(x => cms.push({ ...x, app: a.name }));
+    tC += list.length; tR += vals.length; tS += vals.reduce((s, v) => s + v, 0); tK += c && c.exists() ? +c.val() || 0 : 0;
     rows.push(`<tr><td>${esc(a.name)}</td><td class="n">${vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1) + ' ★' : '–'}</td><td class="n">${vals.length}</td><td class="n">${list.length}</td><td class="n">${nf(c && c.exists() ? c.val() : 0)}</td></tr>`);
   }
+  $('s-cm').textContent = $('o-cm').textContent = nf(tC); $('s-rt').textContent = $('o-rt').textContent = nf(tR);
+  $('s-avg').textContent = tR ? (tS / tR).toFixed(1) + ' ★' : '–'; $('s-clk').textContent = $('o-clk').textContent = nf(tK);
   $('s-table').innerHTML = '<tr><th>App</th><th class="n">Average</th><th class="n">Ratings</th><th class="n">Comments</th><th class="n">Download clicks</th></tr>' + rows.join('');
   cms.sort((a, b) => (b.ts || 0) - (a.ts || 0));
   $('s-comments').innerHTML = cms.slice(0, 10).map(x => `<div class="cm"><b>${esc(x.name)}</b> <span class="mute small">· ${esc(x.app)} · ${new Date(x.ts).toLocaleDateString()}</span><p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No comments yet.</p>';
@@ -283,9 +330,12 @@ async function loadSite() {
 async function gcall(data) { return (await call('adminGoogle')(data)).data; }
 async function loadLink() {
   try { LINK = await gcall({ op: 'linkStatus' }); } catch (e) { LINK = { linked: false }; toast(e.message); }
-  const need = !LINK.linked || !/adsense/.test(LINK.scope || '') || !/devstorage/.test(LINK.scope || '');
-  $('link-box').style.display = need ? '' : 'none';
-  $('link-st').textContent = LINK.linked ? (need ? 'Saved, but AdSense / Play need one more Allow.' : '✔ Saved for good. AdMob, AdSense and Play Console reports are read automatically.') : 'Not given yet.';
+  const sc = LINK.scope || '', has = k => new RegExp(k).test(sc);
+  $('link-box').style.display = LINK.linked ? 'none' : '';
+  $('link-st').innerHTML = LINK.linked
+    ? 'Saved for good: AdMob ' + (has('admob') ? '✔' : '✖') + ' · AdSense ' + (has('adsense') ? '✔' : '✖') + ' · Play Console ' + (has('devstorage') ? '✔' : '✖') +
+      ((has('adsense') && has('devstorage')) ? '' : '<br>For a ✖: press "Allow again" and tick <b>every</b> box in the Google window.')
+    : 'Not given yet.';
   loadMoney(); loadInstalls();
 }
 
@@ -317,7 +367,7 @@ async function loadMoney() {
   let rows = [], notes = [];
   try { rows = rows.concat((await admob30()).rows); } catch (e) { notes.push('AdMob: ' + e.message); }
   if (/adsense/.test(LINK.scope || '')) { try { const s = await adsense30(); if (s) rows = rows.concat(s); else notes.push('Website ads: AdSense not approved yet'); } catch (e) { notes.push('AdSense: ' + e.message); } }
-  else notes.push('Website ads: press "Allow reports" once more');
+  else notes.push('Website ads: ⚙️ Settings → Allow again (tick every box)');
 
   const days = last30(), today = days[29].key, yest = days[28].key, k7 = days[23].key;
   const per = {}, byDay = {};
@@ -338,18 +388,36 @@ async function loadMoney() {
   bars($('m-chart'), days.map(x => ({ ...x, v: byDay[x.key] || 0 })), [{ k: 'v', cls: 'bar3', fmt: v => aed(v) }]);
 }
 
+let REG;
+try { REG = new Intl.DisplayNames(['en'], { type: 'region' }); } catch (e) {}
+const country = c => { try { return (REG && REG.of(c)) || c; } catch (e) { return c; } };
 async function loadInstalls() {
   const T = $('d-table');
   if (!SET.bucket) { T.innerHTML = '<tr><td class="mute">Paste the Play Console address in ⚙️ Settings once.</td></tr>'; return; }
-  if (!LINK || !LINK.linked || !/devstorage/.test(LINK.scope || '')) { T.innerHTML = '<tr><td class="mute">Press "Allow reports (one time only)" above.</td></tr>'; return; }
+  if (!LINK || !LINK.linked || !/devstorage/.test(LINK.scope || '')) { T.innerHTML = '<tr><td class="mute">⚙️ Settings → "Allow again" and tick every box in the Google window.</td></tr>'; return; }
   T.innerHTML = '<tr><td class="mute">⏳ Loading…</td></tr>';
-  let r; try { r = await gcall({ op: 'playInstalls', bucket: SET.bucket, packages: [] }); } catch (e) { T.innerHTML = `<tr><td class="mute">${esc(e.message)}</td></tr>`; return; }
+  let r; try { r = await gcall({ op: 'playStats', bucket: SET.bucket, packages: [] }); } catch (e) { T.innerHTML = `<tr><td class="mute">${esc(e.message)}</td></tr>`; return; }
   const pk = Object.keys(r).filter(k => r[k].lastDate);
-  let tot = 0, n30 = 0, act = 0;
-  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0); tot += p.totalInstalls; n30 += m; act += p.activeDevices;
-    return `<tr><td>${esc(PKG_NAME[k] || k)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n small mute">${esc(p.lastDate)}</td></tr>`; });
-  $('d-total').textContent = pk.length ? nf(tot) : '–'; $('d-30').textContent = pk.length ? nf(n30) : '–'; $('d-active').textContent = pk.length ? nf(act) : '–';
-  T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Report date</th></tr>' + (rows.join('') || '<tr><td colspan="5" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+  let tot = 0, n30 = 0, act = 0, revs = 0, sw = 0, sn = 0;
+  const byDay = {}, cty = {}, reviews = [];
+  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = PKG_NAME[k] || k;
+    tot += p.totalInstalls; n30 += m; act += p.activeDevices; revs += p.reviews30;
+    if (p.rating) { sw += p.rating * Math.max(1, p.totalInstalls); sn += Math.max(1, p.totalInstalls); }
+    p.daily.forEach(x => { const o = byDay[x.d] = byDay[x.d] || { i: 0, u: 0 }; o.i += x.i; o.u += x.u; });
+    p.countries.forEach(([c, n]) => cty[c] = (cty[c] || 0) + n);
+    p.reviews.forEach(v => reviews.push({ ...v, app: name }));
+    return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
+  const has = pk.length > 0;
+  $('d-total').textContent = $('o-inst').textContent = has ? nf(tot) : '–';
+  $('d-30').textContent = $('o-new').textContent = has ? nf(n30) : '–';
+  $('d-active').textContent = has ? nf(act) : '–';
+  $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) : '–';
+  T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="6" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+  bars($('d-chart'), last30().map(x => ({ ...x, i: (byDay[x.iso] || {}).i || 0, u: (byDay[x.iso] || {}).u || 0 })), [{ k: 'i', cls: 'bar3', fmt: v => nf(v) + ' installs' }, { k: 'u', cls: 'bar2', fmt: v => nf(v) + ' uninstalls' }]);
+  const ct = Object.entries(cty).sort((a, b) => b[1] - a[1]).slice(0, 15);
+  $('d-country').innerHTML = '<tr><th>Country</th><th class="n">New installs</th></tr>' + (ct.map(([c, n]) => `<tr><td>${esc(country(c))}</td><td class="n">${nf(n)}</td></tr>`).join('') || '<tr><td colspan="2" class="mute">No data yet.</td></tr>');
+  reviews.sort((a, b) => b.at - a.at);
+  $('d-reviews').innerHTML = reviews.slice(0, 15).map(v => `<div class="cm"><b>${'★'.repeat(Math.max(0, Math.min(5, v.stars)))}${'☆'.repeat(5 - Math.max(0, Math.min(5, v.stars)))}</b> <span class="mute small">· ${esc(v.app)} · ${v.at ? new Date(v.at).toLocaleDateString() : ''}${v.device ? ' · ' + esc(v.device) : ''}${v.replied ? ' · ✔ replied' : ''}</span>${v.title ? '<p><b>' + esc(v.title) + '</b></p>' : ''}<p>${esc(v.text) || '<span class="mute">(stars only)</span>'}</p></div>`).join('') || '<p class="mute">No reviews in the last 2 months.</p>';
 }
 
 /* ---------- settings + one-time permission ---------- */
@@ -364,7 +432,11 @@ function allow() {
     client_id: OAUTH_CLIENT, scope: SCOPES, ux_mode: 'popup', login_hint: ADMIN_EMAIL,
     callback: async r => {
       if (r.error) { toast('Not allowed: ' + r.error); return; }
-      try { await call('adminAdmobLink')({ code: r.code }); toast('✔ Saved for good'); loadLink(); } catch (e) { toast(e.message); }
+      try {
+        const res = (await call('adminAdmobLink')({ code: r.code })).data || {}, sc = res.scope || '';
+        toast('Saved: AdMob ' + (/admob/.test(sc) ? '✔' : '✖') + ' · AdSense ' + (/adsense/.test(sc) ? '✔' : '✖') + ' · Play ' + (/devstorage/.test(sc) ? '✔' : '✖'));
+        loadLink();
+      } catch (e) { toast(e.message); }
     }
   }).requestCode();
 }
