@@ -139,7 +139,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
     </div>
     <div class="boxes">
       <div class="box blue"><b id="o-vis">–</b><span>👥 Website visits today</span><small id="o-vis-s"></small></div>
-      <div class="box blue"><b id="o-inst">–</b><span>⬇️ Total app installs</span><small id="o-new"></small></div>
+      <div class="box blue"><b id="o-inst">–</b><span>⬇️ Total downloads (all stores)</span><small id="o-new"></small></div>
       <div class="box gold"><b id="o-star">–</b><span>⭐ Play Store rating</span><small id="o-rev"></small></div>
       <div class="box gold"><b id="o-rt">–</b><span>⭐ Website rating</span><small id="o-rt-n"></small></div>
       <div class="box purple"><b id="o-cm">–</b><span>💬 Website comments</span><small id="o-fb"></small></div>
@@ -181,8 +181,8 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
   <!-- DOWNLOADS -->
   <section class="tab" id="tab-dl">
     <div class="boxes">
-      <div class="box good"><b id="d-total">–</b><span>Total installs (all apps)</span></div>
-      <div class="box"><b id="d-30">–</b><span>New installs last 30 days</span></div>
+      <div class="box good"><b id="d-total">–</b><span>Total downloads (all apps, all stores)</span></div>
+      <div class="box"><b id="d-30">–</b><span>New on Play (last 30 days)</span></div>
       <div class="box"><b id="d-active">–</b><span>On phones now</span></div>
     </div>
     <div class="card">
@@ -582,16 +582,21 @@ async function loadInstalls() {
   // names of new apps (for example Loviko) come from AdMob by themselves
   if (pk.some(k => !PKG_NAME[k])) { try { const a = await gcall({ url: 'https://admob.googleapis.com/v1/accounts/' + ADMOB_PUBLISHER + '/apps?pageSize=100' });
     (a.apps || []).forEach(x => { const id = x.linkedAppInfo && x.linkedAppInfo.appStoreId, nm = (x.linkedAppInfo && x.linkedAppInfo.displayName) || (x.manualAppInfo && x.manualAppInfo.displayName); if (id && nm && !PKG_NAME[id]) PKG_NAME[id] = nm; }); } catch (e) {} }
-  const rows = pk.map(k => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = appName(k);
-    tot += p.totalInstalls; n30 += m; act += p.activeDevices; revs += p.reviews30;
+  // every store for every app (Play, Huawei, Uptodown, website clicks) — same numbers as the app admin pages
+  const tok = await auth.currentUser.getIdToken();
+  const ST = await Promise.all(pk.map(k => fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/storeDownloads', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ pkg: k, name: appName(k) }) }).then(x => x.json()).catch(() => null)));
+  const cell = x => x && x.available !== false && x.total != null ? nf(x.total) : '<span class="mute">–</span>';
+  const rows = pk.map((k, i) => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = appName(k), st = ST[i] || {};
+    const all = st.total != null ? st.total : p.totalInstalls;
+    tot += all; n30 += m; act += p.activeDevices; revs += p.reviews30;
     if (p.rating) { sw += p.rating * Math.max(1, p.totalInstalls); sn += Math.max(1, p.totalInstalls); }
-    return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
+    return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${cell(st.huawei)}</td><td class="n">${cell(st.uptodown)}</td><td class="n">${cell(st.website)}</td><td class="n"><b>${nf(all)}</b></td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
   const has = pk.length > 0;
   $('d-total').textContent = $('o-inst').textContent = has ? nf(tot) : '–';
-  $('d-30').textContent = has ? nf(n30) : '–'; $('o-new').textContent = has ? '+' + nf(n30) + ' in last 30 days' : '';
+  $('d-30').textContent = has ? nf(n30) : '–'; $('o-new').textContent = has ? '+' + nf(n30) + ' new on Play in 30 days' : '';
   $('d-active').textContent = has ? nf(act) : '–';
   $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) + ' reviews (2 months)' : '';
-  T.innerHTML = '<tr><th>App</th><th class="n">Total installs</th><th class="n">Last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="6" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+  T.innerHTML = '<tr><th>App</th><th class="n">▶️ Play</th><th class="n">🟥 Huawei</th><th class="n">⬇️ Uptodown</th><th class="n">🌐 Website</th><th class="n">⭐ Total</th><th class="n">Play last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="10" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
   const sel = $('d-app'), keep = sel.value;
   sel.innerHTML = '<option value="">All apps</option>' + pk.map(k => `<option value="${esc(k)}">${esc(appName(k))}</option>`).join('');
   if (pk.includes(keep)) sel.value = keep;
