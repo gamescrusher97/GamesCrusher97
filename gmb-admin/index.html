@@ -119,6 +119,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
   <!-- ================= DASHBOARD ================= -->
   <section class="tab on" id="tab-dash">
     <div class="boxes">
+      <div class="box link good" id="box-downloads"><b id="d-downloads">–</b><span>📥 Downloads (all stores)</span><div class="mute small" id="d-downloads-sub"></div></div>
       <div class="box good"><b id="d-online">–</b><span>Online now</span></div>
       <div class="box"><b id="d-active">–</b><span>Active (last 24 h)</span></div>
       <div class="box"><b id="d-played">–</b><span>Played a game (24 h)</span></div>
@@ -458,6 +459,7 @@ const onSub = { 'players:passes': loadPasses, 'players:buys': () => loadPurchase
 $('btn-dash-refresh').onclick = () => { const on = document.querySelector('#nav button.on'), f = on && onTab[on.dataset.tab]; (f || loadDash)(); };
 const cnt = async q => { try { return (await getCountFromServer(q)).data().count; } catch(e){ console.log(e); return '?'; } };
 async function loadDash(){
+  loadStores();
   const now = Date.now(), pres = collection(db, 'presence'), pl = collection(db, 'players');
   const [on, act, played, dev, players, guests, mp, fb] = await Promise.all([
     cnt(query(pres, where('lastActive', '>=', now - 120000))), cnt(query(pres, where('lastActive', '>=', now - DAY))),
@@ -1110,6 +1112,32 @@ function previewGame(engine, ev){
   if($('pv-edit')) $('pv-edit').onclick = () => { closeModal(); goTab('events', 'cal'); editEvent(ev.id); };
 }
 $('modal-x').addEventListener('click', () => { const f = $('pv-frame'); if(f) f.src = 'about:blank'; if(pvHandler){ window.removeEventListener('message', pvHandler); pvHandler = null; } });
+
+/* ---------- downloads from every store (Play, Huawei, Uptodown, website) ---------- */
+let STORES = null;
+$('box-downloads').onclick = showStores;
+async function loadStores(){
+  try {
+    const t = await auth.currentUser.getIdToken();
+    const r = await fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/storeDownloads', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t }, body: JSON.stringify({ pkg: 'com.sahilsheemar.glassmarbleballs', name: 'Glass Marble Balls' }) });
+    const d = await r.json(); if(!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    STORES = d; $('d-downloads').textContent = Number(d.total || 0).toLocaleString(); $('d-downloads-sub').textContent = 'all stores · tap for the list';
+  } catch(e){ STORES = { err: e.message }; $('d-downloads-sub').textContent = 'tap for details'; }
+}
+function showStores(){
+  const d = STORES; if(!d){ toast('Loading…'); loadStores().then(showStores); return; }
+  if(d.err){ modal('<h2>📥 Downloads</h2><div class="alert">' + esc(d.err) + '</div>'); return; }
+  const n = v => Number(v || 0).toLocaleString();
+  const row = (icon, label, x, extra) => { const ok = x && x.available !== false; return `<tr><td>${icon} ${label}</td><td class="n" style="text-align:right"><b>${ok ? n(x.total) : '–'}</b></td><td class="small mute">${ok ? (extra || '') : 'not published yet'}</td></tr>`; };
+  modal(`<h2>📥 Downloads — every store</h2>
+  <table><tr><th>Store</th><th style="text-align:right">Downloads</th><th></th></tr>
+  ${row('▶️', 'Google Play', d.play, d.play && d.play.last30 != null ? '+' + n(d.play.last30) + ' in last 30 days' + (d.play.date ? ' · report ' + esc(d.play.date) : '') : '')}
+  ${row('🟥', 'Huawei AppGallery', d.huawei, d.huawei && d.huawei.last30 != null ? '+' + n(d.huawei.last30) + ' in last 30 days' : '')}
+  ${row('⬇️', 'Uptodown', d.uptodown, d.uptodown && d.uptodown.url ? '<a target="_blank" href="' + esc(d.uptodown.url) + '">open page ↗</a>' : '')}
+  ${row('🌐', 'Website clicks', { total: d.website && d.website.total }, 'gamescrusher97.com download button')}
+  <tr><th>⭐ Total</th><th style="text-align:right;font-size:18px">${n(d.total)}</th><th></th></tr></table>
+  <p class="help" style="margin-top:10px">New stores show here by themselves as soon as the app is published there. Store reports can be 1–2 days late.</p>%EXTRA%`);
+}
 </script>
 </body>
 </html>
