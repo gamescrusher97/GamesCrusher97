@@ -290,7 +290,9 @@ const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
 const ADMOB_PUBLISHER = 'pub-1732207620591859';
 const OAUTH_CLIENT = '35109064745-ttt47rljjmph9rr954jrpgdc1mceskvi.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/admob.readonly https://www.googleapis.com/auth/adsense.readonly https://www.googleapis.com/auth/devstorage.read_only';
-const USD_TO_AED = 3.6725;   // fixed rate (the dirham is pegged to the dollar)
+let USD_TO_AED = 3.6725;   // fixed rate (the dirham is pegged to the dollar)
+// live US$ -> AED rate (falls back to the fixed 3.6725 if the rate service does not answer)
+fetch('https://open.er-api.com/v6/latest/USD').then(r => r.json()).then(j => { const v = j && j.rates && +j.rates.AED; if (v > 3 && v < 4.5) USD_TO_AED = v; }).catch(() => {});
 // apps on the website (for clicks, ratings, comments). Earnings and installs find new apps by themselves.
 const SITE_APPS = [
   { name: 'Glass Marble Balls', slug: 'glass-marble-balls' },
