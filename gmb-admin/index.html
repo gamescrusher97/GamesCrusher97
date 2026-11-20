@@ -170,7 +170,7 @@ pre{ white-space:pre-wrap; word-break:break-word; background:#0f0d18; padding:10
         <p class="mute small" style="margin-top:6px">Estimate from Google's meters. The exact bill is in Google Cloud Billing (link on the side).</p></div>
       <div class="card"><h2>🎯 Monthly limit & alerts</h2>
         <div id="b-info" class="help">Loading…</div>
-        <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="USD"></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
+        <div class="row"><label class="f">Monthly limit<input id="b-amount" type="number" step="1" min="1" value="5"></label><label class="f">Currency<input id="b-cur" value="AED" readonly></label><label class="f">Warn me at (% of limit)<input id="b-alert" type="number" value="80"></label><button class="b gold" id="btn-b-save" style="flex:0 0 auto">Save limit</button></div>
         <p class="help" style="margin-top:8px">Google e-mails you at 50%, 90% and 100%, and a red bar appears on this page. Nothing is stopped automatically — you decide.</p></div>
       <div class="card" style="display:none"><h2>🔑 Ad report keys (one time)</h2>
         <p class="help">AdMob needs nothing (Connect Google reports). <b>Unity</b>: Unity Dashboard → Administration → API management → Monetization Stats API key, and Organization core ID (Administration → Settings). <b>Meta</b>: Business Settings → System users → Generate token (read_audience_network_insights). Saved privately; only this admin account can read them. Unity and Meta numbers come through the server, so they show after the Blaze plan + SETUP.bat.</p>
@@ -308,6 +308,10 @@ const app = initializeApp({
 });
 const auth = getAuth(app), db = getFirestore(app);
 const $ = id => document.getElementById(id);
+let USD_AED = 3.6725;
+// live US$ -> AED rate (falls back to the fixed 3.6725 if the rate service does not answer)
+fetch('https://open.er-api.com/v6/latest/USD').then(r => r.json()).then(j => { const v = j && j.rates && +j.rates.AED; if (v > 3 && v < 4.5) USD_AED = v; }).catch(() => {});
+let BUDGET_CUR = 'AED';   // the currency of the Google budget itself (shown to you in AED)   // Google prices are in US$, everything is shown in AED
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const numOr = (v, d) => { const n = parseFloat(v); return isFinite(n) ? n : d; };
 const fmt = t => t ? new Date(t).toLocaleString([], { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–';
@@ -442,7 +446,7 @@ async function start(){
   if(started) return; started = true;
   try { await loadCfg(); } catch(e){ err(e); }
   try { const s = await getDoc(doc(db, 'adminData', 'settings')); ADM = s.exists() ? s.data() : {}; } catch(e){}
-  if(ADM.budget){ $('b-amount').value = ADM.budget.amount || 5; $('b-cur').value = ADM.budget.currency || 'USD'; $('b-alert').value = ADM.budget.alertPct || 80; }
+  if(ADM.budget){ $('b-amount').value = ADM.budget.amount || 5; $('b-cur').value = ADM.budget.currency || 'AED'; $('b-alert').value = ADM.budget.alertPct || 80; }
   if(ADM.prices){ ['r', 'w', 'd', 'f'].forEach(k => { if(ADM.prices[k] != null) $('pr-' + k).value = ADM.prices[k]; }); }
   if(ADM.metaApp) $('meta-app').value = ADM.metaApp;
   if(ADM.metaToken) $('meta-tok').value = ADM.metaToken;
@@ -891,10 +895,10 @@ const DEF_LIMITS = {
 function LIM(){ const l = JSON.parse(JSON.stringify(DEF_LIMITS)); const o = ADM.limits || {}; Object.keys(o).forEach(k => { if(l[k]) Object.assign(l[k], o[k]); }); return l; }
 $('btn-limits').onclick = () => {
   const l = LIM();
-  modal(`<h2>✏️ Free limits & prices</h2><p class="help">Only change these if Google changes them.</p><table><tr><th>Item</th><th>Free</th><th>Per</th><th>Price (USD)</th><th>for every</th></tr>` +
-    Object.keys(l).map(k => `<tr data-k="${k}"><td>${esc(l[k].name)}</td><td><input data-f="free" type="number" value="${l[k].free}" style="width:110px"></td><td>${l[k].per}</td><td><input data-f="price" type="number" step="any" value="${l[k].price}" style="width:100px"></td><td><input data-f="unit" type="number" value="${l[k].unit}" style="width:100px"></td></tr>`).join('') +
+  modal(`<h2>✏️ Free limits & prices</h2><p class="help">Only change these if Google changes them.</p><table><tr><th>Item</th><th>Free</th><th>Per</th><th>Price (AED)</th><th>for every</th></tr>` +
+    Object.keys(l).map(k => `<tr data-k="${k}"><td>${esc(l[k].name)}</td><td><input data-f="free" type="number" value="${l[k].free}" style="width:110px"></td><td>${l[k].per}</td><td><input data-f="price" type="number" step="any" value="${+(l[k].price * USD_AED).toFixed(4)}" style="width:100px"></td><td><input data-f="unit" type="number" value="${l[k].unit}" style="width:100px"></td></tr>`).join('') +
     `</table><br><button class="b green" id="lim-save">💾 Save</button> <button class="b" id="lim-def">Back to Google's list</button>`);
-  $('lim-save').onclick = async () => { const o = {}; document.querySelectorAll('#modal-body tr[data-k]').forEach(tr => { o[tr.dataset.k] = {}; tr.querySelectorAll('[data-f]').forEach(i => o[tr.dataset.k][i.dataset.f] = +i.value); });
+  $('lim-save').onclick = async () => { const o = {}; document.querySelectorAll('#modal-body tr[data-k]').forEach(tr => { o[tr.dataset.k] = {}; tr.querySelectorAll('[data-f]').forEach(i => o[tr.dataset.k][i.dataset.f] = i.dataset.f === 'price' ? +i.value / USD_AED : +i.value); });
     ADM.limits = o; try { await setDoc(doc(db, 'adminData', 'settings'), { limits: o }, { merge: true }); toast('Saved'); closeModal(); renderBilling(); } catch(e){ err(e); } };
   $('lim-def').onclick = async () => { ADM.limits = {}; try { await setDoc(doc(db, 'adminData', 'settings'), { limits: {} }, { merge: true }); closeModal(); renderBilling(); } catch(e){ err(e); } };
 };
@@ -939,10 +943,10 @@ async function renderBilling(){
       ucard(L.deletes.name, 'DAILY', dD, L.deletes.free, 'deletes', fmtT(pacReset)) +
       ucard(L.calls.name, 'MONTHLY', fM, L.calls.free, 'calls', next1.toLocaleDateString(), '<p class="mute">Only after Blaze + SETUP.bat (the server functions).</p>') +
       ucard(L.egress.name, 'MONTHLY', +egGB.toFixed(3), L.egress.free, 'GB', next1.toLocaleDateString());
-    const money = v => v > 0.004 ? '<b style="color:var(--yellow)">$' + v.toFixed(2) + '</b>' : '<b style="color:var(--green)">$0.00</b>';
+    const money = v => v > 0.004 ? '<b style="color:var(--yellow)">AED ' + (v * USD_AED).toFixed(2) + '</b>' : '<b style="color:var(--green)">AED 0.00</b>';
     const tag = t => `<span class="pill info">${t.toUpperCase()}</span>`;
     $('u-table').innerHTML = `<tr><th>Service</th><th>Price after free</th><th>Above free this month</th><th>Spent</th></tr>` +
-      ['reads', 'writes', 'deletes', 'calls', 'egress'].map(k => `<tr><td>${L[k].name} ${tag(L[k].per === 'day' ? 'daily' : 'monthly')}</td><td>${L[k].price} $ per ${L[k].unit.toLocaleString()}${k === 'egress' ? ' GB' : ''}</td><td>${(Math.round(ex[k] * 100) / 100).toLocaleString()}</td><td>${money(spent[k])}</td></tr>`).join('') +
+      ['reads', 'writes', 'deletes', 'calls', 'egress'].map(k => `<tr><td>${L[k].name} ${tag(L[k].per === 'day' ? 'daily' : 'monthly')}</td><td>${+(L[k].price * USD_AED).toFixed(4)} AED per ${L[k].unit.toLocaleString()}${k === 'egress' ? ' GB' : ''}</td><td>${(Math.round(ex[k] * 100) / 100).toLocaleString()}</td><td>${money(spent[k])}</td></tr>`).join('') +
       `<tr><th colspan=3>Total (estimate)</th><th style="font-size:16px">${money(cost)}</th></tr>
        <tr><td colspan=4 class="mute small">Billing month ${m1.toLocaleDateString()} – ${new Date(next1 - 1).toLocaleDateString()} · renews ${next1.toLocaleDateString()} · daily limits renew at midnight US time (${fmtT(pacReset)} your time)</td></tr>`;
     CHECK.meters = '<span style="color:var(--green)">✔ read ' + ago(now) + '</span>';
@@ -952,18 +956,18 @@ async function renderBilling(){
     const spark = /billing/i.test(e.message);
     CHECK.meters = '<span style="color:var(--yellow)">' + (spark ? 'Google shows these meters only on the Blaze plan. On the free Spark plan nothing can be charged — when a free limit ends, it simply stops for that day.' : esc(e.message)) + '</span>';
     $('u-cards').innerHTML = `<div class="card">${spark ? '🟢 <b>Spark plan (free):</b> no money can be charged. The cards with "left / used / resets" appear here as soon as the Blaze plan is on (then run SETUP.bat once).' : '<span class="alert">' + esc(e.message) + '</span>'}</div>`;
-    $('u-table').innerHTML = `<tr><td>${spark ? 'Spark plan: <b style="color:var(--green)">$0.00</b> — nothing can be charged.' : esc(e.message)}</td></tr>`;
+    $('u-table').innerHTML = `<tr><td>${spark ? 'Spark plan: <b style="color:var(--green)">AED 0.00</b> — nothing can be charged.' : esc(e.message)}</td></tr>`;
   }
   try {
     const bi = await gapi('https://cloudbilling.googleapis.com/v1/projects/' + PROJECT_ID + '/billingInfo');
-    if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Blaze plan is not on yet — nothing can be charged. Set the limit now; it is used as soon as Blaze is on.'; CHECK.bill = '<span style="color:var(--green)">✔ $0 — Spark (free) plan, no billing</span>'; }
+    if(!bi.billingEnabled || !bi.billingAccountName){ $('b-info').innerHTML = 'Blaze plan is not on yet — nothing can be charged. Set the limit now; it is used as soon as Blaze is on.'; CHECK.bill = '<span style="color:var(--green)">✔ AED 0 — Spark (free) plan, no billing</span>'; }
     else {
       ADM.billingAccount = bi.billingAccountName;
-      CHECK.bill = (USAGE && USAGE.cost > 0.004) ? '<span style="color:var(--yellow)">≈ $' + USAGE.cost.toFixed(2) + ' above the free amounts this month</span>' : '<span style="color:var(--green)">✔ $0 — nothing charged, free limits working</span>';
+      CHECK.bill = (USAGE && USAGE.cost > 0.004) ? '<span style="color:var(--yellow)">≈ AED ' + (USAGE.cost * USD_AED).toFixed(2) + ' above the free amounts this month</span>' : '<span style="color:var(--green)">✔ AED 0 — nothing charged, free limits working</span>';
       const bl = await gapi('https://billingbudgets.googleapis.com/v1/' + bi.billingAccountName + '/budgets', null, true);
       const mine = (bl.budgets || []).find(b => (b.budgetFilter && (b.budgetFilter.projects || []).some(p => p.indexOf(PROJECT_NUMBER) >= 0 || p.indexOf(PROJECT_ID) >= 0))) || (bl.budgets || [])[0];
       ADM.budgetName = mine ? mine.name : '';
-      if(mine){ const a = mine.amount && mine.amount.specifiedAmount || {}; $('b-amount').value = +(a.units || 0) + (a.nanos ? a.nanos / 1e9 : 0); $('b-cur').value = a.currencyCode || 'USD'; }
+      if(mine){ const a = mine.amount && mine.amount.specifiedAmount || {}; const amt = +(a.units || 0) + (a.nanos ? a.nanos / 1e9 : 0); BUDGET_CUR = a.currencyCode || 'AED'; $('b-amount').value = BUDGET_CUR === 'USD' ? +(amt * USD_AED).toFixed(2) : amt; $('b-cur').value = 'AED'; }
       $('b-info').innerHTML = 'Billing account: <b>' + esc(bi.billingAccountName) + '</b> · ' + (mine ? 'Limit: <b>' + esc($('b-amount').value + ' ' + $('b-cur').value) + '</b> a month · alerts at ' + (mine.thresholdRules || []).map(t => Math.round(t.thresholdPercent * 100) + '%').join(', ') : 'No limit yet — press "Save limit".');
     }
   } catch(e){ $('b-info').innerHTML = '<span style="color:var(--yellow)">' + esc(e.message) + '</span>'; }
@@ -971,12 +975,12 @@ async function renderBilling(){
   checkBudgetAlert();
 }
 $('btn-b-save').onclick = async () => {
-  const amount = Math.max(1, +$('b-amount').value || 5), cur = ($('b-cur').value || 'USD').toUpperCase(), alertPct = Math.max(10, Math.min(100, +$('b-alert').value || 80));
+  const amount = Math.max(1, +$('b-amount').value || 5), cur = 'AED', alertPct = Math.max(10, Math.min(100, +$('b-alert').value || 80));
   try {
     await setDoc(doc(db, 'adminData', 'settings'), { budget: { amount, currency: cur, alertPct } }, { merge: true });
     ADM.budget = { amount, currency: cur, alertPct };
     if(ADM.billingAccount){
-      const body = { displayName: 'Glass Marble Balls limit', budgetFilter: { projects: ['projects/' + PROJECT_NUMBER] }, amount: { specifiedAmount: { currencyCode: cur, units: String(Math.floor(amount)), nanos: Math.round((amount % 1) * 1e9) } },
+      const body = { displayName: 'Glass Marble Balls limit', budgetFilter: { projects: ['projects/' + PROJECT_NUMBER] }, amount: { specifiedAmount: (g => ({ currencyCode: BUDGET_CUR, units: String(Math.floor(g)), nanos: Math.round((g % 1) * 1e9) }))(BUDGET_CUR === 'USD' ? Math.round(amount / USD_AED * 100) / 100 : amount) },
         thresholdRules: [{ thresholdPercent: alertPct / 100 }, { thresholdPercent: 0.5 }, { thresholdPercent: 0.9 }, { thresholdPercent: 1.0 }].filter((t, i, a) => a.findIndex(x => x.thresholdPercent === t.thresholdPercent) === i) };
       if(ADM.budgetName) await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.budgetName + '?updateMask=amount,thresholdRules', { method: 'PATCH', body: JSON.stringify(body) }, true);
       else await gapi('https://billingbudgets.googleapis.com/v1/' + ADM.billingAccount + '/budgets', { method: 'POST', body: JSON.stringify(body) }, true);
@@ -987,7 +991,7 @@ $('btn-b-save').onclick = async () => {
 };
 function checkBudgetAlert(){
   const b = ADM.budget, u = USAGE || ADM.lastUsage;
-  if(b && u && u.cost >= b.amount * (b.alertPct || 80) / 100) $('global-alert').innerHTML = `<div class="alert">💰 Firebase extra charges this month are about <b>$${u.cost.toFixed(2)}</b> — ${Math.round(u.cost / b.amount * 100)}% of your limit (${b.amount} ${esc(b.currency)}). Open "Usage & Costs" and decide what to do.</div>`;
+  if(b && u && u.cost >= b.amount * (b.alertPct || 80) / 100) $('global-alert').innerHTML = `<div class="alert">💰 Firebase extra charges this month are about <b>AED ${(u.cost * USD_AED).toFixed(2)}</b> — ${Math.round(u.cost / b.amount * 100)}% of your limit (${b.amount} ${esc(b.currency)}). Open "Usage & Costs" and decide what to do.</div>`;
   else $('global-alert').innerHTML = '';
 }
 $('btn-meta-save').onclick = async () => {
@@ -1058,7 +1062,7 @@ async function loadAdEarnings(){
 }
 function any0(){ return ADS && NETS.some(n => ADS.d[n].usd != null); }
 function openAds(){
-  const r = ADS; const money = v => v == null ? '<span class="mute">–</span>' : '<b>$' + v.toFixed(2) + '</b>';
+  const r = ADS; const money = v => v == null ? '<span class="mute">–</span>' : '<b>AED ' + v.toFixed(2) + '</b>';
   if(!r){ toast('Loading…'); loadAdEarnings().then(openAds); return; }
   const tot = k => NETS.some(n => r[k][n].usd != null) ? 'AED ' + NETS.reduce((s, n) => s + (r[k][n].usd || 0), 0).toFixed(2) : '–';
   modal(`<h2>📺 Ads earnings</h2><p class="help">Ads shown = from the network's report (or counted by the game when the report has none yet). Earnings can be a few hours late.</p>
