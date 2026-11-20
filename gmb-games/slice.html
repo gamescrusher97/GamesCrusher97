@@ -145,22 +145,6 @@ body.gfx-low .evc-sp{ display:none; }
     g.font = size + 'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(ch, x, y);
   }
-  /* special marbles (same size as the normal ones): a plain RED marble = bomb, a shiny GOLD marble with the event symbol = bonus */
-  function drawSpecial(g, type, th, x, y, r){
-    if(type === 'bomb'){ drawBomb(g, x, y, r); return; }
-    g.save();
-    g.shadowColor = type === 'gold' ? 'rgba(255,211,77,0.95)' : 'rgba(255,50,50,0.8)';
-    g.shadowBlur = lowGfx() ? 0 : 14;
-    var gr = g.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.08, x, y, r);
-    if(type === 'gold'){ gr.addColorStop(0, '#fffbe0'); gr.addColorStop(0.35, '#ffd34d'); gr.addColorStop(1, '#b9770e'); }
-    else { gr.addColorStop(0, '#ffb3b3'); gr.addColorStop(0.35, '#ff2a2a'); gr.addColorStop(1, '#6e0000'); }
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
-    g.shadowBlur = 0;
-    g.strokeStyle = type === 'gold' ? 'rgba(255,240,170,0.9)' : 'rgba(255,200,200,0.85)'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, r - 1, 0, 6.2832); g.stroke();
-    g.fillStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.ellipse(x - r * 0.34, y - r * 0.42, r * 0.24, r * 0.13, -0.6, 0, 6.2832); g.fill();
-    if(type === 'gold'){ g.fillStyle = '#fff'; emojiAt(g, th.gold, x, y + r * 0.04, r * 1.05); }
-    g.restore();
-  }
 
   /* ------------------------------------------------------------------ v31 shared effects (all weekly games) */
   var audioCtx = null;
@@ -191,21 +175,37 @@ body.gfx-low .evc-sp{ display:none; }
     } catch(e){}
   }
   /* the explosion picture: two shock rings, a fire flash and flying sparks / debris (half as many on a low-graphics phone) */
+  /* v36: a real-looking explosion: a white flash, balls of fire, flying embers and shell bits, then dark smoke (no rings) */
   function explode(fx, x, y, big){
-    var n = (big ? 46 : 26); if(lowGfx()) n = Math.ceil(n / 2);
-    fx.push({ glow: true, x: x, y: y, r: big ? 150 : 95, life: 0.45, max: 0.45, col: 'rgba(255,230,150,0.95)' });
-    fx.push({ ring: true, x: x, y: y, r0: 8, r1: big ? 150 : 95, lw: big ? 9 : 6, life: 0.55, max: 0.55, col: '#ffb347' });
-    fx.push({ ring: true, x: x, y: y, r0: 4, r1: big ? 100 : 62, lw: big ? 6 : 4, life: 0.4, max: 0.4, col: '#fff3c4' });
-    var cols = ['#ff3b1d', '#ff8a1f', '#ffd34d', '#fff3c4', '#3a2a2a'];
-    for(var i = 0; i < n; i++){
-      var a = Math.random() * 6.2832, s = (big ? 120 : 80) + Math.random() * (big ? 330 : 230), c = cols[Math.floor(Math.random() * cols.length)];
-      fx.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 50, life: 0.5 + Math.random() * 0.55, max: 1.05, col: c, sz: 2.5 + Math.random() * (big ? 5.5 : 4), grav: 420 });
+    var low = lowGfx(), s = big ? 1.35 : 1;
+    fx.push({ glow: true, x: x, y: y, r: 170 * s, life: 0.18, max: 0.18, col: 'rgba(255,255,235,1)' });
+    for(var i = 0; i < (low ? 5 : 9); i++){
+      var a = Math.random() * 6.2832, d = Math.random() * 26 * s, sp = 30 + Math.random() * 70;
+      fx.push({ fire: true, x: x + Math.cos(a) * d, y: y + Math.sin(a) * d, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, grav: -60,
+                r0: 10, r1: (48 + Math.random() * 36) * s, life: 0.6 + Math.random() * 0.35, max: 0.95 });
+    }
+    for(var j = 0; j < (low ? 4 : 8); j++){
+      var a2 = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, sp2 = 20 + Math.random() * 40;
+      fx.push({ smoke: true, delay: 0.12 + Math.random() * 0.15, x: x + (Math.random() - 0.5) * 40 * s, y: y - 10, vx: Math.cos(a2) * sp2, vy: Math.sin(a2) * sp2 - 25, grav: -18,
+                r0: 18, r1: (60 + Math.random() * 40) * s, life: 1.3 + Math.random() * 0.6, max: 1.9, a: 0.65 });
+    }
+    var ecol = ['#fff3c4', '#ffd34d', '#ff9a1f', '#ff4a10'];
+    for(var e = 0; e < (low ? 12 : 26); e++){
+      var a3 = Math.random() * 6.2832, sp3 = 140 + Math.random() * 300;
+      fx.push({ x: x, y: y, vx: Math.cos(a3) * sp3, vy: Math.sin(a3) * sp3, life: 0.5 + Math.random() * 0.6, max: 1.1, col: ecol[e % 4], sz: 1.5 + Math.random() * 2.5, grav: 520 });
+    }
+    for(var q = 0; q < (low ? 4 : 8); q++){
+      var a4 = Math.random() * 6.2832, sp4 = 120 + Math.random() * 220;
+      fx.push({ x: x, y: y, vx: Math.cos(a4) * sp4, vy: Math.sin(a4) * sp4, life: 0.8, max: 0.8, col: '#2a2626', sz: 3 + Math.random() * 3, grav: 700 });
     }
   }
   function stepFx(fx, dt){
     for(var f = fx.length - 1; f >= 0; f--){
-      var p = fx[f]; p.life -= dt;
+      var p = fx[f];
+      if(p.delay > 0){ p.delay -= dt; continue; }
+      p.life -= dt;
       if(p.life <= 0){ fx.splice(f, 1); continue; }
+      if(p.fire || p.smoke){ p.vx *= Math.pow(0.15, dt); }
       if(p.txt){ p.y -= 45 * dt; }
       else if(!p.ring && !p.glow){ p.x += p.vx * dt; p.y += p.vy * dt; p.vy += (p.grav === undefined ? 300 : p.grav) * dt; }
     }
@@ -218,6 +218,19 @@ body.gfx-low .evc-sp{ display:none; }
         g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,0.45)'; g.strokeText(p.txt, p.x, p.y); g.fillStyle = p.col; g.fillText(p.txt, p.x, p.y);
       } else if(p.ring){
         g.globalAlpha = k; g.strokeStyle = p.col; g.lineWidth = Math.max(1, p.lw * (0.3 + k)); g.beginPath(); g.arc(p.x, p.y, p.r0 + (p.r1 - p.r0) * (1 - k), 0, 6.2832); g.stroke();
+      } else if(p.delay > 0){
+        /* not started yet */
+      } else if(p.fire){
+        // v36: a ball of fire: white-hot centre, orange, dark red edge; it swells fast and burns out
+        var fr = p.r0 + (p.r1 - p.r0) * Math.sqrt(1 - k), fg = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, fr);
+        fg.addColorStop(0, 'rgba(255,250,220,' + k + ')'); fg.addColorStop(0.25, 'rgba(255,200,70,' + (0.95 * k) + ')');
+        fg.addColorStop(0.55, 'rgba(255,90,10,' + (0.75 * k) + ')'); fg.addColorStop(0.85, 'rgba(120,20,0,' + (0.35 * k) + ')'); fg.addColorStop(1, 'rgba(60,0,0,0)');
+        g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = fg; g.beginPath(); g.arc(p.x, p.y, fr, 0, 6.2832); g.fill(); g.restore();
+      } else if(p.smoke){
+        // dark smoke that rises, grows and fades
+        var srr = p.r0 + (p.r1 - p.r0) * (1 - k), sg = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, srr), sa = Math.min(1, k * 1.6) * (p.a || 0.55);
+        sg.addColorStop(0, 'rgba(45,42,40,' + sa + ')'); sg.addColorStop(0.6, 'rgba(70,66,62,' + (sa * 0.6) + ')'); sg.addColorStop(1, 'rgba(90,85,80,0)');
+        g.fillStyle = sg; g.beginPath(); g.arc(p.x, p.y, srr, 0, 6.2832); g.fill();
       } else if(p.glow){
         var gr = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r); gr.addColorStop(0, p.col); gr.addColorStop(1, 'rgba(255,120,0,0)');
         g.globalAlpha = k; g.fillStyle = gr; g.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2);
@@ -227,40 +240,152 @@ body.gfx-low .evc-sp{ display:none; }
       g.globalAlpha = 1;
     });
   }
-  /* a bomb: a dark glossy ball with a cap, a fuse and a flickering spark (turns with the item) */
-  function drawBomb(g, x, y, r){
-    var tm = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-    g.save();
-    g.shadowColor = 'rgba(255,60,40,0.85)'; g.shadowBlur = lowGfx() ? 0 : 14;
-    var gr = g.createRadialGradient(x - r * 0.35, y - r * 0.38, r * 0.08, x, y, r);
-    gr.addColorStop(0, '#7a7a86'); gr.addColorStop(0.3, '#2c2c35'); gr.addColorStop(1, '#050507');
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
-    g.shadowBlur = 0;
-    g.strokeStyle = 'rgba(255,90,70,0.9)'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, r - 1, 0, 6.2832); g.stroke();
-    g.fillStyle = 'rgba(255,255,255,0.5)'; g.beginPath(); g.ellipse(x - r * 0.34, y - r * 0.42, r * 0.24, r * 0.13, -0.6, 0, 6.2832); g.fill();
-    g.fillStyle = '#9a9aa6'; g.fillRect(x - r * 0.22, y - r * 1.12, r * 0.44, r * 0.26);                      // cap
-    g.strokeStyle = '#c8a064'; g.lineWidth = 2.4; g.lineCap = 'round';                                          // fuse
-    g.beginPath(); g.moveTo(x, y - r * 1.12); g.quadraticCurveTo(x + r * 0.5, y - r * 1.5, x + r * 0.34, y - r * 1.78); g.stroke();
-    var fl = 0.75 + 0.25 * Math.sin(tm / 55), sx = x + r * 0.34, sy = y - r * 1.78;                              // spark
-    g.fillStyle = 'rgba(255,200,60,0.95)'; g.beginPath(); g.arc(sx, sy, r * 0.2 * fl, 0, 6.2832); g.fill();
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(sx, sy, r * 0.09 * fl, 0, 6.2832); g.fill();
-    g.restore();
+  /* v36: realistic marbles, gold bonus marble and bomb. Each look is painted ONCE per size into a small picture (sprite)
+     and then only copied, so phones stay fast even with many marbles on screen. */
+  var SPR = {};
+  function sprite(key, size, paint){
+    var s = SPR[key]; if(s) return s;
+    var k = Math.min(window.devicePixelRatio || 1, 2), c = document.createElement('canvas');
+    c.width = c.height = Math.ceil(size * k); var cg = c.getContext('2d'); cg.scale(k, k); paint(cg, size / 2);
+    SPR[key] = c; return c;
   }
-  /* a plain one-colour glass marble (Marble Shooter) */
+  function glassBall(cg, cx, r, c){
+    // body: the marble's own colour, light in the middle, deep at the edge
+    var gr = cg.createRadialGradient(cx - r * 0.25, cx - r * 0.3, r * 0.05, cx, cx, r);
+    gr.addColorStop(0, c[0]); gr.addColorStop(0.5, c[1]); gr.addColorStop(1, c[2]);
+    cg.fillStyle = gr; cg.beginPath(); cg.arc(cx, cx, r, 0, 6.2832); cg.fill();
+    cg.save(); cg.beginPath(); cg.arc(cx, cx, r, 0, 6.2832); cg.clip();
+    // the twisted ribbons inside the glass (same colour family, so the colour is still easy to see)
+    // a twisted "cat's eye" vane inside the glass, like a real marble (same colour family)
+    function vane(w, col1, col2, alpha, flip){
+      cg.save(); cg.translate(cx, cx); cg.rotate(flip ? 0.9 : -0.55);
+      var vg = cg.createLinearGradient(-r * w, 0, r * w, 0); vg.addColorStop(0, col2); vg.addColorStop(0.5, col1); vg.addColorStop(1, col2);
+      cg.globalAlpha = alpha; cg.fillStyle = vg;
+      cg.beginPath(); cg.moveTo(0, -r * 0.95);
+      cg.bezierCurveTo(r * w * 1.6, -r * 0.4, -r * w * 1.6, r * 0.4, 0, r * 0.95);
+      cg.bezierCurveTo(-r * w * 0.4, r * 0.4, r * w * 0.4, -r * 0.4, 0, -r * 0.95); cg.fill();
+      cg.globalAlpha = alpha * 0.5; cg.strokeStyle = '#ffffff'; cg.lineWidth = Math.max(0.6, r * 0.03); cg.stroke();
+      cg.restore(); cg.globalAlpha = 1;
+    }
+    vane(0.42, c[0], c[2], 0.55, false);
+    vane(0.3, c[1], c[2], 0.45, true);
+    // light bending at the edge of the glass, and the bright spot where light comes out (bottom-right)
+    var rim = cg.createRadialGradient(cx, cx, r * 0.72, cx, cx, r);
+    rim.addColorStop(0, 'rgba(0,0,0,0)'); rim.addColorStop(1, 'rgba(0,0,0,0.38)');
+    cg.fillStyle = rim; cg.fillRect(cx - r, cx - r, r * 2, r * 2);
+    var cau = cg.createRadialGradient(cx + r * 0.38, cx + r * 0.45, 0, cx + r * 0.38, cx + r * 0.45, r * 0.55);
+    cau.addColorStop(0, 'rgba(255,255,255,0.5)'); cau.addColorStop(1, 'rgba(255,255,255,0)');
+    cg.fillStyle = cau; cg.fillRect(cx - r, cx - r, r * 2, r * 2);
+    cg.restore();
+    cg.strokeStyle = 'rgba(255,255,255,0.35)'; cg.lineWidth = Math.max(0.8, r * 0.05); cg.beginPath(); cg.arc(cx, cx, r - r * 0.03, 0, 6.2832); cg.stroke();
+    // window reflection: a sharp highlight and a small second one
+    cg.fillStyle = 'rgba(255,255,255,0.92)'; cg.beginPath(); cg.ellipse(cx - r * 0.36, cx - r * 0.44, r * 0.25, r * 0.12, -0.65, 0, 6.2832); cg.fill();
+    cg.fillStyle = 'rgba(255,255,255,0.6)'; cg.beginPath(); cg.arc(cx - r * 0.08, cx - r * 0.6, r * 0.06, 0, 6.2832); cg.fill();
+  }
+  /* a gold bonus marble: polished metal with a warm glow (no emoji) */
+  function goldBall(cg, cx, r){
+    var halo = cg.createRadialGradient(cx, cx, r * 0.9, cx, cx, r * 1.28);
+    halo.addColorStop(0, 'rgba(255,205,80,0.55)'); halo.addColorStop(1, 'rgba(255,205,80,0)');
+    cg.fillStyle = halo; cg.beginPath(); cg.arc(cx, cx, r * 1.28, 0, 6.2832); cg.fill();
+    var gr = cg.createRadialGradient(cx - r * 0.35, cx - r * 0.4, r * 0.05, cx, cx, r);
+    gr.addColorStop(0, '#fffbe6'); gr.addColorStop(0.2, '#ffe596'); gr.addColorStop(0.5, '#e9a926'); gr.addColorStop(0.82, '#9a5d05'); gr.addColorStop(1, '#5a3300');
+    cg.fillStyle = gr; cg.beginPath(); cg.arc(cx, cx, r, 0, 6.2832); cg.fill();
+    cg.save(); cg.beginPath(); cg.arc(cx, cx, r, 0, 6.2832); cg.clip();
+    var band = cg.createLinearGradient(0, cx + r * 0.05, 0, cx + r);       // the bright floor reflected in the lower half
+    band.addColorStop(0, 'rgba(90,50,0,0.35)'); band.addColorStop(0.35, 'rgba(255,225,140,0.15)'); band.addColorStop(1, 'rgba(255,240,190,0.6)');
+    cg.fillStyle = band; cg.fillRect(cx - r, cx + r * 0.05, r * 2, r);
+    cg.restore();
+    cg.strokeStyle = 'rgba(255,236,170,0.7)'; cg.lineWidth = Math.max(0.8, r * 0.05); cg.beginPath(); cg.arc(cx, cx, r - r * 0.03, 0, 6.2832); cg.stroke();
+    cg.fillStyle = 'rgba(255,255,255,0.95)'; cg.beginPath(); cg.ellipse(cx - r * 0.36, cx - r * 0.44, r * 0.24, r * 0.11, -0.65, 0, 6.2832); cg.fill();
+    cg.fillStyle = 'rgba(255,255,255,0.7)'; cg.beginPath(); cg.arc(cx + r * 0.3, cx - r * 0.55, r * 0.05, 0, 6.2832); cg.fill();
+  }
+  function drawSpecial(g, type, th, x, y, r){
+    if(type === 'bomb'){ drawBomb(g, x, y, r); return; }
+    var size = r * 2.6, s = sprite('gold' + Math.round(r * 2), size, function(cg, cx){ goldBall(cg, cx, r); });
+    g.drawImage(s, x - size / 2, y - size / 2, size, size);
+    // a small glint that moves around the gold marble
+    var tm = (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000, a = tm * 1.6, gx = x + Math.cos(a) * r * 0.55, gy = y + Math.sin(a) * r * 0.55, gl = 0.5 + 0.5 * Math.sin(tm * 5);
+    g.fillStyle = 'rgba(255,255,255,' + (0.5 * gl) + ')';
+    g.beginPath(); for(var k = 0; k < 8; k++){ var aa = k * Math.PI / 4, rr = k % 2 ? r * 0.05 : r * 0.22 * gl; g.lineTo(gx + Math.cos(aa) * rr, gy + Math.sin(aa) * rr); } g.closePath(); g.fill();
+  }
+  /* a bomb: a dark iron ball, a brass cap, a twisted fuse and a burning spark with flying sparks */
+  function drawBomb(g, x, y, r){
+    var size = r * 3.2, s = sprite('bomb' + Math.round(r * 2), size, function(cg, cx){
+      var cy = cx + r * 0.25;
+      var sh = cg.createRadialGradient(cx, cy + r * 0.95, 0, cx, cy + r * 0.95, r * 0.9);
+      sh.addColorStop(0, 'rgba(0,0,0,0.35)'); sh.addColorStop(1, 'rgba(0,0,0,0)'); cg.fillStyle = sh; cg.fillRect(cx - r, cy + r * 0.6, r * 2, r * 0.7);
+      var gr = cg.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.05, cx, cy, r);
+      gr.addColorStop(0, '#8a8d96'); gr.addColorStop(0.25, '#3b3d44'); gr.addColorStop(0.7, '#141518'); gr.addColorStop(1, '#030304');
+      cg.fillStyle = gr; cg.beginPath(); cg.arc(cx, cy, r, 0, 6.2832); cg.fill();
+      cg.save(); cg.beginPath(); cg.arc(cx, cy, r, 0, 6.2832); cg.clip();
+      var rf = cg.createLinearGradient(0, cy + r * 0.3, 0, cy + r); rf.addColorStop(0, 'rgba(120,125,140,0)'); rf.addColorStop(1, 'rgba(120,125,140,0.35)');
+      cg.fillStyle = rf; cg.fillRect(cx - r, cy + r * 0.3, r * 2, r);
+      cg.strokeStyle = 'rgba(0,0,0,0.5)'; cg.lineWidth = r * 0.08; cg.beginPath(); cg.ellipse(cx, cy, r * 1.02, r * 0.32, 0, 0, 6.2832); cg.stroke();   // seam
+      cg.strokeStyle = 'rgba(160,165,175,0.25)'; cg.lineWidth = r * 0.03; cg.beginPath(); cg.ellipse(cx, cy - r * 0.03, r * 1.02, r * 0.32, 0, Math.PI, 2 * Math.PI); cg.stroke();
+      cg.restore();
+      cg.fillStyle = 'rgba(255,255,255,0.55)'; cg.beginPath(); cg.ellipse(cx - r * 0.38, cy - r * 0.45, r * 0.2, r * 0.09, -0.65, 0, 6.2832); cg.fill();
+      var cap = cg.createLinearGradient(cx - r * 0.28, 0, cx + r * 0.28, 0);           // brass cap
+      cap.addColorStop(0, '#6b4a12'); cap.addColorStop(0.45, '#e6c46a'); cap.addColorStop(1, '#5a3c0c');
+      cg.fillStyle = cap; cg.fillRect(cx - r * 0.26, cy - r * 1.12, r * 0.52, r * 0.26);
+      cg.fillStyle = 'rgba(0,0,0,0.35)'; cg.fillRect(cx - r * 0.26, cy - r * 0.9, r * 0.52, r * 0.05);
+      cg.strokeStyle = '#8a6a3c'; cg.lineWidth = r * 0.13; cg.lineCap = 'round';      // twisted rope fuse
+      cg.beginPath(); cg.moveTo(cx, cy - r * 1.12); cg.quadraticCurveTo(cx + r * 0.55, cy - r * 1.5, cx + r * 0.36, cy - r * 1.8); cg.stroke();
+      cg.strokeStyle = 'rgba(40,25,10,0.7)'; cg.lineWidth = r * 0.04;
+      for(var t = 0.1; t < 1; t += 0.18){
+        var px = (1 - t) * (1 - t) * cx + 2 * (1 - t) * t * (cx + r * 0.55) + t * t * (cx + r * 0.36);
+        var py = (1 - t) * (1 - t) * (cy - r * 1.12) + 2 * (1 - t) * t * (cy - r * 1.5) + t * t * (cy - r * 1.8);
+        cg.beginPath(); cg.moveTo(px - r * 0.06, py - r * 0.03); cg.lineTo(px + r * 0.06, py + r * 0.03); cg.stroke();
+      }
+    });
+    g.drawImage(s, x - size / 2, y - size / 2 - r * 0.25, size, size);
+    // the burning end: a hot glow, a white core and a few tiny sparks (changes every frame)
+    var tm = (typeof performance !== 'undefined' ? performance.now() : Date.now()), fl = 0.75 + 0.25 * Math.sin(tm / 45) + Math.random() * 0.1;
+    var sx = x + r * 0.36, sy = y - r * 1.8;
+    var gw = g.createRadialGradient(sx, sy, 0, sx, sy, r * 0.75 * fl);
+    gw.addColorStop(0, 'rgba(255,240,180,0.95)'); gw.addColorStop(0.35, 'rgba(255,150,30,0.6)'); gw.addColorStop(1, 'rgba(255,80,0,0)');
+    g.fillStyle = gw; g.beginPath(); g.arc(sx, sy, r * 0.75 * fl, 0, 6.2832); g.fill();
+    g.fillStyle = '#fffbe8'; g.beginPath(); g.arc(sx, sy, r * 0.1 * fl, 0, 6.2832); g.fill();
+    if(!lowGfx()) for(var k = 0; k < 3; k++){
+      var a = Math.random() * 6.2832, d = r * (0.25 + Math.random() * 0.45);
+      g.fillStyle = Math.random() < 0.5 ? '#ffd34d' : '#ffffff'; g.fillRect(sx + Math.cos(a) * d, sy + Math.sin(a) * d - r * 0.1, 1.6, 1.6);
+    }
+  }
+  /* a one-colour glass marble (Marble Shooter): the colour stays clear and easy to match */
   var SHOOT_COL = [['#ffb3b3', '#ff2f2f', '#7a0a0a'], ['#bfe3ff', '#2f9bff', '#0a3a7a'], ['#c4ffd3', '#2fd065', '#0a6a2a'], ['#fff3b0', '#ffd21f', '#8a6500']];
   function drawPlain(g, type, x, y, r){
-    var c = SHOOT_COL[type % SHOOT_COL.length];
-    var gr = g.createRadialGradient(x - r * 0.32, y - r * 0.36, r * 0.06, x, y, r);
-    gr.addColorStop(0, c[0]); gr.addColorStop(0.45, c[1]); gr.addColorStop(1, c[2]);
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
-    var rim = g.createRadialGradient(x + r * 0.45, y + r * 0.5, 0, x + r * 0.45, y + r * 0.5, r * 0.75);
-    rim.addColorStop(0, 'rgba(255,255,255,0.35)'); rim.addColorStop(1, 'rgba(255,255,255,0)');
-    g.save(); g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.clip(); g.fillStyle = rim; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
-    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 1.2; g.beginPath(); g.arc(x, y, r - 0.6, 0, 6.2832); g.stroke();
-    g.fillStyle = 'rgba(255,255,255,0.88)'; g.beginPath(); g.ellipse(x - r * 0.34, y - r * 0.42, r * 0.26, r * 0.14, -0.6, 0, 6.2832); g.fill();
+    var c = SHOOT_COL[type % SHOOT_COL.length], size = r * 2 + 2;
+    var s = sprite('m' + (type % SHOOT_COL.length) + '_' + Math.round(r * 4), size, function(cg, cx){ glassBall(cg, cx, r, c); });
+    g.drawImage(s, x - size / 2, y - size / 2, size, size);
   }
 
   /* ------------------------------------------------------------------ engine 1: Catch the Balls */
+  /* v36: a dark studio behind the event games: two soft light beams from above, a shiny floor and dark corners (drawn once) */
+  var STUDIO = null;
+  function drawStudio(g, C, th){
+    var key = C.W + 'x' + C.H;
+    if(!STUDIO || STUDIO.key !== key){
+      var k = Math.min(window.devicePixelRatio || 1, 2), cv = document.createElement('canvas'); cv.width = Math.ceil(C.W * k); cv.height = Math.ceil(C.H * k);
+      var s = cv.getContext('2d'); s.scale(k, k); var W = C.W, H = C.H;
+      var c1 = (th && /^#[0-9a-f]{6}$/i.test(th.c1)) ? th.c1 : '#7a2bc9';
+      var bg = s.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0a0912'); bg.addColorStop(0.55, '#141222'); bg.addColorStop(1, '#09080f');
+      s.fillStyle = bg; s.fillRect(0, 0, W, H);
+      [[W * 0.28, -0.12], [W * 0.72, 0.12]].forEach(function(b){            // light beams
+        var lg = s.createLinearGradient(0, 0, 0, H * 0.85); lg.addColorStop(0, 'rgba(255,245,220,0.16)'); lg.addColorStop(1, 'rgba(255,245,220,0)');
+        s.fillStyle = lg; s.beginPath(); s.moveTo(b[0] - W * 0.05, 0); s.lineTo(b[0] + W * 0.05, 0);
+        s.lineTo(b[0] + W * 0.3 + b[1] * W, H * 0.85); s.lineTo(b[0] - W * 0.3 + b[1] * W, H * 0.85); s.closePath(); s.fill();
+      });
+      var fy = H * 0.84;                                                     // the floor
+      var fl = s.createLinearGradient(0, fy, 0, H); fl.addColorStop(0, 'rgba(255,255,255,0.07)'); fl.addColorStop(0.08, 'rgba(20,18,30,0.9)'); fl.addColorStop(1, '#050409');
+      s.fillStyle = fl; s.fillRect(0, fy, W, H - fy);
+      var pool = s.createRadialGradient(W / 2, fy + (H - fy) * 0.4, 0, W / 2, fy + (H - fy) * 0.4, W * 0.55);
+      pool.addColorStop(0, c1 + '40'); pool.addColorStop(1, 'rgba(0,0,0,0)'); s.fillStyle = pool; s.fillRect(0, fy, W, H - fy);
+      s.fillStyle = 'rgba(255,255,255,0.12)'; s.fillRect(0, fy, W, 1);
+      var vg = s.createRadialGradient(W / 2, H * 0.45, Math.min(W, H) * 0.3, W / 2, H * 0.45, Math.max(W, H) * 0.75);
+      vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.6)'); s.fillStyle = vg; s.fillRect(0, 0, W, H);
+      STUDIO = { key: key, cv: cv };
+    }
+    g.drawImage(STUDIO.cv, 0, 0, C.W, C.H);
+  }
   function engineCatch(stage, th, io){
     var C = makeCanvas(stage), g = C.g;
     var balls = [1, 2, 3, 4].map(function(n){ return loadImg('assets/ball' + n + '.png'); });
@@ -465,7 +590,7 @@ body.gfx-low .evc-sp{ display:none; }
       var targetX = C.W * (0.2 + Math.random() * 0.6);
       items.push({ type: type, x: x, y: C.H + rad, vx: (targetX - x) / (apexT * 2), vy: vy, rad: rad, rot: 0, rotv: (Math.random() - 0.5) * 4, img: balls[Math.floor(Math.random() * 4)], sliced: false });
     }
-    function burst(x, y, col, n){ if(lowGfx()) n = Math.ceil(n / 2); fx.push({ ring: true, x: x, y: y, r0: 4, r1: 34, lw: 4, life: 0.3, max: 0.3, col: col }); for(var i = 0; i < n; i++){ var a = Math.random() * 6.28, s = 70 + Math.random() * 190; fx.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.45 + Math.random() * 0.35, max: 0.8, col: col, sz: 2 + Math.random() * 3 }); } }
+    function burst(x, y, col, n){ if(lowGfx()) n = Math.ceil(n / 2); fx.push({ glow: true, x: x, y: y, r: 42, life: 0.22, max: 0.22, col: 'rgba(255,255,255,0.75)' }); for(var i = 0; i < n; i++){ var a = Math.random() * 6.28, s = 70 + Math.random() * 190; fx.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.45 + Math.random() * 0.35, max: 0.8, col: col, sz: 2 + Math.random() * 3 }); } }
     function label(txt, x, y, col){ fx.push({ txt: txt, x: x, y: y - 14, life: 0.8, max: 0.8, col: col, size: 24 }); }
     function segDist(px, py, ax, ay, bx, by){
       var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy, u = l2 ? ((px - ax) * dx + (py - ay) * dy) / l2 : 0;
@@ -556,7 +681,7 @@ body.gfx-low .evc-sp{ display:none; }
       else drawSpecial(g, type, th, 0, 0, rad);
     }
     function draw(){
-      g.setTransform(C.dpr, 0, 0, C.dpr, 0, 0); g.clearRect(0, 0, C.W, C.H);
+      g.setTransform(C.dpr, 0, 0, C.dpr, 0, 0); g.clearRect(0, 0, C.W, C.H); drawStudio(g, C, th);
       var sx = shake > 0 ? (Math.random() - 0.5) * 12 * Math.min(1, shake / 0.45) : 0, sy2 = shake > 0 ? (Math.random() - 0.5) * 8 * Math.min(1, shake / 0.45) : 0;
       g.save(); g.translate(sx, sy2);
       items.forEach(function(it){ g.save(); g.translate(it.x, it.y); g.rotate(it.rot); drawBody(it.type, it.img, it.rad); g.restore(); });
