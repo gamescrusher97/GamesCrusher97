@@ -3408,7 +3408,7 @@ var VGAMES = [
   { id: 'm3-player', name: 'M3 Player', img: 'M3 Player', how: null,
     play: 'https://play.google.com/store/apps/details?id=com.sahilsheemar.m3player' }
 ];
-var V_URL = 'https://firestore.googleapis.com/v1/projects/glass-marble-balls/databases/(default)/documents/publicCodes?pageSize=300&key=AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E';
+var V_URL = 'https://us-central1-glass-marble-balls.cloudfunctions.net/publicCodes';   // codes made on the Glass Marble Balls admin page
 var VCODES = null, vLoading = null;
 function vVal(f) {
   if (!f) return null;
@@ -3423,9 +3423,7 @@ function vLoad(force) {
   if (vLoading) return vLoading;
   vLoading = getJSON(V_URL, 12000).then(function(j) {
     var now = Date.now();
-    VCODES = (j.documents || []).map(function(d) {
-      var f = d.fields || {}, o = { code: d.name.split('/').pop() };
-      ['game', 'type', 'amount', 'expiresAt', 'maxUses', 'uses', 'active', 'createdAt'].forEach(function(k) { o[k] = vVal(f[k]); });
+    VCODES = (j.codes || []).map(function(o) {
       if (!o.game) o.game = 'glass-marble-balls';
       return o;
     }).filter(function(o) {
