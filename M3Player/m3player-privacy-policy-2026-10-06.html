@@ -28,12 +28,13 @@
 <body>
 
 <h1>Privacy Policy for M3 Player</h1>
-<div class="updated">Last updated: October 28, 2026</div>
+<div class="updated">Last updated: November 19, 2026</div>
 
 <p>This Privacy Policy explains how M3 Player ("the App", "we", "us") collects, uses, and protects information when you use the app. M3 Player is developed by Sahil Sheemar.</p>
 
 <h2>1. Information We Collect</h2>
-<p>M3 Player is primarily an offline music player that works with audio files already stored on your device. Most of the app's features (playing, browsing, favoriting, creating playlists, using the equalizer, and cutting or merging audio locally) work entirely on your device and do not send any data anywhere.</p>
+<p>M3 Player is primarily an offline music player that works with audio files already stored on your device. Playing, browsing, favoriting, creating playlists, using the equalizer, and cutting or merging audio all happen on your device. Your music files are never uploaded.</p>
+<p>While the app is open or playing music, it sends a small status message to our server every few minutes. It contains: a random app ID created on your device (not your phone's IMEI or advertising ID), the app version, your phone model, Android version, country (from your phone's language settings), whether music is playing, whether you have Pro and where it came from (Google Play or a voucher), and - only if you are signed in - your account ID and email. We use this to count active users, keep the service working, detect hacked or fake Pro purchases, and deliver messages, warnings or replies from us inside the app.</p>
 <p>If you choose to sign in with Google, we additionally collect and store the following, tied to your Google account email address:</p>
 <ul>
   <li>Your name and email address, as provided by Google Sign-In, to identify your account.</li>
@@ -43,10 +44,10 @@
   <li>Your app preferences: chosen theme (Normal mode, Dark mode, or - for Pro users - the exclusive Gold Luxe or Royal Violet themes) and your Default Save Location setting (App folder or Downloads folder).</li>
 </ul>
 <p>This information is stored securely using Google Firebase (Firestore and Firebase Authentication) so that it can be restored if you sign in again on a new device or after reinstalling the app.</p>
+<p>If you send feedback from Settings, we store your message, the email you type (optional), app version, phone model, Android version, and the random app ID / account ID so we can reply to you inside the app.</p>
 
 <h2>2. Audio Files</h2>
 <p>M3 Player reads the music files already present on your device's storage in order to list and play them, and to create cut or merged audio files using the Edit Music tool. Your audio files are never uploaded to our servers or to any third party - all cutting and merging happens locally on your device, and the resulting file is saved to the location you choose in Settings (App folder, Downloads, or a custom folder you select).</p>
-
 <p>If a song has no cover art of its own, M3 Player may look one up online. In that case only text about the song (its artist, album and title) - never the audio file - is sent to Apple's public iTunes Search service (itunes.apple.com), and the cover image it returns is saved on your device so it is not downloaded again. Apple's privacy policy: <a href="https://www.apple.com/legal/privacy/">https://www.apple.com/legal/privacy/</a></p>
 
 <h2>3. Advertising</h2>
@@ -58,16 +59,16 @@
 </ul>
 
 <h2>4. Purchases</h2>
-<p>M3 Player offers an optional, one-time "Pro" purchase that removes ads and unlocks Pro-only features. This purchase is processed entirely by Google Play Billing. We do not receive or store your payment details (such as card numbers) - Google handles the transaction and only tells our app whether the purchase was successful, so it can unlock Pro features on your device. For information on how Google Play handles your payment information, see Google's own privacy policy linked above. For our own records, we additionally store a backup entry of each completed purchase (purchase token, order ID, product ID, purchase time, and your account email/ID if signed in) in our secure Firebase database. This backup record is never used to grant or verify Pro access - that always happens through Google Play directly - it exists solely so we keep our own copy of sales alongside Google's.</p>
+<p>M3 Player offers an optional, one-time "Pro" purchase that removes ads and unlocks Pro-only features. This purchase is processed entirely by Google Play Billing. We do not receive or store your payment details (such as card numbers) - Google handles the transaction and only tells our app whether the purchase was successful, so it can unlock Pro features on your device. For information on how Google Play handles your payment information, see Google's own privacy policy linked above. For our own records, we additionally store a backup entry of each completed purchase (purchase token, order ID, product ID, purchase time, and your account email/ID if signed in) in our secure Firebase database. To protect against fake or refunded purchases, our server may also check a purchase with Google Play using its purchase token. If a purchase cannot be verified, we may contact you, show a warning, or limit access to the app. If you redeem a voucher code (Settings &gt; Voucher Code), we store the code, your account ID and the time it was redeemed, so the code can only be used once and your Pro works on any device you sign in to.</p>
 
 <h2>5. Permissions</h2>
 <p>M3 Player requests access to your device's audio/media files (storage permission) solely to find, play, and edit the songs already on your device. This access is not used to read or share any other type of file.</p>
 
 <h2>6. Data Sharing</h2>
-<p>We do not sell your personal information. Data described above is only used to provide the app's cloud-sync and advertising features as described in this policy, and is shared only with the service providers named above (Google Firebase, Google AdMob, Unity Ads, Meta Audience Network, and Apple iTunes Search for album artwork) strictly to operate those features.</p>
+<p>We do not sell your personal information. Data described above is only used to run the app (cloud sync, Pro, feedback replies, fraud prevention, usage statistics) and advertising as described in this policy, and is shared only with the service providers named above (Google Firebase, Google Play, Google AdMob, Unity Ads, Meta Audience Network, and Apple iTunes Search for album artwork) strictly to operate those features. All data is sent encrypted (HTTPS).</p>
 
 <h2>7. Data Deletion</h2>
-<p>You can sign out of your Google account inside the app's Settings at any time, which stops further syncing. To request deletion of your cloud-stored data (favorites, playlists, and settings tied to your account), please contact us using the email below.</p>
+<p>You can sign out of your Google account inside the app's Settings at any time, which stops further syncing. To request deletion of your data stored with us (favorites, playlists, settings, feedback and the app status records described above), contact us using the email below - we will delete it.</p>
 
 <h2>8. Children's Privacy</h2>
 <p>M3 Player is not directed at children under 13, and we do not knowingly collect personal information from children under 13.</p>
