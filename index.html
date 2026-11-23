@@ -702,6 +702,19 @@
   .btn-tool { background: linear-gradient(90deg, #ffd86f, #f5a623); color: #1a1a2e; border: none; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(255,216,111,0.3); }
   .btn-tool:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,216,111,0.45); }
   .tool-wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 30px; }
+  .tchk { background: repeating-conic-gradient(#8f8aa8 0 25%, #c9c6dc 0 50%) 0 0 / 18px 18px !important; }
+  .pdf-list { margin: 12px 0 4px; }
+  .pdf-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 8px 10px; margin-bottom: 6px; font-size: 0.88em; }
+  .pdf-item span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdf-item small { color: #9a96c2; white-space: nowrap; }
+  .pdf-item button { background: rgba(255,255,255,0.1); color: #ffd86f; border: none; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 0.95em; flex: none; }
+  .pdfv { position: fixed; inset: 0; z-index: 3000; background: rgba(8,6,20,0.96); display: none; flex-direction: column; }
+  .pdfv.open { display: flex; }
+  .pdfv-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #1c1740; color: #fff; }
+  .pdfv-top b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.95em; }
+  .pdfv-body { flex: 1; overflow: auto; padding: 12px; text-align: center; -webkit-overflow-scrolling: touch; }
+  .pdfv-body canvas { display: block; margin: 0 auto 12px; max-width: 100%; height: auto; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
+  .pp-out { white-space: pre-wrap; }
   .tool-panel { display: none; }
   .tool-panel.active { display: block; }
   .tbox { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 22px; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
@@ -1106,6 +1119,42 @@
   </div>
   <section>
     <div class="games-grid">
+      <div class="game-card" data-tool="bg">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYjFlNGYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwZDBiMjEiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZTA4YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYTkzYSIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdHRlcm4gaWQ9ImsiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjM2EzMTY2Ii8+PHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iNSIgZmlsbD0iIzVhNGY4ZiIvPjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSI1IiBoZWlnaHQ9IjUiIGZpbGw9IiM1YTRmOGYiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHJ4PSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utb3BhY2l0eT0iMC4zNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMTgiIHk9IjE4IiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxMCIgZmlsbD0idXJsKCNrKSIvPjxyZWN0IHg9IjE4IiB5PSIxOCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjY0IiByeD0iMTAiIGZpbGw9IiMxYzE3NDAiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjQwIiByPSIxMSIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0zMCA4MCBxMjAgLTM0IDQwIDAgeiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik03NiAyMCBsLTEyIDEyIE03MCAyMCBoNiB2NiIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utd2lkdGg9IjMuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIi8+PC9zdmc+" alt="Background Remover" class="app-logo-img" />
+        <h3>Background Remover</h3>
+        <p style="margin-bottom:10px;">Remove the background from any photo with AI. Free, and your photo never leaves your device.</p>
+        <ul style="text-align:left; color:#c9c6e0; font-size:0.9em; line-height:1.7; margin:0 0 18px 18px; padding:0;">
+          <li>Works with people, products, pets and more</li>
+          <li>Transparent PNG or a new colour background</li>
+          <li>View the result full screen</li>
+          <li>Download in full quality</li>
+        </ul>
+        <button type="button" class="btn btn-tool" onclick="openTool('bg')">Open Tool</button>
+      </div>
+      <div class="game-card" data-tool="pdf">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYjFlNGYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwZDBiMjEiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZTA4YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYTkzYSIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdHRlcm4gaWQ9ImsiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjM2EzMTY2Ii8+PHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iNSIgZmlsbD0iIzVhNGY4ZiIvPjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSI1IiBoZWlnaHQ9IjUiIGZpbGw9IiM1YTRmOGYiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHJ4PSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utb3BhY2l0eT0iMC4zNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTI4IDE2IGgzMCBsMTYgMTYgdjUyIGE0IDQgMCAwIDEgLTQgNCBoLTQyIGE0IDQgMCAwIDEgLTQgLTQgdi02NCBhNCA0IDAgMCAxIDQgLTQgeiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik01OCAxNiB2MTYgaDE2IiBmaWxsPSIjZTBhOTNhIiBzdHJva2U9IiMxYzE3NDAiIHN0cm9rZS13aWR0aD0iMiIvPjxyZWN0IHg9IjMwIiB5PSI1MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iIzFjMTc0MCIvPjx0ZXh0IHg9IjUwIiB5PSI2NCIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmQ4NmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBERjwvdGV4dD48cGF0aCBkPSJNMzQgMzggaDIyIE0zNCA0NCBoMTYiIHN0cm9rZT0iIzFjMTc0MCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=" alt="PDF Tools" class="app-logo-img" />
+        <h3>PDF Tools</h3>
+        <p style="margin-bottom:10px;">Make a PDF from photos, merge PDFs into one, or make a PDF smaller.</p>
+        <ul style="text-align:left; color:#c9c6e0; font-size:0.9em; line-height:1.7; margin:0 0 18px 18px; padding:0;">
+          <li>Photos to PDF (A4, Letter or photo size)</li>
+          <li>Merge many PDFs into one file</li>
+          <li>Compress a PDF to a smaller size</li>
+          <li>View and download every PDF you make</li>
+        </ul>
+        <button type="button" class="btn btn-tool" onclick="openTool('pdf')">Open Tool</button>
+      </div>
+      <div class="game-card" data-tool="prompt">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYjFlNGYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwZDBiMjEiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZTA4YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYTkzYSIvPjwvbGluZWFyR3JhZGllbnQ+PHBhdHRlcm4gaWQ9ImsiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjM2EzMTY2Ii8+PHJlY3Qgd2lkdGg9IjUiIGhlaWdodD0iNSIgZmlsbD0iIzVhNGY4ZiIvPjxyZWN0IHg9IjUiIHk9IjUiIHdpZHRoPSI1IiBoZWlnaHQ9IjUiIGZpbGw9IiM1YTRmOGYiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHJ4PSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utb3BhY2l0eT0iMC4zNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PHJlY3QgeD0iMTQiIHk9IjIyIiB3aWR0aD0iNDQiIGhlaWdodD0iMzgiIHJ4PSI3IiBmaWxsPSJ1cmwoI2cpIi8+PHJlY3QgeD0iMTgiIHk9IjI2IiB3aWR0aD0iMzYiIGhlaWdodD0iMzAiIHJ4PSI0IiBmaWxsPSIjMWMxNzQwIi8+PGNpcmNsZSBjeD0iMjgiIGN5PSIzNSIgcj0iNCIgZmlsbD0iI2ZmZDg2ZiIvPjxwb2x5Z29uIHBvaW50cz0iMTksNTUgMzIsNDIgNDAsNDkgNDUsNDUgNTMsNTUiIGZpbGw9IiNmZmQ4NmYiLz48cGF0aCBkPSJNNTAgNzAgaDM0IE01MCA3OCBoMjYgTTUwIDYyIGgzMCIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik03NiAyMiBsMyA4IDggMyAtOCAzIC0zIDggLTMgLTggLTggLTMgOCAtMyB6IiBmaWxsPSIjZmZkODZmIi8+PC9zdmc+" alt="Photo to Prompt" class="app-logo-img" />
+        <h3>Photo to Prompt</h3>
+        <p style="margin-bottom:10px;">Upload a photo and get an AI image prompt that makes a very similar picture.</p>
+        <ul style="text-align:left; color:#c9c6e0; font-size:0.9em; line-height:1.7; margin:0 0 18px 18px; padding:0;">
+          <li>Describes the person or subject, place, light and style</li>
+          <li>Ready for Gemini, ChatGPT, Midjourney and others</li>
+          <li>Detailed or short prompt</li>
+          <li>Copy in one tap</li>
+        </ul>
+        <button type="button" class="btn btn-tool" onclick="openTool('prompt')">Open Tool</button>
+      </div>
       <div class="game-card" data-tool="currency">
         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImIiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMyYjFlNGYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwZDBiMjEiLz48L2xpbmVhckdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZTA4YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYTkzYSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iMjQiIGZpbGw9InVybCgjYikiLz48cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHJ4PSIyMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZkODZmIiBzdHJva2Utb3BhY2l0eT0iMC4zNSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSBjeD0iMzgiIGN5PSI0MCIgcj0iMjAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSIzOCIgeT0iNDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMxYTFhMmUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCI+JDwvdGV4dD48Y2lyY2xlIGN4PSI2MiIgY3k9IjYyIiByPSIyMCIgZmlsbD0iI2ZmZDg2ZiIgc3Ryb2tlPSIjMWExYTJlIiBzdHJva2Utd2lkdGg9IjMiLz48dGV4dCB4PSI2MiIgeT0iNzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjIiIGZpbGw9IiMxYTFhMmUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgSGVsdmV0aWNhLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iYm9sZCI+JiM4Mzc3OzwvdGV4dD48L3N2Zz4=" alt="Currency Converter" class="app-logo-img" />
         <h3>Currency Converter</h3>
@@ -1253,6 +1302,77 @@
     <p style="color:#c9c6e0;" id="toolSub"></p>
   </div>
   <div class="tool-wrap">
+
+    <!-- BACKGROUND REMOVER (AI in the browser) -->
+    <div class="tool-panel" data-tool="bg">
+      <div class="tbox">
+        <label class="tdrop"><input type="file" id="bgFile" accept="image/*"><b>&#9986;&#65039; Choose a photo</b><br><small>JPG, PNG or WebP. It stays on your device.</small></label>
+        <div class="tmeta" id="bgMsg" style="text-align:center"></div>
+        <div id="bgOut" style="display:none;margin-top:12px">
+          <div class="timg-prev">
+            <figure><img id="bgA" alt="Original photo"><figcaption>Original</figcaption></figure>
+            <figure><img id="bgB" alt="Photo without background"><figcaption>Background removed</figcaption></figure>
+          </div>
+          <div class="trow">
+            <label class="tfield"><span>New background</span><select id="bgBack"><option value="">Transparent (PNG)</option><option value="#ffffff">White</option><option value="#000000">Black</option><option value="#1e88e5">Blue</option><option value="#e53935">Red</option><option value="#43a047">Green</option><option value="custom">Pick any colour&hellip;</option></select></label>
+            <label class="tfield" id="bgColW" style="display:none"><span>Colour</span><input type="color" id="bgCol" value="#ffd86f"></label>
+          </div>
+          <div class="tool-actions"><button type="button" class="tbtn ghost" id="bgView">&#128065; View</button><button type="button" class="tbtn" id="bgDl">&#11015; Download</button></div>
+        </div>
+      </div>
+      <p class="tool-note">The AI runs inside your own browser, so your photo is never uploaded. The first time, the AI model (about 44 MB) is downloaded once and then kept by your browser. On phones it can take up to a minute.</p>
+    </div>
+
+    <!-- PDF TOOLS -->
+    <div class="tool-panel" data-tool="pdf">
+      <div class="tbox" style="padding:14px 16px">
+        <label class="tfield"><span>Choose PDF tool</span>
+          <select id="pdfMode">
+            <option value="img">&#128444;&#65039; Photos to PDF</option>
+            <option value="merge">&#128206; Merge PDFs</option>
+            <option value="comp">&#128476;&#65039; Compress PDF</option>
+          </select>
+        </label>
+      </div>
+      <div class="tbox">
+        <label class="tdrop"><input type="file" id="pdfFile" multiple accept="image/*"><b id="pdfDropT">&#128247; Choose photos</b><br><small id="pdfDropS">Choose one or more photos. You can change the order.</small></label>
+        <div class="pdf-list" id="pdfList"></div>
+        <div class="trow" id="pdfOptImg">
+          <label class="tfield"><span>Page size</span><select id="pdfSize"><option value="a4">A4</option><option value="letter">Letter</option><option value="fit">Same as photo</option></select></label>
+          <label class="tfield"><span>Margin</span><select id="pdfMargin"><option value="0">No margin</option><option value="20" selected>Small</option><option value="40">Big</option></select></label>
+        </div>
+        <div class="trow" id="pdfOptComp" style="display:none">
+          <label class="tfield"><span>Size / quality</span><select id="pdfQual"><option value="high">Good quality (a little smaller)</option><option value="med" selected>Medium (smaller)</option><option value="low">Smallest (lower quality)</option></select></label>
+        </div>
+        <div class="tool-actions"><button type="button" class="tbtn" id="pdfGo">Make PDF</button></div>
+        <div class="tmeta" id="pdfMsg" style="text-align:center"></div>
+        <div id="pdfRes" style="display:none">
+          <div class="tsub" id="pdfInfo" style="text-align:center"></div>
+          <div class="tool-actions" style="margin-top:12px"><button type="button" class="tbtn ghost" id="pdfView">&#128065; View PDF</button><button type="button" class="tbtn" id="pdfDl">&#11015; Download PDF</button></div>
+        </div>
+      </div>
+      <p class="tool-note">Everything happens inside your own browser. Your photos and PDFs are never uploaded. Compress PDF turns pages into pictures, so text in the new file cannot be selected.</p>
+    </div>
+
+    <!-- PHOTO TO PROMPT (Google Gemini AI) -->
+    <div class="tool-panel" data-tool="prompt">
+      <div class="tbox">
+        <label class="tdrop"><input type="file" id="ppFile" accept="image/*"><b>&#128444;&#65039; Choose a photo</b><br><small>We will write an AI image prompt for it.</small></label>
+        <div id="ppPrev" style="display:none;text-align:center;margin-top:12px"><img id="ppImg" alt="Your photo" style="max-width:100%;max-height:260px;border-radius:12px"></div>
+        <div class="trow" style="margin-top:12px">
+          <label class="tfield"><span>Prompt type</span><select id="ppStyle"><option value="detailed">Detailed (best result)</option><option value="short">Short</option></select></label>
+        </div>
+        <div class="tool-actions"><button type="button" class="tbtn" id="ppGo" disabled>&#10024; Make prompt</button></div>
+        <div class="tmeta" id="ppMsg" style="text-align:center"></div>
+        <div id="ppOut" style="display:none">
+          <label class="tfield"><span>Your prompt</span><textarea id="ppText" readonly></textarea></label>
+          <div class="tool-actions" style="margin-top:10px"><button type="button" class="tbtn" id="ppCopy">&#128203; Copy prompt</button></div>
+          <p class="tmeta" style="text-align:center">Paste it into any AI image maker (Gemini, ChatGPT, Midjourney and others). It makes a very similar picture &ndash; no AI can make exactly the same picture again.</p>
+        </div>
+        <div class="tsub" id="ppUse" style="text-align:center;margin-top:8px"></div>
+      </div>
+      <p class="tool-note">To write the prompt, your photo is sent to Google Gemini AI. Please do not upload private photos. Google may use photos sent to its free service to improve its products. We do not save your photo. There is a free limit for everyone each day.</p>
+    </div>
 
     <!-- CURRENCY -->
     <div class="tool-panel" data-tool="currency">
@@ -1696,6 +1816,7 @@
   </div>
 </div>
 
+<div class="pdfv" id="pdfv"><div class="pdfv-top"><b id="pdfvT">PDF</b><button type="button" class="tbtn small" id="pdfvDl">&#11015; Download</button><button type="button" class="tbtn small ghost" onclick="pdfvClose()">&#10005; Close</button></div><div class="pdfv-body" id="pdfvB"></div></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><button type="button" class="lb-x" aria-label="Close">&#10005;</button><img id="lightboxImg" alt=""></div>
 
 <script>
@@ -2206,7 +2327,8 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') close
 var TOOLS = {
   currency: 'Currency Converter', gold: 'Gold & Silver Price', stocks: 'Stock Market', weather: 'Weather & Air Quality',
   calendar: 'World Calendar', calc: 'Calculator', image: 'Image Compressor & Resizer', qr: 'QR Code Scanner & Generator',
-  password: 'Password Generator', words: 'Word Counter'
+  password: 'Password Generator', words: 'Word Counter',
+  bg: 'Background Remover', pdf: 'PDF Tools', prompt: 'Photo to Prompt'
 };
 var TOOL_SUB = {
   currency: 'Convert any world currency at the latest market rate.',
@@ -2218,7 +2340,10 @@ var TOOL_SUB = {
   image: 'Make photos smaller in seconds, right on your device.',
   qr: 'Scan any QR code or make your own.',
   password: 'Strong random passwords in one tap.',
-  words: 'Count words, characters and reading time.'
+  words: 'Count words, characters and reading time.',
+  bg: 'Remove the background from any photo with AI, right on your device.',
+  pdf: 'Photos to PDF, merge PDFs and compress PDF. View and download.',
+  prompt: 'Get an AI image prompt from any photo.'
 };
 /* old links (v7) still work */
 var TOOL_ALIAS = { emi: ['calc', 'emi'], age: ['calc', 'age'], percent: ['calc', 'percent'], unit: ['calc', 'unit'] };
@@ -2239,7 +2364,7 @@ function openTool(key, sub) {
   showView('tool');
   try { history.replaceState(null, '', '#' + tSlug(TOOLS[key])); } catch (e) {}
   document.title = TOOLS[key] + ' - Free Online Tool | Games Crusher 97';
-  var init = { currency: fxInit, gold: auInit, stocks: tvInit, weather: wxInit, calendar: clInit, calc: calcInit, image: imInit, qr: qrInit, password: pwInit, words: wcInit }[key];
+  var init = { currency: fxInit, gold: auInit, stocks: tvInit, weather: wxInit, calendar: clInit, calc: calcInit, image: imInit, qr: qrInit, password: pwInit, words: wcInit, bg: bgInit, pdf: pdfInit, prompt: ppInit }[key];
   if (!toolInit[key]) { toolInit[key] = true; init(true); } else init(false);
 }
 function goBack() {
@@ -2259,6 +2384,307 @@ tEl('toolRate').onclick = function() {
   var b = card && card.querySelector('.det-btn');
   if (b) b.click();
 };
+
+/* ---------- shared: open a photo file as a canvas (max side in px) ---------- */
+function imgToCanvas(file, max) {
+  return new Promise(function(res, rej) {
+    var url = URL.createObjectURL(file), im = new Image();
+    im.onload = function() {
+      var w = im.naturalWidth, h = im.naturalHeight, k = Math.min(1, max / Math.max(w, h));
+      var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+      var x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c);
+    };
+    im.onerror = function() { URL.revokeObjectURL(url); rej(new Error('This file could not be opened as a photo.')); };
+    im.src = url;
+  });
+}
+function saveBlob(blob, name) {
+  var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(function() { a.remove(); URL.revokeObjectURL(u); }, 1500);
+}
+function loadScript(src) {
+  return new Promise(function(res, rej) {
+    var sc = document.createElement('script'); sc.src = src; sc.async = true;
+    sc.onload = res; sc.onerror = function() { rej(new Error('Could not load a part of the tool. Please check your internet and try again.')); };
+    document.head.appendChild(sc);
+  });
+}
+function errText(e) { return (e && e.message) || String(e || 'Unknown error'); }
+
+/* ---------- 11. Background remover: free AI that runs in the browser (ormbg, Apache-2.0) ---------- */
+var BG = { T: null, seg: null, loading: null, cut: null, blob: null, url: '', name: 'photo' };
+function bgModel(msg) {
+  if (BG.seg) return Promise.resolve(BG.seg);
+  if (!BG.loading) {
+    BG.loading = import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.2/dist/transformers.min.js').then(function(T) {
+      BG.T = T;
+      return T.pipeline('background-removal', 'onnx-community/ormbg-ONNX', { dtype: 'q8', device: 'wasm',
+        progress_callback: function(p) { if (p && p.status === 'progress' && /\.onnx$/.test(p.file || '')) msg('Downloading the AI (only the first time): ' + Math.round(p.progress || 0) + '%'); } });
+    }).then(function(sg) { BG.seg = sg; return sg; }, function(e) { BG.loading = null; throw e; });
+  }
+  return BG.loading;
+}
+function bgInit(first) {
+  if (!first) return;
+  var msg = function(t) { tEl('bgMsg').textContent = t; };
+  tEl('bgFile').addEventListener('change', function() {
+    var f = this.files && this.files[0], inp = this; if (!f) return;
+    BG.name = f.name.replace(/\.[^.]+$/, '') || 'photo';
+    tEl('bgOut').style.display = 'none'; inp.disabled = true; msg('Opening the photo...');
+    imgToCanvas(f, 2048).then(function(c) {
+      tEl('bgA').src = c.toDataURL('image/jpeg', 0.9);
+      msg('Loading the AI...');
+      return bgModel(msg).then(function(sg) {
+        msg('Removing the background... please wait (up to a minute on phones).');
+        return new Promise(function(r) { setTimeout(r, 60); }).then(function() {
+          return sg(BG.T.RawImage && BG.T.RawImage.fromCanvas ? BG.T.RawImage.fromCanvas(c) : c.toDataURL('image/png'));
+        });
+      });
+    }).then(function(out) {
+      var im = Array.isArray(out) ? out[0] : out;
+      var px = im.channels === 4 ? im.data : im.rgba().data;
+      var cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height;
+      cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(px), im.width, im.height), 0, 0);
+      BG.cut = cv; bgPaint(); tEl('bgOut').style.display = 'block';
+      msg('Done! Pick a new background if you like, then View or Download.');
+    }).catch(function(e) {
+      msg('Sorry, it did not work on this device (' + errText(e) + '). Try a smaller photo, or Chrome on a computer.');
+    }).then(function() { inp.disabled = false; inp.value = ''; });
+  });
+  tEl('bgBack').addEventListener('change', function() { tEl('bgColW').style.display = this.value === 'custom' ? '' : 'none'; bgPaint(); });
+  tEl('bgCol').addEventListener('input', bgPaint);
+  tEl('bgView').onclick = function() { if (BG.url) openLightbox(BG.url, 'Photo without background'); };
+  tEl('bgDl').onclick = function() { if (BG.blob) saveBlob(BG.blob, BG.name + (tEl('bgBack').value ? '-new-background.png' : '-no-background.png')); };
+}
+function bgPaint() {
+  if (!BG.cut) return;
+  var v = tEl('bgBack').value, col = v === 'custom' ? tEl('bgCol').value : v;
+  var c = document.createElement('canvas'); c.width = BG.cut.width; c.height = BG.cut.height;
+  var x = c.getContext('2d');
+  if (col) { x.fillStyle = col; x.fillRect(0, 0, c.width, c.height); }
+  x.drawImage(BG.cut, 0, 0);
+  tEl('bgB').classList.toggle('tchk', !col);
+  c.toBlob(function(b) {
+    if (!b) return;
+    if (BG.url) URL.revokeObjectURL(BG.url);
+    BG.blob = b; BG.url = URL.createObjectURL(b); tEl('bgB').src = BG.url;
+  }, 'image/png');
+}
+
+/* ---------- 12. PDF tools: photos to PDF, merge, compress (pdf-lib MIT + pdf.js Apache-2.0, all in the browser) ---------- */
+var PD = { mode: 'img', files: [], out: null, name: 'document.pdf', libP: null, jsP: null };
+function pdfLib() {
+  if (window.PDFLib) return Promise.resolve(window.PDFLib);
+  return PD.libP || (PD.libP = loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js').then(function() { return window.PDFLib; }, function(e) { PD.libP = null; throw e; }));
+}
+function pdfJs() {
+  var base = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.5.438/';
+  return PD.jsP || (PD.jsP = import(base + 'pdf.min.mjs').then(function(L) {
+    return fetch(base + 'pdf.worker.min.mjs').then(function(r) { if (!r.ok) throw new Error('worker'); return r.text(); }).then(function(code) {
+      L.GlobalWorkerOptions.workerPort = new Worker(URL.createObjectURL(new Blob([code], { type: 'text/javascript' })), { type: 'module' });
+      return L;
+    }).catch(function() { L.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs'; return L; });
+  }, function(e) { PD.jsP = null; throw e; }));
+}
+var PDF_MODES = {
+  img: { t: '&#128247; Choose photos', s: 'Choose one or more photos. You can change the order.', acc: 'image/*', multi: true, go: 'Make PDF' },
+  merge: { t: '&#128206; Choose PDF files', s: 'Choose two or more PDFs. You can change the order.', acc: 'application/pdf,.pdf', multi: true, go: 'Merge PDFs' },
+  comp: { t: '&#128476;&#65039; Choose a PDF', s: 'Choose one PDF to make it smaller.', acc: 'application/pdf,.pdf', multi: false, go: 'Compress PDF' }
+};
+function pdfInit(first) {
+  if (!first) return;
+  tEl('pdfMode').addEventListener('change', function() { PD.mode = this.value; PD.files = []; pdfSetMode(); });
+  tEl('pdfFile').addEventListener('change', function() {
+    var add = Array.prototype.slice.call(this.files || []);
+    PD.files = PDF_MODES[PD.mode].multi ? PD.files.concat(add) : add.slice(0, 1);
+    this.value = ''; tEl('pdfRes').style.display = 'none'; tEl('pdfMsg').textContent = ''; pdfList();
+  });
+  tEl('pdfList').addEventListener('click', function(e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var i = +b.getAttribute('data-i'), a = b.getAttribute('data-a'), f = PD.files;
+    if (a === 'x') f.splice(i, 1);
+    else { var j = a === 'u' ? i - 1 : i + 1; if (j >= 0 && j < f.length) { var t = f[i]; f[i] = f[j]; f[j] = t; } }
+    pdfList();
+  });
+  tEl('pdfGo').onclick = pdfRun;
+  tEl('pdfView').onclick = function() { if (PD.out) pdfvOpen(PD.out, PD.name); };
+  tEl('pdfDl').onclick = function() { if (PD.out) saveBlob(new Blob([PD.out], { type: 'application/pdf' }), PD.name); };
+  tEl('pdfvDl').onclick = function() { if (PD.viewing) saveBlob(new Blob([PD.viewing.bytes], { type: 'application/pdf' }), PD.viewing.name); };
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') pdfvClose(); });
+  pdfSetMode();
+}
+function pdfSetMode() {
+  var m = PDF_MODES[PD.mode], inp = tEl('pdfFile');
+  tEl('pdfDropT').innerHTML = m.t; tEl('pdfDropS').textContent = m.s;
+  inp.accept = m.acc; inp.multiple = m.multi;
+  tEl('pdfGo').textContent = m.go;
+  tEl('pdfOptImg').style.display = PD.mode === 'img' ? '' : 'none';
+  tEl('pdfOptComp').style.display = PD.mode === 'comp' ? '' : 'none';
+  tEl('pdfRes').style.display = 'none'; tEl('pdfMsg').textContent = ''; pdfList();
+}
+function pdfList() {
+  var box = tEl('pdfList'); box.textContent = '';
+  PD.files.forEach(function(f, i) {
+    var d = document.createElement('div'); d.className = 'pdf-item';
+    var n = document.createElement('span'); n.textContent = (i + 1) + '. ' + f.name;
+    var z = document.createElement('small'); z.textContent = fmtBytes(f.size);
+    d.appendChild(n); d.appendChild(z);
+    [['u', '&#9650;', 'Move up'], ['d', '&#9660;', 'Move down'], ['x', '&#10005;', 'Remove']].forEach(function(b) {
+      if (!PDF_MODES[PD.mode].multi && b[0] !== 'x') return;
+      var bt = document.createElement('button'); bt.type = 'button'; bt.innerHTML = b[1]; bt.title = b[2]; bt.setAttribute('aria-label', b[2]);
+      bt.setAttribute('data-i', i); bt.setAttribute('data-a', b[0]); d.appendChild(bt);
+    });
+    box.appendChild(d);
+  });
+}
+function canvasJpeg(c, q) { return new Promise(function(r) { c.toBlob(function(b) { b.arrayBuffer().then(function(a) { r(new Uint8Array(a)); }); }, 'image/jpeg', q); }); }
+function pdfRun() {
+  var mode = PD.mode, files = PD.files.slice(), msg = function(t) { tEl('pdfMsg').textContent = t; };
+  if (!files.length) { msg('Please choose ' + (mode === 'img' ? 'at least one photo.' : mode === 'merge' ? 'at least two PDF files.' : 'a PDF file.')); return; }
+  if (mode === 'merge' && files.length < 2) { msg('Please choose at least two PDF files to merge.'); return; }
+  tEl('pdfGo').disabled = true; tEl('pdfRes').style.display = 'none'; msg('Working... please wait.');
+  var before = files.reduce(function(a, f) { return a + f.size; }, 0);
+  (mode === 'comp' ? Promise.all([pdfLib(), pdfJs()]) : pdfLib().then(function(L) { return [L]; })).then(function(libs) {
+    var L = libs[0], doc;
+    return L.PDFDocument.create().then(function(d) {
+      doc = d; doc.setProducer('Games Crusher 97 - gamescrusher97.com'); doc.setCreator('Games Crusher 97 PDF Tools');
+      var chain = Promise.resolve();
+      if (mode === 'img') {
+        var size = tEl('pdfSize').value, mg = +tEl('pdfMargin').value;
+        files.forEach(function(f, i) {
+          chain = chain.then(function() {
+            msg('Adding photo ' + (i + 1) + ' of ' + files.length + '...');
+            return imgToCanvas(f, 2400).then(function(c) {
+              var x = document.createElement('canvas'); x.width = c.width; x.height = c.height;
+              var g = x.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, x.width, x.height); g.drawImage(c, 0, 0);
+              return canvasJpeg(x, 0.9).then(function(bytes) { return doc.embedJpg(bytes); }).then(function(img) {
+                var pw, ph, land = img.width > img.height;
+                if (size === 'fit') { pw = img.width * 0.75 + mg * 2; ph = img.height * 0.75 + mg * 2; }
+                else { var A = size === 'a4' ? [595.28, 841.89] : [612, 792]; pw = land ? A[1] : A[0]; ph = land ? A[0] : A[1]; }
+                var k = Math.min((pw - mg * 2) / img.width, (ph - mg * 2) / img.height), w = img.width * k, h = img.height * k;
+                doc.addPage([pw, ph]).drawImage(img, { x: (pw - w) / 2, y: (ph - h) / 2, width: w, height: h });
+              });
+            });
+          });
+        });
+      } else if (mode === 'merge') {
+        files.forEach(function(f, i) {
+          chain = chain.then(function() {
+            msg('Adding PDF ' + (i + 1) + ' of ' + files.length + '...');
+            return f.arrayBuffer().then(function(a) { return L.PDFDocument.load(a, { ignoreEncryption: true }); })
+              .then(function(src) { return doc.copyPages(src, src.getPageIndices()); })
+              .then(function(pages) { pages.forEach(function(p) { doc.addPage(p); }); })
+              .catch(function(e) { throw new Error('"' + f.name + '" could not be read (' + errText(e) + '). If it has a password, remove it first.'); });
+          });
+        });
+      } else {
+        var Q = { high: [1.6, 0.75], med: [1.3, 0.6], low: [1.0, 0.45] }[tEl('pdfQual').value];
+        chain = files[0].arrayBuffer().then(function(a) { return libs[1].getDocument({ data: new Uint8Array(a) }).promise; }).then(function(src) {
+          var c2 = Promise.resolve();
+          for (var n = 1; n <= src.numPages; n++) (function(n) {
+            c2 = c2.then(function() {
+              msg('Making page ' + n + ' of ' + src.numPages + ' smaller...');
+              return src.getPage(n).then(function(pg) {
+                var v1 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: Q[0] });
+                var c = document.createElement('canvas'); c.width = Math.ceil(v.width); c.height = Math.ceil(v.height);
+                var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+                return pg.render({ canvasContext: g, canvas: c, viewport: v }).promise.then(function() { return canvasJpeg(c, Q[1]); })
+                  .then(function(bytes) { return doc.embedJpg(bytes); })
+                  .then(function(img) { doc.addPage([v1.width, v1.height]).drawImage(img, { x: 0, y: 0, width: v1.width, height: v1.height }); pg.cleanup(); });
+              });
+            });
+          })(n);
+          return c2.then(function() { pdfFree(src); });
+        });
+      }
+      return chain;
+    }).then(function() { msg('Saving...'); return doc.save(); }).then(function(bytes) {
+      var base = mode === 'img' ? 'photos' : mode === 'merge' ? 'merged' : files[0].name.replace(/\.pdf$/i, '') + '-small';
+      PD.out = bytes; PD.name = base + '.pdf';
+      var info = 'Your PDF is ready: ' + doc.getPageCount() + ' page' + (doc.getPageCount() === 1 ? '' : 's') + ', ' + fmtBytes(bytes.length) + '.';
+      if (mode === 'comp') {
+        var p = Math.round((1 - bytes.length / before) * 100);
+        info += p > 0 ? ' It is ' + p + '% smaller (was ' + fmtBytes(before) + ').' : ' It is not smaller than the original (' + fmtBytes(before) + '). Try "Smallest", or keep your original file.';
+      }
+      tEl('pdfInfo').textContent = info; tEl('pdfRes').style.display = 'block'; msg('');
+    });
+  }).catch(function(e) { msg('Sorry, something went wrong: ' + errText(e)); })
+    .then(function() { tEl('pdfGo').disabled = false; });
+}
+function pdfFree(doc) { try { if (doc.destroy) doc.destroy(); else if (doc.loadingTask) doc.loadingTask.destroy(); else if (doc.cleanup) doc.cleanup(); } catch (e) {} }
+/* PDF viewer: draws every page, works on phones too */
+function pdfvOpen(bytes, name) {
+  var box = tEl('pdfvB'), run = (PD.viewRun = (PD.viewRun || 0) + 1);
+  PD.viewing = { bytes: bytes, name: name };
+  tEl('pdfvT').textContent = name; box.innerHTML = '<p class="tmeta">Opening...</p>';
+  tEl('pdfv').classList.add('open'); document.body.style.overflow = 'hidden';
+  pdfJs().then(function(L) { return L.getDocument({ data: bytes.slice() }).promise; }).then(function(doc) {
+    if (run !== PD.viewRun) return;
+    box.textContent = ''; PD.viewDoc = doc;
+    var W = Math.min(box.clientWidth - 24, 900), dpr = Math.min(window.devicePixelRatio || 1, 2), chain = Promise.resolve();
+    for (var n = 1; n <= doc.numPages; n++) (function(n) {
+      chain = chain.then(function() {
+        if (run !== PD.viewRun) return;
+        return doc.getPage(n).then(function(pg) {
+          var v0 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: W / v0.width * dpr });
+          var c = document.createElement('canvas'); c.width = Math.ceil(v.width); c.height = Math.ceil(v.height); c.style.width = W + 'px';
+          box.appendChild(c);
+          return pg.render({ canvasContext: c.getContext('2d'), canvas: c, viewport: v }).promise;
+        });
+      });
+    })(n);
+    return chain;
+  }).catch(function(e) { if (run === PD.viewRun) box.innerHTML = ''; var p = document.createElement('p'); p.className = 'tmeta'; p.textContent = 'This PDF could not be shown here (' + errText(e) + '). You can still download it.'; box.appendChild(p); });
+}
+function pdfvClose() {
+  var v = tEl('pdfv'); if (!v || !v.classList.contains('open')) return;
+  PD.viewRun = (PD.viewRun || 0) + 1; v.classList.remove('open'); document.body.style.overflow = '';
+  tEl('pdfvB').textContent = ''; if (PD.viewDoc) { pdfFree(PD.viewDoc); PD.viewDoc = null; }
+}
+
+/* ---------- 13. Photo to prompt (Google Gemini AI through our server; free daily limit) ---------- */
+var PP_URL = 'https://us-central1-glass-marble-balls.cloudfunctions.net/photoPrompt';
+var PP = { img: '' };
+function ppUsage(d) {
+  if (!d || !d.limit) return;
+  var full = d.used >= d.limit;
+  tEl('ppUse').innerHTML = 'Free prompts today: <b>' + nf(Math.min(d.used, d.limit), 0) + '</b> of <b>' + nf(d.limit, 0) + '</b> used' + (full ? ' &ndash; the limit for today is reached. Please come back tomorrow.' : ' (it starts again every day).');
+}
+function ppInit(first) {
+  fetch(PP_URL, { cache: 'no-store' }).then(function(r) { return r.json(); }).then(ppUsage).catch(function() {});
+  if (!first) return;
+  var msg = function(t) { tEl('ppMsg').textContent = t; };
+  tEl('ppFile').addEventListener('change', function() {
+    var f = this.files && this.files[0]; if (!f) return;
+    this.value = ''; PP.img = ''; tEl('ppGo').disabled = true; tEl('ppOut').style.display = 'none'; msg('Opening the photo...');
+    imgToCanvas(f, 1024).then(function(c) {
+      var x = document.createElement('canvas'); x.width = c.width; x.height = c.height;
+      var g = x.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, x.width, x.height); g.drawImage(c, 0, 0);
+      var u = x.toDataURL('image/jpeg', 0.85);
+      PP.img = u.split(',')[1]; tEl('ppImg').src = u; tEl('ppPrev').style.display = 'block';
+      tEl('ppGo').disabled = false; msg('Now press "Make prompt".');
+    }).catch(function(e) { msg(errText(e)); });
+  });
+  tEl('ppGo').onclick = function() {
+    if (!PP.img) return;
+    var b = this; b.disabled = true; tEl('ppOut').style.display = 'none'; msg('The AI is looking at your photo... (about 5-15 seconds)');
+    fetch(PP_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ img: PP.img, style: tEl('ppStyle').value }) })
+      .then(function(r) { return r.json().catch(function() { return { error: 'The server did not answer. Please try again.' }; }); })
+      .then(function(j) {
+        ppUsage(j);
+        if (!j.prompt) { msg(j.error || 'Sorry, no prompt was made. Please try again.'); return; }
+        tEl('ppText').value = j.prompt; tEl('ppOut').style.display = 'block'; msg('');
+      })
+      .catch(function() { msg('Could not reach the server. Please check your internet and try again.'); })
+      .then(function() { b.disabled = false; });
+  };
+  tEl('ppCopy').onclick = function() {
+    var t = tEl('ppText').value, b = this, ok = function() { b.innerHTML = '&#10004; Copied'; setTimeout(function() { b.innerHTML = '&#128203; Copy prompt'; }, 1800); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function() { tEl('ppText').select(); document.execCommand('copy'); ok(); });
+    else { tEl('ppText').select(); document.execCommand('copy'); ok(); }
+  };
+}
 
 /* ---------- number helpers ---------- */
 function nf(n, max, min) {

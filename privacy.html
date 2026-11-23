@@ -48,6 +48,8 @@
   <li><b>Location (optional):</b> only if you press “use my location” in the weather tool, your browser asks for permission and the coordinates are sent to the weather service. We do not save them.</li>
   <li><b>Camera (optional):</b> the QR scanner uses your camera only while it is open; the picture stays on your device.</li>
   <li><b>Free tools:</b> currency, gold, weather and similar tools send only the values needed to public data services. Calculators and the image compressor work inside your browser; images are not uploaded.</li>
+  <li><b>Background Remover and PDF Tools:</b> these work fully inside your browser. Your photos and PDFs are never uploaded. The first time you use the Background Remover, your browser downloads a free AI model (from Hugging Face and jsDelivr) and keeps it for next time.</li>
+  <li><b>Photo to Prompt:</b> to write the prompt, the photo you choose is sent (made smaller) to Google Gemini AI through our server. We do not save the photo or the prompt. Google may use content sent to its free Gemini service to improve its products, so please do not upload private photos. To keep the daily free limit fair, our server counts how many prompts each visitor makes per day using a scrambled code made from the IP address (the IP address itself is not saved; the code changes every day).</li>
   <li><b>Partners:</b> if you contact us about becoming a partner, we use your message only to reply to you.</li>
 </ul>
 
@@ -57,6 +59,7 @@
 <h2>4. Services we use</h2>
 <ul>
   <li>Google Firebase and Google Cloud (database for comments, ratings, feedback, counters and voucher codes)</li>
+  <li>Google Gemini AI (Photo to Prompt tool)</li>
   <li>Cloudflare (to find the country of a visit; your IP address is not saved by us)</li>
   <li>Google AdSense (ads) and Google Fonts</li>
   <li>Public data services for the free tools (such as Open-Meteo and wttr.in for weather, and currency and gold price services), TradingView (stock market widget) and the donation services PayPal, Ko-fi and UPI — these are run by those companies and follow their own privacy policies.</li>

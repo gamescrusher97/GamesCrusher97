@@ -144,6 +144,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <div class="box gold"><b id="o-rt">–</b><span>⭐ Website rating</span><small id="o-rt-n"></small></div>
       <div class="box purple"><b id="o-cm">–</b><span>💬 Website comments</span><small id="o-fb"></small></div>
       <div class="box purple"><b id="o-clk">–</b><span>👆 Download clicks</span><small>from the website</small></div>
+      <div class="box blue"><b id="o-ai">–</b><span>🖼️ Photo to Prompt today</span><small id="o-ai-s">free AI limit</small></div>
     </div>
     <div class="card">
       <h2>📊 Earnings per day <span class="pill">LAST 30 DAYS</span></h2>
@@ -351,7 +352,15 @@ async function start() {
   showBucket(); drawLinks();
   loadAll();
 }
-function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); }
+function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); loadAi(); }
+// Photo to Prompt (website tool): free Gemini uses today, from the public counter
+async function loadAi() {
+  try {
+    const d = await (await fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/photoPrompt', { cache: 'no-store' })).json();
+    $('o-ai').textContent = nf(d.used || 0) + ' / ' + nf(d.limit || 0);
+    $('o-ai-s').textContent = (d.used >= d.limit ? 'limit reached - starts again tomorrow' : nf(Math.max(0, d.limit - d.used)) + ' free left today') + ' · cost AED 0';
+  } catch (e) { $('o-ai-s').textContent = 'not available'; }
+}
 async function loadNews() {
   const admin = isSiteAdmin();
   $('n-connect').style.display = admin ? 'none' : ''; $('n-form').style.display = admin ? '' : 'none';
