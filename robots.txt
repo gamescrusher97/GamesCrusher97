@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /site-admin/
+Disallow: /gmb-admin/
+
+Sitemap: https://gamescrusher97.com/sitemap.xml
