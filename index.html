@@ -648,6 +648,13 @@
   .tkr-wait { color: #c9c6e0; cursor: default; border: none; }
   .pup { color: #4ade80; font-weight: 700; } .pdn { color: #ff7a7a; font-weight: 700; } .peq { color: #c9c6e0; }
   @media (prefers-reduced-motion: reduce) { .tkr-tag i { animation: none; } }
+  /* ===== stock market tool ===== */
+  .st-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #6b6790; margin-right: 6px; vertical-align: middle; }
+  .st-dot.on { background: #34d27b; box-shadow: 0 0 6px #34d27b; }
+  .st-grp { color: #b8b4d8; font-size: 0.8em; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin: 14px 0 2px; }
+  #stList tr { cursor: pointer; } #stList tr:hover, #stList tr.on { background: rgba(255,216,111,0.08); }
+  .st-rng { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 6px; }
+  .st-rng .tchip { padding: 5px 11px; }
   /* ===== crypto prices tool ===== */
   .cr-head { display: flex; gap: 14px; align-items: center; margin-bottom: 12px; }
   .cr-head .tbig { font-size: clamp(1.4em, 6.5vw, 2em); }
@@ -1240,11 +1247,11 @@
         <p style="margin-bottom:10px;">Live share prices and charts for India, USA and the world.</p>
         <div class="shots" data-shots="t_stocks" data-name="Stock Market"></div>
         <ul style="text-align:left; color:#c9c6e0; font-size:0.9em; line-height:1.7; margin:0 0 18px 18px; padding:0;">
-          <li>Sensex, S&amp;P 500, Nasdaq and other indices</li>
+          <li>Sensex, Nifty, S&amp;P 500, Nasdaq and more, real-time</li>
           <li>Top Indian and US shares in one place</li>
-          <li>Search any stock symbol and see its chart</li>
-          <li>Gold, silver, crude oil and Bitcoin too</li>
-          <li>Charts and data by TradingView</li>
+          <li>Search any share and see its chart, 1 day to 5 years</li>
+          <li>Gold, silver and crude oil too</li>
+          <li>Prices refresh every minute</li>
         </ul>
         <button type="button" class="btn btn-tool" onclick="openTool('stocks')">Open Tool</button>
         <a class="tool-more" href="/stock-market/">About Stock Market &rarr;</a>
@@ -1495,17 +1502,25 @@
 
     <!-- STOCKS -->
     <div class="tool-panel" data-tool="stocks">
-      <div class="ttv" id="tvTape" style="min-height:46px"></div>
       <div class="tbox" style="padding:16px">
-        <div class="tchips" id="tvChips"></div>
-        <div class="trow" style="margin-bottom:6px">
-          <label class="tfield"><span>Search any symbol (e.g. AAPL, BSE:TCS, NSE:INFY)</span><input type="text" id="tvSym" placeholder="Type a stock symbol" autocapitalize="characters"></label>
-          <button type="button" class="tbtn" id="tvGo">Show</button>
+        <div class="tchips" id="stChips"></div>
+        <div class="trow" style="margin-bottom:0;position:relative">
+          <label class="tfield"><span>Search any share or index (e.g. Reliance, Apple, Nifty)</span><input type="text" id="stFind" placeholder="Type a company name or symbol" autocomplete="off"></label>
+          <button type="button" class="tbtn" id="stGo">Search</button>
+          <div class="wx-sug" id="stSug"></div>
         </div>
       </div>
-      <div class="ttv" id="tvChart" style="height:480px"></div>
-      <div class="ttv" id="tvQuotes" style="height:520px"></div>
-      <p class="tool-note">Market data and charts by TradingView. Some exchanges show delayed prices. For information only, not investment advice.</p>
+      <div class="tbox" id="stBig"><div style="text-align:center;color:#9a96c2">Loading&hellip;</div></div>
+      <div class="tbox">
+        <h3>&#128202; Markets</h3>
+        <div class="tmeta" id="stMeta" style="margin-top:0;margin-bottom:6px">Loading live prices&hellip;</div>
+        <div id="stList"></div>
+      </div>
+      <div class="tbox" style="padding:14px">
+        <h3>&#129351; Gold, silver and oil</h3>
+        <div class="ttv" id="tvQuotes" style="height:250px"></div>
+      </div>
+      <p class="tool-note">Shares and indices: real-time prices from Yahoo Finance, refreshed every minute. Gold, silver and oil: TradingView. For information only, not investment advice.</p>
     </div>
 
     <!-- CRYPTO -->
@@ -2440,7 +2455,7 @@ var TOOLS = {
 var TOOL_SUB = {
   currency: 'Convert any world currency at the latest market rate.',
   gold: 'Live gold and silver price in any currency.',
-  stocks: 'Live charts and prices for shares and indices.',
+  stocks: 'Real-time prices and charts for Indian, US and world markets.',
   crypto: 'Live Bitcoin, Ethereum and top coin prices in any currency.',
   weather: 'Yesterday, now and tomorrow for any city, with air quality.',
   calendar: 'Every world calendar with festivals and holidays.',
@@ -2472,7 +2487,7 @@ function openTool(key, sub) {
   showView('tool');
   try { history.replaceState(null, '', '#' + tSlug(TOOLS[key])); } catch (e) {}
   document.title = TOOLS[key] + ' - Free Online Tool | Games Crusher 97';
-  var init = { currency: fxInit, gold: auInit, stocks: tvInit, weather: wxInit, calendar: clInit, calc: calcInit, image: imInit, qr: qrInit, password: pwInit, words: wcInit, bg: bgInit, pdf: pdfInit, prompt: ppInit, crypto: crInit }[key];
+  var init = { currency: fxInit, gold: auInit, stocks: stInit, weather: wxInit, calendar: clInit, calc: calcInit, image: imInit, qr: qrInit, password: pwInit, words: wcInit, bg: bgInit, pdf: pdfInit, prompt: ppInit, crypto: crInit }[key];
   if (!toolInit[key]) { toolInit[key] = true; init(true); } else init(false);
 }
 function goBack() {
@@ -2824,6 +2839,17 @@ function getJSON(url, ms) {
 /* ---------- exchange rates: 3 free sources + last good copy ---------- */
 var FX = null, fxLoading = null;
 var FX_SOURCES = [
+  function() { return getJSON('https://api.coingecko.com/api/v3/exchange_rates', 10000).then(function(j) {
+    var R = j && j.rates, u = R && R.usd && R.usd.value, live = {};
+    if (!(u > 0)) throw new Error('bad');
+    Object.keys(R).forEach(function(k) { var x = R[k]; if (x && x.type === 'fiat' && x.value > 0 && /^[a-z]{3}$/.test(k)) live[k.toUpperCase()] = x.value / u; });
+    if (!live.INR || !live.AED || !live.EUR) throw new Error('bad');
+    live.USD = 1;
+    return getJSON('https://open.er-api.com/v6/latest/USD', 8000).then(function(e) { return e && e.rates ? e.rates : {}; }).catch(function() { return {}; }).then(function(all) {
+      var r = {}; Object.keys(all).forEach(function(k) { if (all[k] > 0) r[k] = all[k]; }); Object.keys(live).forEach(function(k) { r[k] = live[k]; });
+      return { r: r, t: Date.now() };
+    });
+  }); },
   function() { return getJSON('https://open.er-api.com/v6/latest/USD').then(function(j) {
     if (j.result !== 'success' || !j.rates || !j.rates.INR) throw new Error('bad'); return { r: j.rates, t: j.time_last_update_unix * 1000 }; }); },
   function() { return getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json').then(fxFaw); },
@@ -2837,7 +2863,7 @@ function fxFaw(j) {
   return { r: r, t: Date.parse(j.date + 'T00:00:00Z'), xau: j.usd.xau, xag: j.usd.xag };
 }
 function loadFX(force) {
-  if (FX && !force && Date.now() - FX.got < 20 * 60000) return Promise.resolve(FX);
+  if (FX && !FX.cached && !force && Date.now() - FX.got < 60000) return Promise.resolve(FX);
   if (fxLoading) return fxLoading;
   var i = 0;
   fxLoading = new Promise(function(res) {
@@ -2888,7 +2914,7 @@ function fxInit(first) {
     tEl('fxSwap').onclick = function() { var a = tEl('fxFrom').value; tEl('fxFrom').value = tEl('fxTo').value; tEl('fxTo').value = a; fxCalc(); };
   }
   fxLoad(first);
-  toolTimers.push(setInterval(function() { fxLoad(false, true); }, 30 * 60000));
+  toolTimers.push(setInterval(function() { fxLoad(false, true); }, 60000));
   toolTimers.push(setInterval(fxMeta, 60000));
 }
 function fxLoad(first, force) {
@@ -2967,7 +2993,7 @@ function auInit(first) {
     auDraw();
   });
   toolTimers.push(setInterval(function() { loadMetal().then(auDraw); }, 60000));
-  toolTimers.push(setInterval(function() { loadFX(true).then(auDraw); }, 30 * 60000));
+  toolTimers.push(setInterval(function() { loadFX(true).then(auDraw); }, 60000));
 }
 function auDraw() {
   var m = METAL, fx = FX, meta = tEl('auMeta');
@@ -2992,8 +3018,6 @@ function auDraw() {
 }
 
 /* ---------- 3. stocks (TradingView free widgets) ---------- */
-var TV_CHIPS = [['Sensex', 'BSE:SENSEX'], ['Reliance', 'BSE:RELIANCE'], ['TCS', 'BSE:TCS'], ['HDFC Bank', 'BSE:HDFCBANK'], ['Infosys', 'BSE:INFY'],
-  ['Apple', 'NASDAQ:AAPL'], ['Nvidia', 'NASDAQ:NVDA'], ['Tesla', 'NASDAQ:TSLA'], ['Microsoft', 'NASDAQ:MSFT'], ['Gold', 'OANDA:XAUUSD'], ['Bitcoin', 'BITSTAMP:BTCUSD']];
 function tvWidget(box, name, cfg) {
   box.textContent = '';
   var c = document.createElement('div'); c.className = 'tradingview-widget-container'; c.style.height = '100%'; c.style.width = '100%';
@@ -3004,32 +3028,136 @@ function tvWidget(box, name, cfg) {
   s.text = JSON.stringify(cfg);
   c.appendChild(s); box.appendChild(c);
 }
-function tvChart(sym) {
-  tvWidget(tEl('tvChart'), 'advanced-chart', { autosize: true, symbol: sym, interval: 'D', timezone: 'Etc/UTC', theme: 'dark', style: '1', locale: 'en',
-    allow_symbol_change: true, hide_side_toolbar: true, calendar: false, support_host: 'https://www.tradingview.com' });
-  document.querySelectorAll('#tvChips .tchip').forEach(function(b) { b.classList.toggle('on', b.getAttribute('data-s') === sym); });
+/* real-time prices for shares and indices: our server asks Yahoo Finance (cached 30 s) */
+var MKT_URL = 'https://us-central1-glass-marble-balls.cloudfunctions.net/marketQuotes';
+var ST_GROUPS = [
+  ['India indices', [['^BSESN', 'Sensex'], ['^NSEI', 'Nifty 50'], ['^NSEBANK', 'Bank Nifty']]],
+  ['India shares', [['RELIANCE.NS', 'Reliance'], ['TCS.NS', 'TCS'], ['HDFCBANK.NS', 'HDFC Bank'], ['INFY.NS', 'Infosys'], ['SBIN.NS', 'SBI'], ['ICICIBANK.NS', 'ICICI Bank'], ['BHARTIARTL.NS', 'Bharti Airtel'], ['ITC.NS', 'ITC']]],
+  ['USA indices', [['^GSPC', 'S&P 500'], ['^IXIC', 'Nasdaq'], ['^DJI', 'Dow Jones']]],
+  ['USA shares', [['AAPL', 'Apple'], ['NVDA', 'Nvidia'], ['MSFT', 'Microsoft'], ['AMZN', 'Amazon'], ['GOOGL', 'Alphabet'], ['TSLA', 'Tesla'], ['META', 'Meta']]],
+  ['World', [['^N225', 'Nikkei 225 (Japan)'], ['^GDAXI', 'DAX (Germany)'], ['^FTSE', 'FTSE 100 (UK)']]]
+];
+var ST_CHIPS = [['^BSESN', 'Sensex'], ['^NSEI', 'Nifty 50'], ['RELIANCE.NS', 'Reliance'], ['TCS.NS', 'TCS'], ['^GSPC', 'S&P 500'], ['AAPL', 'Apple'], ['NVDA', 'Nvidia'], ['TSLA', 'Tesla']];
+var ST_RANGES = [['1d', '1 day'], ['5d', '5 days'], ['1mo', '1 month'], ['6mo', '6 months'], ['1y', '1 year'], ['5y', '5 years']];
+var MKT = null, mktLoading = null, stSel = '^BSESN', stRange = '1d', stData = null, stDay = {}, stN = 0;
+function stName(sym) { for (var g = 0; g < ST_GROUPS.length; g++) for (var i = 0; i < ST_GROUPS[g][1].length; i++) if (ST_GROUPS[g][1][i][0] === sym) return ST_GROUPS[g][1][i][1]; return ''; }
+function stCurSign(sym, cur) {
+  if (sym.charAt(0) === '^') return '';
+  if (cur) return cur === 'INR' ? '₹' : cur === 'USD' ? '$' : cur + ' ';
+  return /\.(NS|BO)$/.test(sym) ? '₹' : '$';
 }
-function tvInit(first) {
-  if (!first) return;
-  var box = tEl('tvChips');
-  TV_CHIPS.forEach(function(c) {
-    var b = document.createElement('button'); b.type = 'button'; b.className = 'tchip'; b.textContent = c[0]; b.setAttribute('data-s', c[1]);
-    b.onclick = function() { tvChart(c[1]); }; box.appendChild(b);
+function stLive(t) { return t && Date.now() / 1000 - t < 300; }   // a new price in the last 5 minutes = market open now
+function stTime(t) { var d = new Date(t * 1000), today = new Date().toDateString() === d.toDateString(); return d.toLocaleString(undefined, today ? { hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+function stChg(p, prev) {
+  if (!(p > 0) || !(prev > 0)) return '<span class="peq">&ndash;</span>';
+  var d = p - prev, pc = d / prev * 100, cls = pc > 0.005 ? 'pup' : pc < -0.005 ? 'pdn' : 'peq';
+  return '<span class="' + cls + '">' + (pc > 0.005 ? '&#9650; +' : pc < -0.005 ? '&#9660; ' : '') + nf(pc, 2, 2) + '%</span>';
+}
+function loadMkt(force) {
+  if (MKT && !MKT.cached && !force && Date.now() - MKT.got < 45000) return Promise.resolve(MKT);
+  if (mktLoading) return mktLoading;
+  mktLoading = getJSON(MKT_URL, 12000).then(function(j) {
+    if (!j || !j.q || !Object.keys(j.q).length) throw new Error('bad');
+    MKT = { q: j.q, at: j.at * 1000, got: Date.now() }; tStore.set('gc97_mkt', JSON.stringify(MKT)); return MKT;
+  }).catch(function() {
+    if (!MKT) { try { var c = JSON.parse(tStore.get('gc97_mkt') || 'null'); if (c && c.q) { c.cached = true; MKT = c; } } catch (e) {} }
+    else MKT.cached = true;
+    return MKT;
+  }).then(function(v) { mktLoading = null; return v; });
+  return mktLoading;
+}
+function stInit(first) {
+  if (first) {
+    var box = tEl('stChips');
+    ST_CHIPS.forEach(function(c) { var b = document.createElement('button'); b.type = 'button'; b.className = 'tchip'; b.textContent = c[1]; b.setAttribute('data-s', c[0]); b.onclick = function() { stOpen(c[0], '1d', true); }; box.appendChild(b); });
+    var inp = tEl('stFind'), sug = tEl('stSug'), tm = 0;
+    inp.addEventListener('input', function() { clearTimeout(tm); var q = inp.value.trim(); if (q.length < 2) { sug.style.display = 'none'; return; } tm = setTimeout(function() { stSearch(q, false); }, 400); });
+    inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); stSearch(inp.value.trim(), true); } });
+    tEl('stGo').onclick = function() { stSearch(inp.value.trim(), true); };
+    document.addEventListener('click', function(e) { if (!e.target.closest('#stSug') && e.target !== inp) sug.style.display = 'none'; });
+    tEl('stList').addEventListener('click', function(e) { var tr = e.target.closest('tr[data-s]'); if (tr) stOpen(tr.getAttribute('data-s'), '1d', true); });
+    tEl('stBig').addEventListener('click', function(e) { var b = e.target.closest('[data-r]'); if (b) stOpen(stSel, b.getAttribute('data-r'), false); });
+    tvWidget(tEl('tvQuotes'), 'market-quotes', { width: '100%', height: '100%', symbolsGroups: [
+      { name: 'Commodities', symbols: [{ name: 'OANDA:XAUUSD', displayName: 'Gold (per ounce)' }, { name: 'OANDA:XAGUSD', displayName: 'Silver (per ounce)' }, { name: 'TVC:USOIL', displayName: 'Crude oil (WTI)' }, { name: 'TVC:UKOIL', displayName: 'Brent oil' }] }],
+      showSymbolLogo: true, isTransparent: false, colorTheme: 'dark', locale: 'en' });
+  }
+  stOpen(stSel, '1d', false);
+  loadMkt().then(stList);
+  toolTimers.push(setInterval(function() { loadMkt(true).then(stList); if (stRange === '1d') stOpen(stSel, '1d', false, true); }, 60000));
+  toolTimers.push(setInterval(stMeta, 20000));
+}
+function stSearch(q, pickFirst) {
+  var sug = tEl('stSug'); if (!q) return;
+  getJSON(MKT_URL + '?q=' + encodeURIComponent(q.slice(0, 40)), 10000).then(function(j) {
+    var r = (j && j.results) || [];
+    if (!r.length) { sug.innerHTML = '<button type="button" disabled>Nothing found. Try another name.</button>'; sug.style.display = 'block'; return; }
+    if (pickFirst) { sug.style.display = 'none'; stOpen(r[0].s, '1d', true); return; }
+    sug.textContent = '';
+    r.forEach(function(x) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = tkrEsc(x.n) + ' <small>' + tkrEsc(x.s) + ' &middot; ' + tkrEsc(x.ex) + '</small>';
+      b.onclick = function() { sug.style.display = 'none'; tEl('stFind').value = ''; stOpen(x.s, '1d', true); };
+      sug.appendChild(b);
+    });
+    sug.style.display = 'block';
+  }).catch(function() { sug.innerHTML = '<button type="button" disabled>Search is not working right now. Try again.</button>'; sug.style.display = 'block'; });
+}
+function stOpen(sym, range, scroll, quiet) {
+  var changed = sym !== stSel || range !== stRange;
+  stSel = sym; stRange = range || '1d';
+  var my = ++stN;
+  if (changed && !quiet && stData) tEl('stBig').style.opacity = '0.55';
+  document.querySelectorAll('#stChips .tchip').forEach(function(b) { b.classList.toggle('on', b.getAttribute('data-s') === sym); });
+  document.querySelectorAll('#stList tr[data-s]').forEach(function(tr) { tr.classList.toggle('on', tr.getAttribute('data-s') === sym); });
+  if (scroll) tEl('stBig').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  getJSON(MKT_URL + '?sym=' + encodeURIComponent(sym) + '&range=' + stRange, 12000).then(function(d) {
+    if (my !== stN) return;
+    if (!d || !(d.p > 0)) throw new Error('bad');
+    if (stRange === '1d' && d.prev > 0) stDay[sym] = { prev: d.prev, hi: d.hi, lo: d.lo };
+    stData = d; stBig();
+  }).catch(function() {
+    if (my !== stN) return;
+    tEl('stBig').style.opacity = '';
+    if (!stData || stData.s !== sym) tEl('stBig').innerHTML = '<div style="text-align:center;color:#9a96c2">Could not load this price right now. Please try again in a minute.</div>';
   });
-  function go() { var v = tEl('tvSym').value.trim().toUpperCase().replace(/\s+/g, ''); if (v) tvChart(v); }
-  tEl('tvGo').onclick = go;
-  tEl('tvSym').addEventListener('keydown', function(e) { if (e.key === 'Enter') go(); });
-  tvWidget(tEl('tvTape'), 'ticker-tape', { symbols: [
-    { proName: 'FOREXCOM:SPXUSD', title: 'S&P 500' }, { proName: 'FOREXCOM:NSXUSD', title: 'US 100' }, { proName: 'BSE:SENSEX', title: 'Sensex' },
-    { proName: 'OANDA:XAUUSD', title: 'Gold' }, { proName: 'OANDA:XAGUSD', title: 'Silver' }, { proName: 'BITSTAMP:BTCUSD', title: 'Bitcoin' }, { proName: 'FX_IDC:USDINR', title: 'USD/INR' }],
-    showSymbolLogo: true, isTransparent: false, displayMode: 'adaptive', colorTheme: 'dark', locale: 'en' });
-  tvChart('BSE:SENSEX');
-  tvWidget(tEl('tvQuotes'), 'market-quotes', { width: '100%', height: '100%', symbolsGroups: [
-    { name: 'Indices', symbols: [{ name: 'FOREXCOM:SPXUSD', displayName: 'S&P 500' }, { name: 'FOREXCOM:NSXUSD', displayName: 'US 100' }, { name: 'FOREXCOM:DJI', displayName: 'Dow 30' }, { name: 'BSE:SENSEX', displayName: 'Sensex' }, { name: 'INDEX:NKY', displayName: 'Nikkei 225' }, { name: 'INDEX:DEU40', displayName: 'DAX' }] },
-    { name: 'India', symbols: [{ name: 'BSE:RELIANCE', displayName: 'Reliance' }, { name: 'BSE:TCS', displayName: 'TCS' }, { name: 'BSE:HDFCBANK', displayName: 'HDFC Bank' }, { name: 'BSE:INFY', displayName: 'Infosys' }, { name: 'BSE:SBIN', displayName: 'SBI' }, { name: 'BSE:ICICIBANK', displayName: 'ICICI Bank' }] },
-    { name: 'USA', symbols: [{ name: 'NASDAQ:AAPL', displayName: 'Apple' }, { name: 'NASDAQ:NVDA', displayName: 'Nvidia' }, { name: 'NASDAQ:MSFT', displayName: 'Microsoft' }, { name: 'NASDAQ:AMZN', displayName: 'Amazon' }, { name: 'NASDAQ:GOOGL', displayName: 'Alphabet' }, { name: 'NASDAQ:TSLA', displayName: 'Tesla' }] },
-    { name: 'Commodities', symbols: [{ name: 'OANDA:XAUUSD', displayName: 'Gold' }, { name: 'OANDA:XAGUSD', displayName: 'Silver' }, { name: 'TVC:USOIL', displayName: 'Crude Oil' }, { name: 'BITSTAMP:BTCUSD', displayName: 'Bitcoin' }] }],
-    showSymbolLogo: true, isTransparent: false, colorTheme: 'dark', locale: 'en' });
+}
+function stBig() {
+  var d = stData, box = tEl('stBig'); box.style.opacity = '';
+  var day = stDay[d.s] || (MKT && MKT.q[d.s] ? { prev: MKT.q[d.s].prev } : null), cs = stCurSign(d.s, d.cur), live = stLive(d.t);
+  var nm = stName(d.s) || d.n, h = '<div class="cr-name">' + tkrEsc(nm) + ' <small>' + tkrEsc(d.s.replace(/\.NS$/, '')) + (d.ex ? ' &middot; ' + tkrEsc(d.ex) : '') + '</small></div>' +
+    '<div class="tbig">' + cs + nf(d.p, 2, 2) + '</div>' +
+    '<div>' + (day && day.prev ? stChg(d.p, day.prev) + ' <span class="cr-mute">today' + (day.prev ? ' (' + (d.p - day.prev >= 0 ? '+' : '') + nf(d.p - day.prev, 2, 2) + ')' : '') + '</span>' : '') + '</div>' +
+    '<div class="tmeta" style="margin-top:6px"><span class="st-dot' + (live ? ' on' : '') + '"></span>' + (live ? 'Market open &middot; live price at ' + stTime(d.t) : 'Market closed &middot; last price at ' + stTime(d.t)) + ' (your time)</div>';
+  h += '<div class="st-rng">' + ST_RANGES.map(function(r) { return '<button type="button" class="tchip' + (r[0] === stRange ? ' on' : '') + '" data-r="' + r[0] + '">' + r[1] + '</button>'; }).join('') + '</div>';
+  var v = (d.pts || []).map(function(x) { return x[1]; });
+  if (v.length > 2) {
+    var mn = Math.min.apply(null, v), mx = Math.max.apply(null, v), up = v[v.length - 1] >= (stRange === '1d' && day && day.prev ? day.prev : v[0]), col = up ? '#4ade80' : '#ff7a7a', pth = crPath(v, 600, 190, 10);
+    var t0 = d.pts[0][0], t1 = d.pts[d.pts.length - 1][0], fmt = function(t) { return new Date(t * 1000).toLocaleString(undefined, stRange === '1d' ? { hour: '2-digit', minute: '2-digit' } : stRange === '5d' || stRange === '1mo' ? { day: 'numeric', month: 'short' } : { month: 'short', year: 'numeric' }); };
+    h += '<div class="cr-chart"><svg viewBox="0 0 600 190" preserveAspectRatio="none" role="img" aria-label="Price chart"><defs><linearGradient id="stG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + col + '" stop-opacity=".35"/><stop offset="1" stop-color="' + col + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + pth + 'L600 190L0 190Z" fill="url(#stG)"/><path d="' + pth + '" fill="none" stroke="' + col + '" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>' +
+      '<div class="cr-ax"><span>' + fmt(t0) + '</span><span>High ' + cs + nf(mx, 2, 2) + ' &middot; Low ' + cs + nf(mn, 2, 2) + '</span><span>' + fmt(t1) + '</span></div></div>';
+    if (stRange !== '1d') h += '<div class="tmeta">Change in ' + ST_RANGES.filter(function(r) { return r[0] === stRange; })[0][1] + ': ' + stChg(v[v.length - 1], v[0]) + '</div>';
+  } else h += '<div class="tmeta">No chart for this time yet.</div>';
+  var st = [];
+  if (day && day.hi > 0) st.push(['Day high', cs + nf(day.hi, 2, 2)]);
+  if (day && day.lo > 0) st.push(['Day low', cs + nf(day.lo, 2, 2)]);
+  if (day && day.prev > 0) st.push(['Previous close', cs + nf(day.prev, 2, 2)]);
+  if (st.length) h += '<div class="cr-stats">' + st.map(function(x) { return '<div><span>' + x[0] + '</span><b>' + x[1] + '</b></div>'; }).join('') + '</div>';
+  box.innerHTML = h;
+}
+function stMeta() {
+  var m = MKT, el = tEl('stMeta'); if (!el) return;
+  if (!m) { el.textContent = 'Could not load prices right now. Please check your internet and try again.'; return; }
+  el.innerHTML = '<span class="live' + (m.cached ? ' old' : '') + '"></span>' + (m.cached ? 'Offline: showing the last saved prices from ' : 'Prices updated ') + whenText(m.at) + ' (' + ago(m.at) + '). Green dot = market open now. Tap a row for its chart.';
+}
+function stList() {
+  var m = MKT, el = tEl('stList'); stMeta(); if (!m) return;
+  el.innerHTML = ST_GROUPS.map(function(g) {
+    return '<div class="st-grp">' + g[0] + '</div><table class="ttable"><tbody>' + g[1].map(function(x) {
+      var q = m.q[x[0]]; if (!q) return '';
+      return '<tr data-s="' + x[0] + '" tabindex="0"' + (x[0] === stSel ? ' class="on"' : '') + '><td><span class="st-dot' + (stLive(q.t) ? ' on' : '') + '"></span>' + x[1] + '</td><td class="n">' + stCurSign(x[0]) + nf(q.p, 2, 2) + '</td><td class="n" style="width:92px">' + stChg(q.p, q.prev) + '</td></tr>';
+    }).join('') + '</tbody></table>';
+  }).join('');
 }
 
 /* ---------- 4. image compressor ---------- */
@@ -4209,21 +4337,13 @@ var WX_DEF = { 'Asia/Dubai': ['Dubai', 'United Arab Emirates', 25.0772, 55.3093]
 var TKR = { chg: null, wx: null, last: '', speed: 55 };
 function tkrEsc(t) { return String(t).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 // yesterday and today from the daily rate files -> % change for gold, silver and currencies
+// yesterday's closing prices (the daily rate file made at the end of each day), to show today's change of gold and silver
 function tkrChange() {
-  if (TKR.chg && Date.now() - TKR.chg.got < 3 * 3600000) return Promise.resolve(TKR.chg);
-  var base = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@';
-  return getJSON(base + 'latest/v1/currencies/usd.json', 12000).then(function(a) {
-    var day = new Date(Date.parse(a.date + 'T00:00:00Z') - 86400000).toISOString().slice(0, 10);
-    return getJSON(base + day + '/v1/currencies/usd.json', 12000).catch(function() { return getJSON('https://' + day + '.currency-api.pages.dev/v1/currencies/usd.json', 12000); })
-      .then(function(b) { if (!a.usd || !b.usd) throw new Error('bad'); TKR.chg = { now: a.usd, old: b.usd, got: Date.now() }; return TKR.chg; });
-  }).catch(function() { return TKR.chg; });
-}
-// % change of the price of 1 X counted in Y (both as "per 1 US dollar" rates)
-function tkrPctPair(x, y) {
-  var c = TKR.chg; if (!c) return null;
-  var a1 = c.now[x], b1 = c.now[y], a0 = c.old[x], b0 = c.old[y];
-  if (!(a1 > 0 && b1 > 0 && a0 > 0 && b0 > 0)) return null;
-  return ((b1 / a1) / (b0 / a0) - 1) * 100;
+  if (TKR.chg && Date.now() - TKR.chg.got < 3600000) return Promise.resolve(TKR.chg);
+  return getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json', 12000)
+    .catch(function() { return getJSON('https://latest.currency-api.pages.dev/v1/currencies/usd.json', 12000); })
+    .then(function(a) { if (!a || !a.usd || !(a.usd.xau > 0)) throw new Error('bad'); TKR.chg = { close: a.usd, got: Date.now() }; return TKR.chg; })
+    .catch(function() { return TKR.chg; });
 }
 // the visitor's city from their internet connection (no location permission). Only the city is kept, never the IP address.
 function ipCity() {
@@ -4256,8 +4376,8 @@ function tkrWeather() {
 }
 function tkrIt(go, arg, html) { return '<button type="button" class="tkr-it" data-go="' + go + '" data-arg="' + (arg || '') + '">' + html + '</button>'; }
 function tkrBuild() {
-  return Promise.all([loadFX(), loadMetal(), loadCrypto(), tkrChange(), tkrWeather()]).then(function(r) {
-    var fx = r[0], mt = r[1], cr = r[2], wx = r[4], L = defaultCur(), kL = fx && fx.r[L];
+  return Promise.all([loadFX(), loadMetal(), loadCrypto(), tkrChange(), tkrWeather(), loadMkt()]).then(function(r) {
+    var fx = r[0], mt = r[1], cr = r[2], wx = r[4], mk = r[5], L = defaultCur(), kL = fx && fx.r[L];
     if (!kL) { L = 'USD'; kL = 1; }
     var money = function(v) { return (L === 'USD' ? '$' : L + ' ') + nf(v, smartDp(v)); };
     var coin = function(id) {
@@ -4266,19 +4386,21 @@ function tkrBuild() {
     };
     var metal = function(sym, name, icon, usd) {
       if (!(usd > 0)) return '';
-      var g = usd / OZ * kL, ch = tkrPctPair(sym, 'usd');
+      // today's change = live price now vs yesterday's closing price, in the visitor's own currency (only when the price is live)
+      var g = usd / OZ * kL, c = TKR.chg && TKR.chg.close, ch = null;
+      if (mt && mt.live && c && c[sym] > 0 && c[L.toLowerCase()] > 0) ch = ((usd * kL) / ((1 / c[sym]) * c[L.toLowerCase()]) - 1) * 100;
       return tkrIt('gold', '', icon + ' <b>' + name + '</b> ' + (L === 'USD' ? '$' + nf(usd, 2, 2) + '/oz' : money(g) + '/gram') + (ch != null ? ' ' + crPct(ch) : ''));
     };
     var pairs = [];
     if (fx) ['USD', 'EUR', 'GBP'].forEach(function(c) {
       if (c === L || !fx.r[c]) return;
-      var strong = fx.r[c] < fx.r[L], a = strong ? c : L, b = strong ? L : c, v = fx.r[b] / fx.r[a], ch = tkrPctPair(a.toLowerCase(), b.toLowerCase());
-      pairs.push(tkrIt('currency', a + '-' + b, '&#128177; <b>1 ' + a + '</b> = ' + nf(v, smartDp(v)) + ' ' + b + (ch != null ? ' ' + crPct(ch) : '')));
+      var strong = fx.r[c] < fx.r[L], a = strong ? c : L, b = strong ? L : c, v = fx.r[b] / fx.r[a];
+      pairs.push(tkrIt('currency', a + '-' + b, '&#128177; <b>1 ' + a + '</b> = ' + nf(v, smartDp(v)) + ' ' + b));
     });
     var weather = wx ? tkrIt('weather', '', wx.w[0] + ' <b>' + tkrEsc(wx.name) + '</b> ' + Math.round(wx.t) + '&deg;C') : '';
-    var stocks = tkrIt('stocks', '', '&#128200; <b>Stock Market</b> live charts');
+    var idx = function(sym, name) { var q = mk && mk.q[sym]; return q && q.p > 0 ? tkrIt('stocks', sym, '&#128200; <b>' + name + '</b> ' + nf(q.p, 2, 2) + ' ' + stChg(q.p, q.prev)) : ''; };
     var au = mt && mt.au, ag = mt && mt.ag;
-    var list = [coin('bitcoin'), metal('xau', 'Gold 24K', '&#129351;', au), pairs[0], weather, coin('ethereum'), metal('xag', 'Silver', '&#129352;', ag), pairs[1], stocks, pairs[2]].filter(Boolean);
+    var list = [coin('bitcoin'), metal('xau', 'Gold 24K', '&#129351;', au), pairs[0], weather, coin('ethereum'), metal('xag', 'Silver', '&#129352;', ag), idx('^BSESN', 'Sensex'), pairs[1], idx('^NSEI', 'Nifty 50'), idx('^GSPC', 'S&P 500'), pairs[2]].filter(Boolean);
     if (list.length < 3) list.push(tkrIt('tools', '', '&#129520; <b>Free tools</b> <small>currency, gold, crypto, weather and more</small>'));
     TKR.built = Date.now(); tkrRender(list.join(''));
   });
@@ -4314,6 +4436,7 @@ function tkrSpeed(off) {
     var go = b.getAttribute('data-go'), arg = b.getAttribute('data-arg');
     if (go === 'tools') { showView('tools'); return; }
     if (go === 'crypto' && arg) crSel = arg;
+    if (go === 'stocks' && arg) stSel = arg;
     if (go === 'currency' && arg) {
       var p = arg.split('-'); tStore.set('gc97_fxf', p[0]); tStore.set('gc97_fxt', p[1]);
       if (tEl('fxFrom').options.length) { tEl('fxFrom').value = p[0]; tEl('fxTo').value = p[1]; }
@@ -4327,8 +4450,8 @@ function tkrSpeed(off) {
   showView = function(name) { sv(name); if (TKR.wait && TKR.last) { var h = TKR.last; TKR.last = ''; tkrRender(h); } };
   function tick() { if (!document.hidden) tkrBuild(); }
   setTimeout(function() { tkrBuild(); }, 400);
-  setInterval(tick, 90000);
-  document.addEventListener('visibilitychange', function() { if (!document.hidden && TKR.last && Date.now() - (TKR.built || 0) > 90000) tick(); });
+  setInterval(tick, 60000);
+  document.addEventListener('visibilitychange', function() { if (!document.hidden && TKR.last && Date.now() - (TKR.built || 0) > 60000) tick(); });
 })();
 setInterval(renderDay, 60000);
 </script>
