@@ -1141,6 +1141,7 @@ function showStores(){
   ${row('🟥', 'Huawei AppGallery', d.huawei, d.huawei && d.huawei.last30 != null ? '+' + n(d.huawei.last30) + ' in last 30 days' : '')}
   ${row('⬇️', 'Uptodown', d.uptodown, d.uptodown && d.uptodown.url ? '<a target="_blank" href="' + esc(d.uptodown.url) + '">open page ↗</a>' : '')}
   ${row('🌐', 'Website clicks', { total: d.website && d.website.total }, 'gamescrusher97.com download button')}
+  ${(d.others || []).filter(o => o && o.available).map(o => `<tr><td>${esc(o.icon || '🛒')} ${esc(o.name)}</td><td class="n" style="text-align:right"><b>${o.total == null ? '✔' : n(o.total)}</b></td><td class="small mute">${o.total == null ? 'listed &middot; this store does not share download numbers' : ''} ${o.url ? '<a target="_blank" href="' + esc(o.url) + '">open page ↗</a>' : ''}</td></tr>`).join('')}
   <tr><th>⭐ Total</th><th style="text-align:right;font-size:18px">${n(d.total)}</th><th></th></tr></table>
   <p class="help" style="margin-top:10px">New stores show here by themselves as soon as the app is published there. Store reports can be 1–2 days late.</p>%EXTRA%`);
 }
