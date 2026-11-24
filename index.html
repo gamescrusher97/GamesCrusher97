@@ -2956,7 +2956,8 @@ function fxCalc() {
 /* ---------- 2. gold & silver ---------- */
 var METAL = null;
 var OZ = 31.1034768;
-function loadMetal() {
+function loadMetal(force) {
+  if (METAL && !METAL.cached && !force && Date.now() - (METAL.got || 0) < 50000) return Promise.resolve(METAL);
   function goldApi() {
     return Promise.all([getJSON('https://api.gold-api.com/price/XAU'), getJSON('https://api.gold-api.com/price/XAG')]).then(function(a) {
       if (!(a[0].price > 0 && a[1].price > 0)) throw new Error('bad');
@@ -2977,9 +2978,18 @@ function loadMetal() {
         var c = null; try { c = JSON.parse(tStore.get('gc97_metal') || 'null'); } catch (e) {}
         if (c && c.au) { c.cached = true; METAL = c; } res(METAL); return;
       }
-      src[i++]().then(function(d) { METAL = d; tStore.set('gc97_metal', JSON.stringify(d)); res(d); }).catch(next);
+      src[i++]().then(function(d) { d.got = Date.now(); METAL = d; tStore.set('gc97_metal', JSON.stringify(d)); res(d); }).catch(next);
     })();
   });
+}
+function auCurNow() { return tStore.get('gc97_auc') || (tEl('auCur') && tEl('auCur').value) || defaultCur(); }
+function auUnitNow() { return parseFloat(tStore.get('gc97_auu') || (tEl('auUnit') && tEl('auUnit').value) || '1') || 1; }
+var AU_UNIT_SHORT = { '1': 'gram', '10': '10 g', '11.6638': 'tola', '31.1035': 'oz', '1000': 'kg' };
+// today's change = live price now vs yesterday's closing price, in the chosen currency (only when the price is live)
+function metalChg(sym, usd, cur) {
+  var c = TKR.chg && TKR.chg.close, fx = FX && FX.r, l = cur.toLowerCase();
+  if (!(METAL && METAL.live) || !c || !(c[sym] > 0) || !fx || !(fx[cur] > 0) || !(c[l] > 0)) return null;
+  return ((usd * fx[cur]) / ((1 / c[sym]) * c[l]) - 1) * 100;
 }
 function auInit(first) {
   if (first) {
@@ -2992,7 +3002,8 @@ function auInit(first) {
     if (fx && (first || !tEl('auCur').options.length)) fillCurSelect(tEl('auCur'), fx.r, tStore.get('gc97_auc') || defaultCur());
     auDraw();
   });
-  toolTimers.push(setInterval(function() { loadMetal().then(auDraw); }, 60000));
+  tkrChange().then(auDraw);
+  toolTimers.push(setInterval(function() { loadMetal(true).then(auDraw); }, 60000));
   toolTimers.push(setInterval(function() { loadFX(true).then(auDraw); }, 60000));
 }
 function auDraw() {
@@ -3012,6 +3023,11 @@ function auDraw() {
   }
   rows('auGold', [['24K (99.9%)', auG], ['22K (91.6%)', auG * 22 / 24], ['21K (87.5%)', auG * 21 / 24], ['18K (75%)', auG * 18 / 24]]);
   rows('auSilver', [['Fine silver (99.9%)', agG], ['Sterling silver (92.5%)', agG * 0.925]]);
+  // the same "today" change as the live price line at the top
+  [['auGold', metalChg('xau', m.au, cur)], ['auSilver', metalChg('xag', m.ag, cur)]].forEach(function(x) {
+    var td = tEl(x[0]).querySelector('tr td.n'); if (td && x[1] != null) td.innerHTML = td.textContent + ' ' + crPct(x[1]);
+  });
+  if (typeof tkrBuild === 'function') tkrBuild();
   meta.innerHTML = '<span class="live' + (m.cached || !m.live ? ' old' : '') + '"></span>' +
     (m.cached ? 'Offline: showing the last saved price from ' : m.live ? 'Live price, updated ' : 'Daily price, updated ') + whenText(m.t) + ' (' + ago(m.t) + ').' +
     ' Gold ' + money(m.au, 'USD') + ' / Silver ' + money(m.ag, 'USD') + ' per ounce.';
@@ -3083,7 +3099,7 @@ function stInit(first) {
   }
   stOpen(stSel, '1d', false);
   loadMkt().then(stList);
-  toolTimers.push(setInterval(function() { loadMkt(true).then(stList); if (stRange === '1d') stOpen(stSel, '1d', false, true); }, 60000));
+  toolTimers.push(setInterval(function() { loadMkt(true).then(function() { stList(); tkrBuild(); }); if (stRange === '1d') stOpen(stSel, '1d', false, true); }, 60000));
   toolTimers.push(setInterval(stMeta, 20000));
 }
 function stSearch(q, pickFirst) {
@@ -4296,6 +4312,7 @@ function crMeta() {
 function crDraw() {
   if (!CR) { tEl('crMeta').textContent = 'Could not load crypto prices right now. Please check your internet and try again.'; tEl('crBig').innerHTML = '<div style="text-align:center;color:#9a96c2">No prices yet.</div>'; tEl('crList').innerHTML = ''; return; }
   crMeta(); crBig(); crList(); crConv('coin');
+  if (typeof tkrBuild === 'function') tkrBuild();
 }
 function crBig() {
   var d = CR, m = d.m[crSel]; if (!m) { crSel = 'bitcoin'; m = d.m[crSel]; } if (!m) return;
@@ -4379,17 +4396,18 @@ function tkrBuild() {
   return Promise.all([loadFX(), loadMetal(), loadCrypto(), tkrChange(), tkrWeather(), loadMkt()]).then(function(r) {
     var fx = r[0], mt = r[1], cr = r[2], wx = r[4], mk = r[5], L = defaultCur(), kL = fx && fx.r[L];
     if (!kL) { L = 'USD'; kL = 1; }
-    var money = function(v) { return (L === 'USD' ? '$' : L + ' ') + nf(v, smartDp(v)); };
     var coin = function(id) {
       var m = cr && cr.m[id], c = crInfo(id); if (!m) return '';
-      return tkrIt('crypto', id, crIcon(c, m, 18) + '<b>' + c[2] + '</b> $' + nf(m.p, m.p >= 100 ? 0 : smartDp(m.p)) + ' ' + (m.ch != null ? crPct(m.ch) : ''));
+      var K = crK();   // same currency as the Crypto Prices tool
+      return tkrIt('crypto', id, crIcon(c, m, 18) + '<b>' + c[2] + '</b> ' + crMoney(m.p * K.k, K) + ' ' + (m.ch != null ? crPct(m.ch) : ''));
     };
     var metal = function(sym, name, icon, usd) {
       if (!(usd > 0)) return '';
-      // today's change = live price now vs yesterday's closing price, in the visitor's own currency (only when the price is live)
-      var g = usd / OZ * kL, c = TKR.chg && TKR.chg.close, ch = null;
-      if (mt && mt.live && c && c[sym] > 0 && c[L.toLowerCase()] > 0) ch = ((usd * kL) / ((1 / c[sym]) * c[L.toLowerCase()]) - 1) * 100;
-      return tkrIt('gold', '', icon + ' <b>' + name + '</b> ' + (L === 'USD' ? '$' + nf(usd, 2, 2) + '/oz' : money(g) + '/gram') + (ch != null ? ' ' + crPct(ch) : ''));
+      // same currency, weight and rounding as the Gold & Silver tool
+      var cur = auCurNow(), k = fx && fx.r[cur], u = auUnitNow();
+      if (!k) { cur = 'USD'; k = 1; }
+      var ch = metalChg(sym, usd, cur);
+      return tkrIt('gold', '', icon + ' <b>' + name + '</b> ' + money(usd / OZ * k * u, cur) + '/' + (AU_UNIT_SHORT[String(u)] || 'gram') + (ch != null ? ' ' + crPct(ch) : ''));
     };
     var pairs = [];
     if (fx) ['USD', 'EUR', 'GBP'].forEach(function(c) {
