@@ -469,8 +469,10 @@ async function loadDash(){
   const [on, act, played, dev, players, guests, mp, fb] = await Promise.all([
     cnt(query(pres, where('lastActive', '>=', now - 120000))), cnt(query(pres, where('lastActive', '>=', now - DAY))),
     cnt(query(pres, where('lastPlayed', '>=', now - DAY))), cnt(pres), cnt(pl), cnt(query(pres, where('signedIn', '==', false))),
-    cnt(query(pl, where('monthlyPass.active', '==', true))), cnt(query(collection(db, 'feedback'), where('status', '==', 'new')))
-  ]);
+    cnt(query(pl, where('monthlyPass.active', '==', true))), cnt(query(collection(db, 'feedback'), where('status', '==', 'new'))),
+    // website visitor feedback belongs to the website admin page, not here
+    cnt(query(collection(db, 'feedback'), where('status', '==', 'new'), where('appVersion', '==', 'website'))).catch(() => 0)
+  ]).then(a => { a[7] = Math.max(0, a[7] - a[8]); return a; });
   $('d-online').textContent = on; $('d-active').textContent = act; $('d-played').textContent = played; $('d-devices').textContent = dev;
   $('d-players').textContent = players; $('d-guests').textContent = guests; $('d-mpass').textContent = mp; $('d-fb').textContent = fb;
   const cur = currentEvent();
@@ -825,7 +827,8 @@ async function loadCodes(){
 $('btn-f-load').onclick = loadFeedback;
 async function loadFeedback(){
   try {
-    const rows = snapRows(await getDocs(query(collection(db, 'feedback'), orderBy('at', 'desc'), limit(200))));
+    // only feedback from the game (website visitor feedback is on the website admin page)
+    const rows = snapRows(await getDocs(query(collection(db, 'feedback'), orderBy('at', 'desc'), limit(300)))).filter(r => r.d.appVersion !== 'website').slice(0, 200);
     $('f-table').innerHTML = '<tr><th>When</th><th>From</th><th>Feedback</th><th>Status</th></tr>' + (rows.map(r => `<tr class="click" data-id="${esc(r.id)}"><td class="small">${fmt(r.d.at)}</td><td>${esc(r.d.name || '')}<div class="mute small">${esc(r.d.email || 'guest')}</div></td><td>${esc((r.d.text || '').slice(0, 120))}${(r.d.text || '').length > 120 ? '…' : ''}</td><td>${r.d.status === 'done' ? '<span class="pill ok">done</span>' : '<span class="pill warn">new</span>'}</td></tr>`).join('') || '<tr><td colspan=4 class="mute">No feedback yet.</td></tr>');
     $('f-table').querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { const r = rows.find(x => x.id === tr.dataset.id); openFeedback(r); });
   } catch(e){ err(e); }

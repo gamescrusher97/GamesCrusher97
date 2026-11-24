@@ -100,6 +100,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <button data-tab="dl">⬇️ Downloads</button>
       <button data-tab="site">⭐ Website</button>
       <button data-tab="news">📢 Messages</button>
+      <button data-tab="usage">💰 Usage &amp; Costs</button>
       <button data-tab="links">🔗 Other admins</button>
       <button data-tab="set">⚙️ Settings</button>
     </nav>
@@ -145,6 +146,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <div class="box purple"><b id="o-cm">–</b><span>💬 Website comments</span><small id="o-fb"></small></div>
       <div class="box purple"><b id="o-clk">–</b><span>👆 Download clicks</span><small>from the website</small></div>
       <div class="box blue"><b id="o-ai">–</b><span>🖼️ Photo to Prompt today</span><small id="o-ai-s">free AI limit</small></div>
+      <div class="box good"><b id="o-srv">–</b><span>🖥️ Website server cost this month</span><small id="o-srv-s">live prices + Photo to Prompt</small></div>
     </div>
     <div class="card">
       <h2>📊 Earnings per day <span class="pill">LAST 30 DAYS</span></h2>
@@ -224,7 +226,20 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <div id="s-comments"></div>
       <p class="help" style="margin:8px 0 0">Your reply shows on the website under the comment as “✔ Games Crusher 97 replied”.</p>
     </div>
-    <div class="card"><h2>📩 Feedback from the website form</h2><div id="s-feedback"></div><p class="help" style="margin:8px 0 0">Reply by email. These also show in the Glass Marble Balls admin → Feedback.</p></div>
+    <div class="card"><h2>📩 Feedback from the website form</h2><div id="s-feedback"></div><p class="help" style="margin:8px 0 0">Reply by email. Website feedback is kept only here, in the website's own database.</p></div>
+  </section>
+
+  <!-- USAGE & COSTS (only the website) -->
+  <section class="tab" id="tab-usage">
+    <div class="boxes">
+      <div class="box good"><b id="u-total">–</b><span>💰 Website cost this month</span><small id="u-total-s">everything below together</small></div>
+    </div>
+    <div class="card">
+      <h2>💰 Website usage &amp; costs <span class="pill">THIS MONTH</span></h2>
+      <p class="help">Only the website (gamescrusher97.com). Every app and game shows its own usage on its own admin page.</p>
+      <div class="scroll"><table id="u-web"></table></div>
+      <p class="help" style="margin:8px 0 0">Prices are Google's. Money is shown in AED. The website server runs on Google's pay-as-you-go plan, so it stays free while it is under the free amounts above.</p>
+    </div>
   </section>
 
   <!-- MESSAGES TO THE WEBSITE -->
@@ -284,7 +299,7 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
-import { getFirestore, doc, getDoc, setDoc, collection, query as fq, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, collection, query as fq, where, getDocs, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getDatabase, ref, get, set, remove, query, limitToLast } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
 const ADMIN_EMAIL = 'gamescrusher97@gmail.com';
@@ -352,12 +367,56 @@ async function start() {
   showBucket(); drawLinks();
   loadAll();
 }
-function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); loadAi(); }
+function loadAll() { loadVisits(); loadSite(); loadLink(); loadFeedback(); loadNews(); loadAi(); loadSrv(); }
+onAuthStateChanged(siteAuth, () => { if (auth.currentUser) loadFeedback(); });
 // Photo to Prompt (website tool): free Gemini uses today, from the public counter
+// website server functions (stock market prices + Photo to Prompt): calls and server time this month vs Google's free amounts
+const SRV_FREE = { calls: 2000000, cpu: 180000, mem: 360000 }, SRV_PRICE = { calls: 0.40 / 1e6, cpu: 0.000024, mem: 0.0000025 }, USD_AED_SRV = 3.6725;
+async function srvMetric(type, start) {
+  const u = new URL('https://monitoring.googleapis.com/v3/projects/glass-marble-balls/timeSeries');
+  u.searchParams.set('filter', 'metric.type="' + type + '" AND resource.labels.service_name=one_of("marketquotes","photoprompt")');
+  u.searchParams.set('interval.startTime', new Date(start).toISOString());
+  u.searchParams.set('interval.endTime', new Date().toISOString());
+  u.searchParams.set('aggregation.alignmentPeriod', Math.max(60, Math.round((Date.now() - start) / 1000)) + 's');
+  u.searchParams.set('aggregation.perSeriesAligner', 'ALIGN_SUM');
+  u.searchParams.set('aggregation.crossSeriesReducer', 'REDUCE_SUM');
+  const j = await gcall({ url: u.toString() });
+  let sum = 0; (j.timeSeries || []).forEach(ts => (ts.points || []).forEach(p => { sum += +(p.value.int64Value || p.value.doubleValue || 0); }));
+  return sum;
+}
+let AIU = null;
+async function loadSrv() {
+  const row = (name, used, free, cost, note) => `<tr><td>${name}</td><td>${used}</td><td>${free}</td><td style="text-align:right"><b style="color:${cost > 0.001 ? '#ff7a7a' : '#3ddc84'}">AED ${cost.toFixed(2)}</b></td></tr>` + (note ? `<tr><td colspan="4" class="help" style="padding-top:0">${note}</td></tr>` : '');
+  let calls = 0, secs = 0, ok = true, usd = 0;
+  try {
+    const m1 = new Date(); m1.setDate(1); m1.setHours(0, 0, 0, 0);
+    [calls, secs] = await Promise.all([srvMetric('run.googleapis.com/request_count', m1.getTime()), srvMetric('run.googleapis.com/container/billable_instance_time', m1.getTime())]);
+  } catch (e) { ok = false; $('o-srv-s').textContent = 'not available: ' + (e.message || e); }
+  // each website function runs with 256 MB memory and 1/6 of a CPU
+  const cpu = secs / 6, mem = secs * 0.25;
+  const cCalls = Math.max(0, calls - SRV_FREE.calls) * SRV_PRICE.calls, cCpu = Math.max(0, cpu - SRV_FREE.cpu) * SRV_PRICE.cpu, cMem = Math.max(0, mem - SRV_FREE.mem) * SRV_PRICE.mem;
+  usd = cCalls + cCpu + cMem;
+  const pct = Math.max(calls / SRV_FREE.calls, cpu / SRV_FREE.cpu, mem / SRV_FREE.mem) * 100, aed = usd * USD_AED_SRV;
+  if (ok) {
+    $('o-srv').textContent = 'AED ' + aed.toFixed(2); $('o-srv').style.color = usd > 0.001 ? '#ff7a7a' : '#3ddc84';
+    $('o-srv-s').textContent = nf(calls) + ' calls · ' + (pct < 0.1 ? 'under 0.1' : pct.toFixed(1)) + '% of the free amount used' + (usd > 0.001 ? ' - above free!' : ' · free');
+  }
+  const ai = AIU ? nf(AIU.used || 0) + ' today' : '–', na = ok ? '' : ' (could not read Google meters)';
+  $('u-web').innerHTML = '<tr><th>Part of the website</th><th>Used</th><th>Free amount</th><th style="text-align:right">Cost</th></tr>' +
+    row('🖥️ Website server calls (live prices, stock market, Photo to Prompt)' + na, nf(calls), '2,000,000 / month', cCalls * USD_AED_SRV) +
+    row('⏱️ Website server time (CPU)' + na, nf(cpu) + ' CPU-seconds', '180,000 / month', cCpu * USD_AED_SRV) +
+    row('🧠 Website server memory' + na, nf(mem) + ' GB-seconds', '360,000 / month', cMem * USD_AED_SRV) +
+    row('🖼️ Photo to Prompt AI (Google Gemini)', ai, (AIU ? nf(AIU.limit) : '–') + ' / day', 0, 'Uses a Google project with no payment card, so it can never cost money. When the free amount ends, it stops until tomorrow.') +
+    row('🗄️ Website database (ratings, comments, feedback, visits, messages)', 'free plan', 'Spark plan', 0, 'The website database is on Google\'s free Spark plan: nothing can ever be charged.') +
+    row('🌐 Website hosting (GitHub Pages) and price data (CoinGecko, Yahoo Finance, Open-Meteo, TradingView)', '–', 'free', 0) +
+    `<tr><th colspan="3">Total this month</th><th style="text-align:right">AED ${aed.toFixed(2)}</th></tr>`;
+  $('u-total').textContent = 'AED ' + aed.toFixed(2); $('u-total').style.color = usd > 0.001 ? '#ff7a7a' : '#3ddc84';
+  $('u-total-s').textContent = usd > 0.001 ? 'above the free amounts!' : 'free - under all free amounts';
+}
 async function loadAi() {
   try {
     const d = await (await fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/photoPrompt', { cache: 'no-store' })).json();
-    $('o-ai').textContent = nf(d.used || 0) + ' / ' + nf(d.limit || 0);
+    AIU = d; $('o-ai').textContent = nf(d.used || 0) + ' / ' + nf(d.limit || 0); if ($('u-web').innerHTML) loadSrv();
     $('o-ai-s').textContent = (d.used >= d.limit ? 'limit reached - starts again tomorrow' : nf(Math.max(0, d.limit - d.used)) + ' free left today') + ' · cost AED 0';
   } catch (e) { $('o-ai-s').textContent = 'not available'; }
 }
@@ -380,12 +439,30 @@ $('btn-n-send').onclick = async () => {
   try { await set(ref(rtdb, 'news/' + id), msg); $('n-text').value = ''; $('n-title').value = ''; $('n-count').textContent = '0 / 1000'; toast('✔ Sent — it is on the website now'); loadNews(); } catch (e) { toast(e.message); }
 };
 async function loadFeedback() {
-  try {
-    const qs = await getDocs(fq(collection(fs, 'feedback'), where('appVersion', '==', 'website')));
-    const list = []; qs.forEach(d => list.push(d.data())); list.sort((a, b) => (b.at || 0) - (a.at || 0));
-    $('o-fb').textContent = list.length ? nf(list.length) + ' feedback messages' : 'no feedback yet';
-    $('s-feedback').innerHTML = list.slice(0, 30).map(x => `<div class="cm"><b>${esc(x.email || 'no email')}</b> <span class="mute small">· ${x.at ? new Date(x.at).toLocaleString() : ''}</span>${x.email ? ` · <a href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Re: your feedback - Games Crusher 97')}">reply</a>` : ''}<p>${esc(x.text)}</p></div>`).join('') || '<p class="mute">No feedback yet.</p>';
-  } catch (e) { $('s-feedback').innerHTML = '<p class="mute">' + esc(e.message) + '</p>'; }
+  const list = [];
+  if (isSiteAdmin()) {
+    try { const sn = await get(ref(rtdb, 'feedback')); if (sn.exists()) Object.values(sn.val()).forEach(x => list.push({ email: x.email, text: x.message, at: x.ts })); }
+    catch (e) { $('s-feedback').innerHTML = '<p class="mute">' + esc(e.message) + '</p>'; }
+    // old website feedback was saved in the game's database: move it to the website's own database once
+    try {
+      const qs = await getDocs(fq(collection(fs, 'feedback'), where('appVersion', '==', 'website')));
+      for (const d of qs.docs) {
+        const x = d.data();
+        try {
+          await set(ref(rtdb, 'feedback/old_' + d.id.replace(/[^A-Za-z0-9_-]/g, '')), { email: String(x.email || 'unknown@unknown.com').slice(0, 100), message: String(x.text || '-').slice(0, 2000), ts: +x.at || Date.now() });
+          await deleteDoc(d.ref);
+          list.push({ email: x.email, text: x.text, at: x.at });
+        } catch (e) { list.push({ email: x.email, text: x.text, at: x.at }); }
+      }
+    } catch (e) {}
+  } else {
+    $('s-feedback').innerHTML = '<p class="help">Press “🔓 Connect website comments” above once to see the website feedback.</p>';
+    $('o-fb').textContent = 'connect to see feedback';
+    return;
+  }
+  list.sort((a, b) => (b.at || 0) - (a.at || 0));
+  $('o-fb').textContent = list.length ? nf(list.length) + ' feedback messages' : 'no feedback yet';
+  $('s-feedback').innerHTML = list.length ? list.slice(0, 30).map(x => `<div class="cm"><b>${esc(x.email || 'no email')}</b> <span class="mute small">· ${x.at ? new Date(x.at).toLocaleString() : ''}</span>${x.email ? ` · <a href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Re: your feedback - Games Crusher 97')}">reply by email</a>` : ''}<div>${esc(x.text || '')}</div></div>`).join('') : '<p class="mute">No feedback yet.</p>';
 }
 
 /* ---------- small bar chart ---------- */

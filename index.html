@@ -4682,11 +4682,8 @@ if (fbForm) fbForm.addEventListener("submit", async e => {
   if (Date.now() - (+store.get("gc97fb") || 0) < 60000) { out.textContent = "Please wait a minute before sending again."; return; }
   btn.disabled = true; out.textContent = "Sending...";
   try {
-    // goes to the admin inbox (shown on the Site Admin page and the Glass Marble Balls admin page)
-    const [{ initializeApp: initA, getApps }, { getFirestore, collection, addDoc }] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"), import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")]);
-    const gapp = getApps().find(x => x.name === "inbox") || initA({ apiKey: "AIzaSyAAvFOwm_atM_GW2YljMcYQ5-yuHKPsB1E", authDomain: "glass-marble-balls.firebaseapp.com", projectId: "glass-marble-balls", appId: "1:35109064745:web:7f844923b50914d0930c38" }, "inbox");
-    await addDoc(collection(getFirestore(gapp), "feedback"), { text: msg.slice(0, 2000), email: em.slice(0, 100), name: "Website visitor", at: Date.now(), appVersion: "website", device: "web", status: "new" });
+    // saved in the website's own database; only the website admin page (Site Admin) can read it
+    await set(push(ref(db, "feedback")), { email: em.slice(0, 100), message: msg.slice(0, 2000), ts: Date.now() });
     store.set("gc97fb", Date.now()); fbForm.reset(); out.textContent = "Thanks! Your feedback was sent.";
   } catch (err) { out.textContent = "Could not send right now. Please try again."; }
   btn.disabled = false;
