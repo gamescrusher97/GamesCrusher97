@@ -185,13 +185,13 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
   <section class="tab" id="tab-dl">
     <div class="boxes">
       <div class="box good"><b id="d-total">–</b><span>Total downloads (all apps, all stores)</span></div>
-      <div class="box"><b id="d-30">–</b><span>New on Play (last 30 days)</span></div>
+      <div class="box"><b id="d-30">–</b><span>New downloads (last 30 days)</span></div>
       <div class="box"><b id="d-active">–</b><span>On phones now</span></div>
     </div>
     <div class="card">
       <h2>⬇️ Per app</h2>
       <div class="scroll"><table id="d-table"></table></div>
-      <p class="help" style="margin:8px 0 0">From Play Console (updated once a day). New apps appear by themselves. Google never shares <b>who</b> downloaded — only how many and from which country.</p>
+      <p class="help" style="margin:8px 0 0">Every store together (Google Play, Huawei, Uptodown, the website and any new store), updated once a day. New apps appear by themselves. Google never shares <b>who</b> downloaded — only how many and from which country.</p>
     </div>
     <div class="card">
       <h2>📈 New installs per day <span class="pill">LAST 30 DAYS</span> <select id="d-app" style="margin-left:auto;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font:inherit"><option value="">All apps</option></select></h2>
@@ -671,22 +671,18 @@ async function loadInstalls() {
   // every store for every app (Play, Huawei, Uptodown, website clicks) — same numbers as the app admin pages
   const tok = await auth.currentUser.getIdToken();
   const ST = await Promise.all(pk.map(k => fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/storeDownloads', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify({ pkg: k, name: appName(k) }) }).then(x => x.json()).catch(() => null)));
-  const cell = x => x && x.available !== false && x.total != null ? nf(x.total) : '<span class="mute">–</span>';
-  // APKPure, Aptoide and any store added later on the server: real numbers are added, "listed only" stores show their name
-  const others = list => { const on = (list || []).filter(o => o && o.available); if (!on.length) return '<span class="mute">–</span>';
-    const num = on.filter(o => o.total != null).reduce((t, o) => t + o.total, 0), names = on.map(o => esc(o.name) + (o.total == null ? ' ✔' : '')).join(', ');
-    return (on.some(o => o.total != null) ? nf(num) + '<br>' : '') + '<small class="mute">' + names + '</small>'; };
-  const rows = pk.map((k, i) => { const p = r[k], m = p.daily.reduce((s, x) => s + x.i, 0), name = appName(k), st = ST[i] || {};
+  const rows = pk.map((k, i) => { const p = r[k], st = ST[i] || {}, name = appName(k);
     const all = st.total != null ? st.total : p.totalInstalls;
+    const m = p.daily.reduce((s, x) => s + x.i, 0) + ((st.huawei && st.huawei.available !== false && st.huawei.last30) || 0);
     tot += all; n30 += m; act += p.activeDevices; revs += p.reviews30;
     if (p.rating) { sw += p.rating * Math.max(1, p.totalInstalls); sn += Math.max(1, p.totalInstalls); }
-    return `<tr><td>${esc(name)}</td><td class="n">${nf(p.totalInstalls)}</td><td class="n">${cell(st.huawei)}</td><td class="n">${cell(st.uptodown)}</td><td class="n">${cell(st.website)}</td><td class="n">${others(st.others)}</td><td class="n"><b>${nf(all)}</b></td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
+    return `<tr><td>${esc(name)}</td><td class="n"><b>${nf(all)}</b></td><td class="n">${nf(m)}</td><td class="n">${nf(p.activeDevices)}</td><td class="n">${p.rating ? p.rating.toFixed(2) + ' ★' : '–'}</td><td class="n">${nf(p.reviews30)}</td></tr>`; });
   const has = pk.length > 0;
   $('d-total').textContent = $('o-inst').textContent = has ? nf(tot) : '–';
-  $('d-30').textContent = has ? nf(n30) : '–'; $('o-new').textContent = has ? '+' + nf(n30) + ' new on Play in 30 days' : '';
+  $('d-30').textContent = has ? nf(n30) : '–'; $('o-new').textContent = has ? '+' + nf(n30) + ' new in 30 days' : '';
   $('d-active').textContent = has ? nf(act) : '–';
   $('o-star').textContent = sn ? (sw / sn).toFixed(2) + ' ★' : '–'; $('o-rev').textContent = has ? nf(revs) + ' reviews (2 months)' : '';
-  T.innerHTML = '<tr><th>App</th><th class="n">▶️ Play</th><th class="n">🟥 Huawei</th><th class="n">⬇️ Uptodown</th><th class="n">🌐 Website</th><th class="n">🧩 Other stores</th><th class="n">⭐ Total</th><th class="n">Play last 30 days</th><th class="n">On phones now</th><th class="n">Play rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="10" class="mute">No Play reports found yet (they appear about a day after installs).</td></tr>');
+  T.innerHTML = '<tr><th>App</th><th class="n">⭐ Total downloads</th><th class="n">New (30 days)</th><th class="n">On phones now</th><th class="n">Rating</th><th class="n">Reviews</th></tr>' + (rows.join('') || '<tr><td colspan="6" class="mute">No reports found yet (they appear about a day after installs).</td></tr>');
   const sel = $('d-app'), keep = sel.value;
   sel.innerHTML = '<option value="">All apps</option>' + pk.map(k => `<option value="${esc(k)}">${esc(appName(k))}</option>`).join('');
   if (pk.includes(keep)) sel.value = keep;
@@ -747,5 +743,12 @@ function allow() {
 }
 $('btn-link').onclick = allow; $('btn-link2').onclick = allow;
 </script>
+<!-- gc-nobreak: keep "Games Crusher 97", "Sahil Sheemar" and the email on one line -->
+<style>.gc-nb{white-space:nowrap}</style>
+<script>(function(){var RX=/Games\s+Crusher\s+97|Sahil\s+Sheemar/gi,EM=/gamescrusher97@gmail\.com/i,SKIP=/^(SCRIPT|STYLE|TEXTAREA|TITLE|NOSCRIPT)$/;
+function fixText(t){var p=t.parentNode;if(!p||SKIP.test(p.nodeName)||p.isContentEditable)return;var s=t.data,s2=s.replace(RX,function(m){return m.replace(/\s+/g,' ')});if(s2!==s)t.data=s2;
+if(p.classList&&p.classList.contains('gc-nb'))return;var m=EM.exec(t.data);if(m){var mid=t.splitText(m.index);mid.splitText(m[0].length);var sp=document.createElement('span');sp.className='gc-nb';p.insertBefore(sp,mid);sp.appendChild(mid);}}
+function fix(root){if(!root)return;if(root.nodeType===3){fixText(root);return;}if(root.nodeType!==1||SKIP.test(root.nodeName))return;var w=document.createTreeWalker(root,4,null),n,a=[];while((n=w.nextNode()))a.push(n);a.forEach(fixText);}
+fix(document.body);new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')fixText(m.target);else m.addedNodes.forEach(fix);});}).observe(document.body,{childList:true,subtree:true,characterData:true});})();</script>
 </body>
 </html>

@@ -1008,4 +1008,11 @@ body.gfx-low .evc-sp{ display:none; }
   setTimeout(notApp, 4000);
 })();
 </script>
+<!-- gc-nobreak: keep "Games Crusher 97", "Sahil Sheemar" and the email on one line -->
+<style>.gc-nb{white-space:nowrap}</style>
+<script>(function(){var RX=/Games\s+Crusher\s+97|Sahil\s+Sheemar/gi,EM=/gamescrusher97@gmail\.com/i,SKIP=/^(SCRIPT|STYLE|TEXTAREA|TITLE|NOSCRIPT)$/;
+function fixText(t){var p=t.parentNode;if(!p||SKIP.test(p.nodeName)||p.isContentEditable)return;var s=t.data,s2=s.replace(RX,function(m){return m.replace(/\s+/g,' ')});if(s2!==s)t.data=s2;
+if(p.classList&&p.classList.contains('gc-nb'))return;var m=EM.exec(t.data);if(m){var mid=t.splitText(m.index);mid.splitText(m[0].length);var sp=document.createElement('span');sp.className='gc-nb';p.insertBefore(sp,mid);sp.appendChild(mid);}}
+function fix(root){if(!root)return;if(root.nodeType===3){fixText(root);return;}if(root.nodeType!==1||SKIP.test(root.nodeName))return;var w=document.createTreeWalker(root,4,null),n,a=[];while((n=w.nextNode()))a.push(n);a.forEach(fixText);}
+fix(document.body);new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')fixText(m.target);else m.addedNodes.forEach(fix);});}).observe(document.body,{childList:true,subtree:true,characterData:true});})();</script>
 </body></html>
