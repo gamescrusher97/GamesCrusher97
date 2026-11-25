@@ -240,6 +240,11 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
       <div class="scroll"><table id="u-web"></table></div>
       <p class="help" style="margin:8px 0 0">Prices are Google's. Money is shown in AED. The website server runs on Google's pay-as-you-go plan, so it stays free while it is under the free amounts above.</p>
     </div>
+    <div class="card">
+      <h2>🖼️ Photo to Prompt (AI photo tool) <span class="pill">FREE LIMIT</span></h2>
+      <div id="u-ai"><p class="mute">Loading…</p></div>
+      <p class="help" style="margin:8px 0 0">The AI key is in a Google project with <b>no payment card</b>, so this tool can never cost money. When today's free amount is used up, the tool shows "come back tomorrow" until the reset. Background Remover, PDF Tools, Image Compressor, QR and the other tools run inside the visitor's own phone or computer: unlimited and free.</p>
+    </div>
   </section>
 
   <!-- MESSAGES TO THE WEBSITE -->
@@ -401,7 +406,7 @@ async function loadSrv() {
     $('o-srv').textContent = 'AED ' + aed.toFixed(2); $('o-srv').style.color = usd > 0.001 ? '#ff7a7a' : '#3ddc84';
     $('o-srv-s').textContent = nf(calls) + ' calls · ' + (pct < 0.1 ? 'under 0.1' : pct.toFixed(1)) + '% of the free amount used' + (usd > 0.001 ? ' - above free!' : ' · free');
   }
-  const ai = AIU ? nf(AIU.used || 0) + ' today' : '–', na = ok ? '' : ' (could not read Google meters)';
+  const ai = AIU ? nf(AIU.used || 0) + ' today' + (AIU.monthUsed != null ? ' · ' + nf(AIU.monthUsed) + ' this month' : '') : '–', na = ok ? '' : ' (could not read Google meters)';
   $('u-web').innerHTML = '<tr><th>Part of the website</th><th>Used</th><th>Free amount</th><th style="text-align:right">Cost</th></tr>' +
     row('🖥️ Website server calls (live prices, stock market, Photo to Prompt)' + na, nf(calls), '2,000,000 / month', cCalls * USD_AED_SRV) +
     row('⏱️ Website server time (CPU)' + na, nf(cpu) + ' CPU-seconds', '180,000 / month', cCpu * USD_AED_SRV) +
@@ -418,7 +423,19 @@ async function loadAi() {
     const d = await (await fetch('https://us-central1-glass-marble-balls.cloudfunctions.net/photoPrompt', { cache: 'no-store' })).json();
     AIU = d; $('o-ai').textContent = nf(d.used || 0) + ' / ' + nf(d.limit || 0); if ($('u-web').innerHTML) loadSrv();
     $('o-ai-s').textContent = (d.used >= d.limit ? 'limit reached - starts again tomorrow' : nf(Math.max(0, d.limit - d.used)) + ' free left today') + ' · cost AED 0';
-  } catch (e) { $('o-ai-s').textContent = 'not available'; }
+    const left = Math.max(0, (d.limit || 0) - (d.used || 0)), pct = d.limit ? Math.min(100, (d.used || 0) / d.limit * 100) : 0;
+    const col = pct >= 100 ? '#ff7a7a' : pct >= 80 ? '#ffd86f' : '#3ddc84';
+    const days = Object.entries(d.days || {}).sort(), best = days.reduce((m, x) => x[1] > m[1] ? x : m, ['', 0]);
+    const nDays = days.length ? Math.max(1, +String(d.day || '').slice(8, 10) || days.length) : 0;
+    const reset = d.resetsAt ? new Date(d.resetsAt).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'midnight (USA Pacific time)';
+    $('u-ai').innerHTML = `<div class="boxes">
+        <div class="box ${pct >= 100 ? '' : 'good'}"><b style="color:${col}">${nf(d.used || 0)} / ${nf(d.limit || 0)}</b><span>Photos today</span><small>${nf(left)} left today · starts again ${esc(reset)}</small></div>
+        <div class="box blue"><b>${d.monthUsed != null ? nf(d.monthUsed) : '–'}</b><span>Photos this month</span><small>${nDays ? 'about ' + nf(Math.round((d.monthUsed || 0) / nDays)) + ' a day' + (best[1] ? ' · busiest day ' + esc(best[0].slice(5)) + ': ' + nf(best[1]) : '') : 'no photos yet'}</small></div>
+        <div class="box good"><b>AED 0.00</b><span>Cost</span><small>no payment card · can never be charged</small></div>
+      </div>
+      <div style="height:8px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin:4px 0 6px"><div style="height:100%;width:${pct.toFixed(1)}%;background:${col}"></div></div>
+      <p class="help" style="margin:0">Limit: ${nf(d.limit || 0)} photos a day for all visitors together, and ${nf(d.perVisitor || 15)} a day per visitor.</p>`;
+  } catch (e) { $('o-ai-s').textContent = 'not available'; if ($('u-ai')) $('u-ai').innerHTML = '<p class="mute">Could not read the Photo to Prompt numbers right now.</p>'; }
 }
 async function loadNews() {
   const admin = isSiteAdmin();
