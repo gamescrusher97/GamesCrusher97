@@ -233,17 +233,15 @@ table tr:hover td{ background:rgba(255,255,255,.025); }
   <section class="tab" id="tab-usage">
     <div class="boxes">
       <div class="box good"><b id="u-total">–</b><span>💰 Website cost this month</span><small id="u-total-s">everything below together</small></div>
+      <div class="box good"><b id="u-ai-today">–</b><span>🖼️ Photo to Prompt today</span><small id="u-ai-today-s">free AI limit</small><div style="height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin:8px 6px 0"><div id="u-ai-bar" style="height:100%;width:0;background:#3ddc84"></div></div></div>
+      <div class="box blue"><b id="u-ai-month">–</b><span>🖼️ Photo to Prompt this month</span><small id="u-ai-month-s">photos made</small></div>
+      <div class="box blue"><b id="u-calls">–</b><span>🖥️ Server calls this month</span><small id="u-calls-s">of 2,000,000 free</small></div>
     </div>
     <div class="card">
       <h2>💰 Website usage &amp; costs <span class="pill">THIS MONTH</span></h2>
       <p class="help">Only the website (gamescrusher97.com). Every app and game shows its own usage on its own admin page.</p>
       <div class="scroll"><table id="u-web"></table></div>
-      <p class="help" style="margin:8px 0 0">Prices are Google's. Money is shown in AED. The website server runs on Google's pay-as-you-go plan, so it stays free while it is under the free amounts above.</p>
-    </div>
-    <div class="card">
-      <h2>🖼️ Photo to Prompt (AI photo tool) <span class="pill">FREE LIMIT</span></h2>
-      <div id="u-ai"><p class="mute">Loading…</p></div>
-      <p class="help" style="margin:8px 0 0">The AI key is in a Google project with <b>no payment card</b>, so this tool can never cost money. When today's free amount is used up, the tool shows "come back tomorrow" until the reset. Background Remover, PDF Tools, Image Compressor, QR and the other tools run inside the visitor's own phone or computer: unlimited and free.</p>
+      <p class="help" style="margin:8px 0 0">Prices are Google's. Money is shown in AED. The website server runs on Google's pay-as-you-go plan, so it stays free while it is under the free amounts above. Background Remover, PDF Tools, Image Compressor, QR and the other tools run inside the visitor's own phone or computer: unlimited and free.</p>
     </div>
   </section>
 
@@ -411,10 +409,11 @@ async function loadSrv() {
     row('🖥️ Website server calls (live prices, stock market, Photo to Prompt)' + na, nf(calls), '2,000,000 / month', cCalls * USD_AED_SRV) +
     row('⏱️ Website server time (CPU)' + na, nf(cpu) + ' CPU-seconds', '180,000 / month', cCpu * USD_AED_SRV) +
     row('🧠 Website server memory' + na, nf(mem) + ' GB-seconds', '360,000 / month', cMem * USD_AED_SRV) +
-    row('🖼️ Photo to Prompt AI (Google Gemini)', ai, (AIU ? nf(AIU.limit) : '–') + ' / day', 0, 'Uses a Google project with no payment card, so it can never cost money. When the free amount ends, it stops until tomorrow.') +
+    row('🖼️ Photo to Prompt AI (Google Gemini)', ai, (AIU ? nf(AIU.limit) : '–') + ' / day', 0, 'Google project with no payment card: it can never cost money. ' + (AIU ? nf(AIU.perVisitor || 15) + ' photos a day per visitor. ' : '') + 'When the daily amount ends, the tool says "come back tomorrow" until the reset.') +
     row('🗄️ Website database (ratings, comments, feedback, visits, messages)', 'free plan', 'Spark plan', 0, 'The website database is on Google\'s free Spark plan: nothing can ever be charged.') +
     row('🌐 Website hosting (GitHub Pages) and price data (CoinGecko, Yahoo Finance, Open-Meteo, TradingView)', '–', 'free', 0) +
     `<tr><th colspan="3">Total this month</th><th style="text-align:right">AED ${aed.toFixed(2)}</th></tr>`;
+  if (ok) { const cp = calls / SRV_FREE.calls * 100; $('u-calls').textContent = nf(calls); $('u-calls-s').textContent = (cp < 0.1 ? 'under 0.1' : cp.toFixed(1)) + '% of 2,000,000 free'; }
   $('u-total').textContent = 'AED ' + aed.toFixed(2); $('u-total').style.color = usd > 0.001 ? '#ff7a7a' : '#3ddc84';
   $('u-total-s').textContent = usd > 0.001 ? 'above the free amounts!' : 'free - under all free amounts';
 }
@@ -425,17 +424,14 @@ async function loadAi() {
     $('o-ai-s').textContent = (d.used >= d.limit ? 'limit reached - starts again tomorrow' : nf(Math.max(0, d.limit - d.used)) + ' free left today') + ' · cost AED 0';
     const left = Math.max(0, (d.limit || 0) - (d.used || 0)), pct = d.limit ? Math.min(100, (d.used || 0) / d.limit * 100) : 0;
     const col = pct >= 100 ? '#ff7a7a' : pct >= 80 ? '#ffd86f' : '#3ddc84';
-    const days = Object.entries(d.days || {}).sort(), best = days.reduce((m, x) => x[1] > m[1] ? x : m, ['', 0]);
-    const nDays = days.length ? Math.max(1, +String(d.day || '').slice(8, 10) || days.length) : 0;
-    const reset = d.resetsAt ? new Date(d.resetsAt).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'midnight (USA Pacific time)';
-    $('u-ai').innerHTML = `<div class="boxes">
-        <div class="box ${pct >= 100 ? '' : 'good'}"><b style="color:${col}">${nf(d.used || 0)} / ${nf(d.limit || 0)}</b><span>Photos today</span><small>${nf(left)} left today · starts again ${esc(reset)}</small></div>
-        <div class="box blue"><b>${d.monthUsed != null ? nf(d.monthUsed) : '–'}</b><span>Photos this month</span><small>${nDays ? 'about ' + nf(Math.round((d.monthUsed || 0) / nDays)) + ' a day' + (best[1] ? ' · busiest day ' + esc(best[0].slice(5)) + ': ' + nf(best[1]) : '') : 'no photos yet'}</small></div>
-        <div class="box good"><b>AED 0.00</b><span>Cost</span><small>no payment card · can never be charged</small></div>
-      </div>
-      <div style="height:8px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin:4px 0 6px"><div style="height:100%;width:${pct.toFixed(1)}%;background:${col}"></div></div>
-      <p class="help" style="margin:0">Limit: ${nf(d.limit || 0)} photos a day for all visitors together, and ${nf(d.perVisitor || 15)} a day per visitor.</p>`;
-  } catch (e) { $('o-ai-s').textContent = 'not available'; if ($('u-ai')) $('u-ai').innerHTML = '<p class="mute">Could not read the Photo to Prompt numbers right now.</p>'; }
+    const days = Object.entries(d.days || {}), nDays = Math.max(1, +String(d.day || '').slice(8, 10) || 1), avg = (d.monthUsed || 0) / nDays;
+    const reset = d.resetsAt ? new Date(d.resetsAt).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'tomorrow';
+    $('u-ai-today').textContent = nf(d.used || 0) + ' / ' + nf(d.limit || 0); $('u-ai-today').style.color = col;
+    $('u-ai-today-s').textContent = nf(left) + ' left · resets ' + reset;
+    $('u-ai-bar').style.width = pct.toFixed(1) + '%'; $('u-ai-bar').style.background = col;
+    $('u-ai-month').textContent = d.monthUsed != null ? nf(d.monthUsed) : '–';
+    $('u-ai-month-s').textContent = days.length ? (avg < 1 ? 'less than 1 a day' : 'about ' + nf(Math.round(avg)) + ' a day') + ' · AED 0' : 'no photos yet · AED 0';
+  } catch (e) { $('o-ai-s').textContent = 'not available'; if ($('u-ai-today-s')) $('u-ai-today-s').textContent = 'not available right now'; }
 }
 async function loadNews() {
   const admin = isSiteAdmin();
